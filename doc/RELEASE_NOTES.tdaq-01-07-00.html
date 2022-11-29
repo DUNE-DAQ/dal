@@ -1,0 +1,170 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>New Page 1</title>
+</head>
+
+<body>
+
+<h4>Generation of Release-Installation-Path variables</h4>
+<p>Add attribute <i>SW_Repository::InstallationPathVariableName</i> to define 
+name of process environment variable and substitution parameter, pointing to the 
+release installation. Such variables and parameters are automatically created by 
+DAL algorithms for each software repository used by an application.</p>
+<p>One of such variable is TDAQ_INST_PATH. There will be no need to define in 
+the database or remember about it's value synchronization with sw repository 
+installation path. It's value will be created by DAL fro each application from 
+TDAQ release sw repository or for each application using TDAQ sw repository. 
+Similar variable can be generated for detectors, e.g. to create TILE_INST_PATH 
+variable one has to set&nbsp; InstallationPathVariableName = &quot;TILE_INST_PATH&quot; 
+for sw repositoty object describing Tile release.</p>
+<p>When non-TDAQ release is described in the config database and installation 
+path variable is required, an appropriate name of the variable has to be put 
+into sw repository object and the variable has to be removed from database, if 
+it was already defined.<br>
+<br>
+The change affects dal schema, dal library and <i>dal_create_sw_repository</i> 
+application. The latter one introduces new parameter to specify name of the 
+generated variable, that is already used by the DAQRelease package.</p>
+<h4>Description of IGUI Properties</h4>
+<p>There is a proposal to improve IGUI configuration, which will be used in next 
+tdaq-01-08 release. The functionality described in this section already has been 
+implemented in the dal package and users are welcome for suggestions on it's 
+improvements.</p>
+<h5>Introduction</h5>
+<p>Different detectors and TDAQ sub-systems develop own plug-ins for IGUI. 
+Before a new run, where different detectors and systems are participating, one 
+has to modify manually IGUI start script and to define which plug-ins and jar 
+files need to be used for next run. The improvement suggestion is to put 
+information about plug-ins and jars into Configuration database and to setup 
+IGUI transparently for users taking into account which systems and detectors are 
+participation in the run.<br>
+<br>
+The original proposal is the following:</p>
+<ul>
+	<li>associate description of IGUI properties and jar files with applications 
+	(better with sw objects), providing input information to IGUI plug-in;</li>
+	<li>if such application is running for given partition, IGUI properties and 
+	jar files associated with applications needs to be applied to IGUI setup;</li>
+	<li>modify IGUI (or it's start script) to dynamically calculate above 
+	parameters for given partition.</li>
+</ul>
+Since many detectors are using RCD and we do not have description of C++ 
+plug-ins used by that framework, the only level of granularity we can use is the 
+software repository (and not a sw object or application). By this reason it is 
+proposed to put description of IGUI's properties and jar files on the level sw 
+repository description and assume, if a sw repository is used, then associated 
+IGUI plug-ins need to be configured and displayed.<br>
+<br>
+Note, similar approach is used which IS info description files need to be loaded 
+by the is-info rdb server.<h5>Schema Changes</h5>
+<ul>
+	<li>new multi-value string attribute <i>SW_Repository::IGUIProperties</i> 
+	has been added to the core config schema;</li>
+	<li>for Java plug-ins we already have <i>JarFile</i><b> </b>class linked 
+	with repository' sw objects.</li>
+</ul>
+<h5>DB Population</h5>
+<p>The new attribute is filled by the <i>dal_create_sw_repository</i> utility, 
+when a user puts into cmt requirements file the following macro:</p>
+<blockquote>
+	<tt>macro sw.repository.igui-properties.<b>a_name</b>: &quot;<b>a_value</b>&quot;</tt></blockquote>
+Above <b>a_name</b> is any logical non-empty name you like and <b>a_value</b> 
+will be added to the value of corresponding <i>SW_Repository::IGUIProperties</i> 
+attribute. For example:<blockquote>
+	<tt>macro sw.repository.igui-properties.<b>logfile</b>: &quot;<b>-Digui.logfile=${TDAQ_LOGS_PATH}/igui.out</b>&quot;</tt></blockquote>
+If one needs to fill <i>SW_Repository::IGUIProperties</i> attribute for a 
+detector or a sub-system, this has to be done manually using oks data editor or 
+by some script.<br>
+<br>
+For jar files used by the IGUI, it is assumed that we have to use all ones, 
+which are put into used sw repository objects.<h5>How to get IGUI properties</h5>
+<p>There is a new binary called <i>dal_get_igui_setup</i>. It reads the 
+configuration description for given partition, finds all used sw repositories, 
+builds space-separated list of IGUI properties and colon-separated list of jar 
+files and set these two lists to some environment variables using sh or csh 
+syntax as shown below:</p>
+<blockquote>
+	<tt><font color="#000066">bash$ dal_get_igui_setup -d oksconfig:daq/partitions/be_test.data.xml 
+	-p be_test -s <b>sh</b></font><br>
+	export __IGUI_PROPERTIES__=&quot;-Digui.logfile=/tmp/test_logs/be_test/igui.out&quot;<br>
+	export __IGUI_CLASSPATH__=&quot;/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/ClipsServer.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/DFdal.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/config.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/dal.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/igui.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/mrs.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/oksconfig.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/pmg.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/rdbconfig.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/rm.jar&quot;</tt></blockquote>
+<blockquote>
+	<tt><font color="#000066">tcsh$ dal_get_igui_setup -d rdbconfig:RDB -p 
+	be_test -s <b>csh</b></font><br>
+	setenv&nbsp; __IGUI_PROPERTIES__ &quot;-Digui.logfile=/tmp/test_logs/be_test/igui.out&quot;<br>
+	setenv __IGUI_CLASSPATH__ &quot;/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/ClipsServer.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/DFdal.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/config.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/dal.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/igui.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/mrs.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/oksconfig.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/pmg.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/rdbconfig.jar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	/afs/cern.ch/atlas/project/tdaq/cmt/nightly/installed/share/lib/rm.jar&quot;</tt></blockquote>
+<h5>To be done by setup or IGUI developers</h5>
+<p>This <i>dal_get_igui_setup</i><b> </b>needs to be used by setup or igui start 
+script to add values of above two variables to appropriate IGUI parameters (i.e. 
+list of properties passed to java and to be pre-pended to CLASSPATH).</p>
+<h4>Schema Changes</h4>
+<p>Below there are schema changes not described above:</p>
+<ul>
+	<li>add relation <i>MasterTrigger</i> to the <i>Partition</i> class</li>
+	<li>removed obsolete compiler and platform tags: <i>x86_64-slc3</i>, <i>
+	icc8-opt</i>, <i>icc8-dbg</i></li>
+	<li>replace <i>gcc345</i> and <i>gcc344</i> by <i>gcc34</i> in accordance 
+	with CMT policy changes</li>
+</ul>
+<h4>API Changes</h4>
+<ul>
+	<li>the algorithms substituting variables generate <i>daq::config::Generic</i> 
+	exception instead of <i>daq::core::no_substitution</i> and <i>
+	daq::bad_substitution</i> when a parameter cannot be substituted;</li>
+	<li><i>get_info get_parameters()</i> and <i>get_some_info get_environment()</i> 
+	algorithms are throwing <i>daq::core::BadApplicationInfo</i> and <i>
+	daq::core::BadProgramInfo</i> exceptions derived from the <i>daq::core::AlgorithmError</i> 
+	base exception.</li>
+</ul>
+<h4>Bug Fixes</h4>
+<ul>
+	<li>use <i>UID </i>instead of name to get message passing <i>NodeID</i> 
+	since it is used is such way by the Run Control;</li>
+	<li>when calculate used sw repositories, take into account ones used by sw 
+	repository via <i>Uses</i> relationship;</li>
+	<li>when fill list of objects referenced by the partition object to be 
+	preloaded for performance improvements, add the partition object itself</li>
+</ul>
+
+</body>
+
+</html>

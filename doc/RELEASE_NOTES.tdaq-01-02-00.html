@@ -1,0 +1,55 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Schema Changes</title>
+</head>
+
+<body>
+
+<h4>Schema Changes</h4>
+<ul>
+  <li>create boolean <i>Application::Logging</i> attribute to indicate whether the
+    standard output of this application shall be piped to <i> /dev/null</i> or stored in a log
+    file</li>
+  <li>modify method <i>Application::get_output_error_device()</i> to return
+    value of the <i>Logging</i> attribute</li>
+  <li>create integer <i>RunControlApplication::ProbeInterval </i>attribute to
+    define at what interval (in seconds) a controller shall probe its children</li>
+  <li>create integer <i>RunControlApplication::FullStatisticsInterval</i>
+    attribute to define at what time interval (in seconds) the controller shall
+    request complete operational statistics to its children</li>
+  <li>create 0 to N <i>Segment::Infrastructure</i> relationship to describe
+    infrastructure applications, which are started before any other applications
+    from given and all included segments</li>
+</ul>
+<h4>Algorithms Changes</h4>
+<ul>
+  <li>the algorithms <i>Application::get_some_parameters()</i> and <i>Component::get_parents()</i>
+    can use path queries (see <a href="#oks">oks</a> changes for more
+    information) to find&nbsp; list of parents segments; since the query is
+    executed on the server, that improves performance for a big configuration
+    reducing number of objects read from RDB server by above algorithms; the
+    path queries are used by the DAL algorithms, if environment &quot;<i>DAL_USE_PATH_QUERY</i>&quot;
+    is defined, otherwise old approach (i.e. segment's tree iteration) is used</li>
+  <li>the algorithms take into account applications of <i>Segment::Infrastructure</i>
+    and <i>OnlineSegment::PartitionIndependentApplications</i> relationships</li>
+  <li>fix the problem of substitution of the dependent variables values: if two
+    dependent parameters <i>A='X'</i> and <i>B='${A}Y'</i> are also used as
+    environment variables, then the values of those variables were not
+    substituted as expected, i.e. they were <i>A='X'</i> and <i>B='${A}Y'</i>
+    instead of <i>A='X'</i> and <i>B='XY'</i></li>
+</ul>
+<h4>Utilities</h4>
+<ul>
+  <li>the utility <i>dal_load_is_info_files</i> checks repository root for is
+    info files</li>
+</ul>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

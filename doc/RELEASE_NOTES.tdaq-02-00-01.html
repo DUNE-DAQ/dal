@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+ xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta http-equiv="Content-Language" content="en-gb">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Untitled 1</title>
+</head>
+<body>
+<h4><span style="font-weight: bold;"></span>Message Passing Node ID</h4>
+<ul>
+  <li>Add calculation of the message passing Node ID for message
+passing resources, which are not applications, i.e.</li>
+  <ul>
+    <li>the object has to be linked with segment's or resource-set's
+resources</li>
+    <li>one of it's base classes has to be "<span
+ style="font-style: italic;">DFMessagePassingNode</span>" class</li>
+    <li>it cannot be casted to "<span style="font-style: italic;">BaseApplication</span>"
+class</li>
+    <li>example: objects of "<span style="font-style: italic;">RobinReadoutModule</span>"
+class from data-flow schema linked as resources</li>
+  </ul>
+  <li>Rename unused <span style="font-style: italic;">daq::Application::ROB</span>
+type to <span style="font-style: italic;">daq::Application::ROBIN</span>
+to support above application types</li>
+</ul>
+<h4>Disabled Algorithm</h4>
+<h5>1. Remove obsolete check_parents parameter</h5>
+C++ and Java code have to use disabled() algorithm with the only
+parameter pointing to the partition object. Second parameter
+check_parents has to be removed (note, the second parameter was
+optional in C++). The disable status of parents is always taken inot
+account.<br>
+<br>
+<h5>2. Implement why_disabled() algorithm in Java</h5>
+As requested by <a class="moz-txt-link-freetext"
+ href="https://savannah.cern.ch/bugs/?34962">https://savannah.cern.ch/bugs/?34962</a>,
+the Component
+class implements why_disabled() algorithm to provide textual
+description of a reason to disable given resource or segment, e.g.:<br>
+<ul>
+  <li>explicitly disabled resource:<br>
+    <font color="#000066"><tt>&nbsp;&nbsp; object
+'BCM_ROD_Spare@BCM_ROD_Module'
+is disabled because<br>
+&nbsp; &nbsp;&nbsp; it is explicitly disabled<br>
+    <br>
+    </tt></font></li>
+  <li>disabled because of direct parent:<br>
+    <tt><font color="#000066">&nbsp;&nbsp; object
+'TRTBarrelC_LTP_BusyChannel_BC0@BusyChannel' is disabled because<br>
+&nbsp;&nbsp;&nbsp;&nbsp; it's parent TRTBarrelC_LTP@LTPModule is
+disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it is explicitly disabled<br>
+    </font></tt><br>
+  </li>
+  <li>disabled because of chain of parents:<br>
+    <font color="#000066"><tt>&nbsp;&nbsp; object
+'PixelL12_TIM4_busy@BusyChannel' is disabled because<br>
+&nbsp;&nbsp;&nbsp;&nbsp; it's parent PixelL12_RODBusy@RODBusyModule is
+disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it's parent PixelL12_LTP@LTPModule
+is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it's parent
+PixelDisks_LTP@LTPModule is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it's
+parent PixelL0_LTP@LTPModule is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it's parent PixelLTPi_Global@LTPiModule is disabled
+because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it's parent RCDPixelTtcCratePitL0@RCD is disabled
+because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it's parent PixelTtcCrateBLayer@Segment is disabled
+because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it's parent Pixel@Segment is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it is explicitly disabled<br>
+    <br>
+    </tt></font></li>
+  <li>resource-set OR disabling:<br>
+    <font color="#000066"><tt>&nbsp;&nbsp; object
+'ROS-TIL-LBC-ROL-16@ResourceSetOR' is disabled because<br>
+&nbsp;&nbsp;&nbsp;&nbsp; it is "resource-set-OR" and at least one child
+TileLaserModule@TileLaserModule is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it's parent TileLaserRCD@RCD is
+disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it is explicitly
+disabled</tt></font><br>
+    <br>
+  </li>
+  <li>resource-set AND disabling (dummy example):<br>
+    <font color="#000066"><tt>&nbsp;&nbsp; object
+'ROBIN-TRT-ECC-03-3@RobinReadoutModule' is disabled because<br>
+&nbsp;&nbsp;&nbsp;&nbsp; it is "resource-set-AND" and all children (2)
+are disabled:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [1] component
+ROL-TRT-ECC-03-341402@RobinDataChannel is disabled
+because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it's parent
+rod341402_ResourceSet@ResourceSetOR is disabled
+because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it is
+"resource-set-OR" and at least one child
+rod341402@TRTROD05Module is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+it is explicitly disabled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [2] component
+dummy@RobinDataChannel is disabled because:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it is explicitly
+disabled</tt></font></li>
+</ul>
+See <a
+ href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/DAQ/online/dal/jexamples/TestDisabled.java?root=atlastdaq&amp;view=markup">dal/jexamples/TestDisabled.java</a>
+for example of usage.<br>
+<br>
+<h5>3. Set used disabled and enabled components in Java</h5>
+Like in C++, DAL implements two dal.Partition algorithms to set
+temporarily disabled or enabled components:<br>
+<br>
+<tt><font color="#003300"><i>&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; The method temporarily marks given
+components as 'disabled'<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; without modifying partition object in
+database.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; Above is overwritten by consequent
+set_disabled() call.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; It is automatically clean when
+database is updated or reload.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; @param objs&nbsp; vector of components
+to be temporarily disabled.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */</i></font><br>
+<br>
+&nbsp; <b>public void set_disabled(dal.Component objs[])</b> ...<br>
+<font color="#003300"><i><br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; The method temporarily marks given
+components as 'enabled'<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; without modifying partition object in
+database.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; Above is overwritten by consequent
+set_enabled() call.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; It is automatically clean when
+database is updated or reload.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp; @p</i></font>aram objs&nbsp; vector of
+components to be temporarily
+enabled.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+<br>
+&nbsp; <b>public void set_enabled(dal.Component objs[])</b> ...</tt><br>
+<br>
+See <a
+ href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/DAQ/online/dal/jexamples/TestDisabled.java?root=atlastdaq&amp;view=markup">dal/jexamples/TestDisabled.java</a>
+for example of usage.<br>
+<br>
+<h5>4. Multiple configuration objects and user enabling/disabling in
+Java code</h5>
+Since by efficiency reasons the dal.Component.disabled() algorithm uses
+singleton map to keep information about disabled status of components,
+a user disabling/enabling changes status of components application
+wide. Also, there is a problem, when Java application creates more than
+one configuration objects and call disabled() algorithm on them (e.g.
+disabling status should be different, when IGUI works with RDB and
+RDB_RW servers and changes disabling on RDB_RW) or uses different
+partition objects.<br>
+<br>
+The problem can be solved using an object of dal.Resources class used
+to implement above mentioned singleton map. Each object of
+dal.Resources class can be used separately with configuration object,
+partition and user disabled/enabled components. In such case instead of
+using DAL algorithms of of Component and Partition class, use
+appropriate methods of dal.Resources class:<br>
+<br>
+<table border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <th valign="top">DAL algorithm<br>
+      </th>
+      <th valign="top">Appropriate method of dal.Resources class<br>
+      </th>
+    </tr>
+    <tr>
+      <td valign="top">dal.Partition.set_disabled()</td>
+      <td valign="top">public void set_disabled(dal.Component objs[])</td>
+    </tr>
+    <tr>
+      <td valign="top">dal.Partition.set_enabled()</td>
+      <td valign="top">public void set_enabled(dal.Component objs[])</td>
+    </tr>
+    <tr>
+      <td valign="top">dal.Componet.disabled()</td>
+      <td valign="top">public boolean get_disabled(dal.Component obj,
+dal.Partition p, config.Configuration db) throws
+config.SystemException, config.NotFoundException</td>
+    </tr>
+    <tr>
+      <td valign="top">dal.Componet.why_disabled() </td>
+      <td valign="top">public String why_disabled(dal.Component c,
+config.Configuration db, String prefix, boolean recursive) throws
+config.SystemException</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+For more info see file dal/jsrc/dal/Resources.java<br>
+<br>
+Example of simultaneous usage of default and user-specific Resources
+object:<br>
+<tt>config.Configuration db = new
+config.Configuration("rdbconfig:RDB");<br>
+dal.Partition p = dal.Algorithms.get_partition(db, "be_test");<br>
+<br>
+</tt><tt>config.Configuration db2 = new
+config.Configuration("rdbconfig:RDB_RW");<br>
+dal.Partition p2 = dal.Algorithms.get_partition(db2, "be_test");<br>
+<br>
+dal.Resources resources = new dal.Resources(); <font color="#003300"><i>//
+will use with </i></font></tt><font color="#003300"><i><tt>db2 scope<br>
+</tt></i></font><tt><font color="#003300"><i><br>
+&nbsp; // disable in db2 scope resources "r1" and "r2"</i></font></tt><br>
+<tt>dal.Component[] disabled_objs = new dal.Component[2];<br>
+disabled_objs[0] = dal.Component_Helper.get(db2,"r1");</tt><tt><br>
+disabled_objs[1] = dal.Component_Helper.get(db2,"r2");<br>
+resources.set_disabled(disabled_objs);<br>
+<br>
+&nbsp; <i><font color="#003300">// check status of "r1" in db and
+report
+why if disabled:</font></i><br>
+</tt><tt>dal.Component r1 = </tt><tt>dal.Component_Helper.get(db,"r1");<br>
+if(r1</tt><tt>.disabled(p)</tt><tt>) {<br>
+&nbsp; </tt><tt>System.out.println("object r1 in db1 is disabled
+because "
++ r1.</tt><tt>why_disabled("&nbsp; ", true)</tt><tt>);</tt><br>
+<tt>}</tt><br>
+<tt><br>
+</tt><tt>&nbsp; <i><font color="#003300">// check status of "r1" in
+db2
+and report why if disabled:</font></i></tt><br>
+<tt>dal.Component r1_2 = </tt><tt>dal.Component_Helper.get(db2,"r1");<br>
+</tt><tt>if(resources.get_disabled(</tt><tt>r1_2</tt><tt>, p2, db2)) {<br>
+&nbsp; </tt><tt>System.out.println("object r1 in db2 is disabled
+because "
++ </tt><tt>resources</tt><tt>.</tt><tt>why_disabled(</tt><tt>r1_2</tt><tt>,
+db2, "&nbsp; ", true)</tt><tt>);</tt>
+<ul>
+</ul>
+</body>
+</html>

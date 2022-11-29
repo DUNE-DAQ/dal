@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="content-type">
+    <title>RELEASE_NOTES</title>
+    <style>
+<!--
+pre          {  }
+-->
+  </style>
+  </head>
+  <body>
+    <h3>Changes in Core Schema</h3>
+    <h4>Back-up hosts</h4>
+    <ul>
+      <li>Move <i>BackupHosts</i> relationship from <i>InfrastructureApplication</i>
+        to <i>Application</i> class. This allows to explicitly define
+        backup hosts for any non-template application. In previous
+        releases this was only possible for infrastructure non-template
+        application.</li>
+      <li>Extend enumeration range of <i>RunsOn</i> attribute of <i>TemplateApplication</i>
+        class. New token <i>FirstHostWithBackup</i> has been added. If
+        selected, template applications will have up to two random hosts
+        from it's segment <i>Hosts</i> relationship allocated for
+        backup purposes. Note, the template applications running on all
+        hosts or all but first host have no backup hosts and cannot be
+        restarted in case of problems with their host.<br>
+      </li>
+      <li>Extend enumeration range of <i>SegmentProcEnvVarValue</i>
+        attribute of <i>InfrastructureBase</i> class. New <i>token </i><i>
+          runsOnAndBackup</i> has been added. If selected, the value of
+        generated segment-wide environment variables contains comma
+        separated list of host and backup host names. In fact this
+        feature is available since tdaq-06-01-01 release, see <a
+          href="https://its.cern.ch/jira/browse/ADHI-4155">patch
+          ADHI-4155</a> for more details. </li>
+      <li>Move algorithm <i>InfrastructureApplication::</i><i>get_backup_hosts()</i>
+        to <i>AppConfig</i> class. It returns vector of backup hosts,
+        if defined, for both normal and template applications.<br>
+      </li>
+    </ul>
+    <p>See also <a
+href="https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltRunControl#Back_up_hosts">RunControl
+        TWiki</a>.<br>
+    </p>
+    <h4>Project Tag Removal</h4>
+    <p>Remove obsolete <i>T0_ProjectTag</i> attribute from <i>OnlineSegment</i>
+      class, that has been replaced by explicit relationship from
+      partition long time ago.<br>
+    </p>
+    <h3>SW Repository Generation</h3>
+    <p>When migration from CMT to CMake release build tool will be fully
+      completed, the <i>dal_create_sw_repository</i> utility will
+      become obsolete. Still it can be used with existing <i>cmt/requiremets</i>
+      files, but one should look forward to new <a
+href="https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltCMake#Software_Repository_Generation">yaml
+        based CMake solution</a>.<br>
+    </p>
+    <h4> </h4>
+  </body>
+</html>

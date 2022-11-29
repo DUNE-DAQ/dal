@@ -1,0 +1,22 @@
+/* XPM */
+static char * resource_xpm[] = {
+"21 14 5 1",
+"  c darkgrey s BottomShadow",
+". c white s TopShadow",
+"X c lightgrey s Background",
+"o c red s Red",
+"O c green s Green",
+"                     ",
+"                    .",
+"  XXXXXXXXXXXXXXXXX..",
+"  XXXX XXXXXXX XXXX..",
+"  XXX X.XXXXX X.XXX..",
+"  XX XoX.XXX XOX.XX..",
+"  X XoXoX.X XOXOX.X..",
+"  XX XoX.XXX XOX.XX..",
+"  XXX X.XXXXX X.XXX..",
+"  XXXX XXXXXXX XXXX..",
+"  XXXXXXXXXXXXXXXXX..",
+"  XXXXXXXXXXXXXXXXX..",
+" ....................",
+"....................."};

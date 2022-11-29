@@ -1,0 +1,528 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>New Page 1</title>
+<style>
+<!--
+pre          {  }
+-->
+</style>
+</head>
+
+<body>
+
+<p>There are several important schema changes to improve TDAQ configuration 
+description:</p>
+<ul>
+	<li><b>template applications</b> to be able to describe by single database 
+	objects similar applications, which only differ by name (e.g. HLT processing 
+	tasks, EFD, SFI, controllers)</li>
+	<li><b>external packages</b> to be able to describe paths to binaries and 
+	shared libraries for a directory structure different from CMT; also describe 
+	platform-dependent environment variables</li>
+	<li><b>resource sets</b> to be able to describe a resource container 
+	changing state of inserted resources using a single operation (e.g. for interlinked 
+	resources)</li>
+	<li><b>backup hosts </b>to be able to describe spare hosts using to re-start 
+	essential infrastructure applications in case of their main hosts fail</li>
+</ul>
+<p>All such changes have been discussed during 2005 TDAQ Workshop in Mainz 
+(click
+<a href="http://agenda.cern.ch/askArchive.php?base=agenda&categ=a051610&id=a051610s12t7/transparencies">
+link</a> for more information).</p>
+<h4>Template Applications</h4>
+<p>In the past it was necessary to create one configuration database object per 
+one process running online. The total number of such processes including HLT 
+processing tasks may reach in the final system 10,000. However most of such 
+applications have very similar data values and only differ by values of few 
+attributes (usually by name). The primary idea is to describe similar 
+applications by single object and put little knowledge into DAL algorithms to 
+calculate unique attribute values. In this case we will gain storage space and 
+performance (less space, faster read, easier readable and editable).</p>
+<p>The proposal document is available from EDMS:
+<a href="https://edms.cern.ch/document/684859">
+https://edms.cern.ch/document/684859</a>. There are several extensions created 
+after document publish date, which are listed below.</p>
+<h5>How to get all applications with data collection parameters</h5>
+<p>The <i>Partition::get_all_applications()</i> algorithm is implemented for C++ 
+and Java DAL and it should be used instead 
+of old Partition::get_applications() one, that knows nothing about template 
+applications.</p>
+<p>The C++ algorithm's prototype can be found in generated <i>dal/Partition.h</i> 
+file:</p>
+<blockquote>
+	<div>
+		<font face="Courier New" size="2">void get_all_applications(std::vector&lt;daq::core::AppConfig&gt;&amp; 
+		out, Configuration&amp; db,<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::set&lt;std::string&gt; * app_types = 0,<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::set&lt;const Segment *&gt; * use_segments = 0,<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::set&lt;const Computer *&gt; * use_hosts = 0) 
+		const</font><p>where:</div>
+	<ul>
+		<li>the <i>out</i> parameter is the result of the algorithm's work (see
+		<a href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/DAQ/online/dal/dal/app-config.h?rev=HEAD&cvsroot=atlastdaq&only_with_tag=dal-01-08-01&content-type=text/vnd.viewcvs-markup">
+		dal/app-config.h</a> file for more information about <i>AppConfig</i> 
+		class to get application parameters such as: application id, data 
+		collection node id, pointers to application, segment and host 
+		configuration database objects);</li>
+		<li>the optional <i>app_types</i> parameter defines set of application 
+		class names (also takes into account their subclasses), which objects 
+		have to taken into account (use all applications, if the parameter is 
+		0);</li>
+		<li>the optional <i>use_segments</i> parameter defines set of segments, 
+		which applications have to be taken into account (use all segments, if 
+		the parameter = 0);</li>
+		<li>the optional <i>use_hosts</i> parameter defines set of hosts where 
+		the applications have to run on (use all hosts, if the parameter = 0).</li>
+	</ul>
+	<p>Above optional parameters can be combined.</p>
+</blockquote>
+<p>To test <i>get_all_applications()</i> algorithm work there is dedicated 
+binary <b>dal_dump_app_config</b>:</p>
+<blockquote>
+	<table border="0" id="table1" cellpadding="0">
+		<tr>
+			<td colspan="3"><font face="Courier New" size="2" color="#000080">Usage: 
+			<b>dal_dump_app_config</b> [-d <i>database-name</i>] -p <i>partition</i> [-t 
+	[<i>types</i> ...]] [-c [<i>ids</i> ...]] [-s [<i>ids</i> ...]]</font></td>
+		</tr>
+		<tr>
+			<td colspan="3"><font face="Courier New" size="2" color="#000080">Options/Arguments:</font></td>
+		</tr>
+		<tr>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp; --data | -d&nbsp; 
+			<i>database-name</i></font></td>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp;&nbsp;</font></td>
+			<td><font face="Courier New" size="2" color="#000080">name of the database (ignore TDAQ_DB variable)</font></td>
+		</tr>
+		<tr>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp; --partition-name | -p 
+			<i>partition</i></font></td>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp;&nbsp;</font></td>
+			<td><font face="Courier New" size="2" color="#000080">name of the partition object</font></td>
+		</tr>
+		<tr>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp; --application-types | -t 
+			<i>types</i></font></td>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp;&nbsp;</font></td>
+			<td><font face="Courier New" size="2" color="#000080">filter out all applications except given classes (and their 
+			subclasses)</font></td>
+		</tr>
+		<tr>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp; --hosts | -c 
+			<i>ids</i></font></td>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp;&nbsp;</font></td>
+			<td><font face="Courier New" size="2" color="#000080">filter out all applications except those which run on given 
+			hosts</font></td>
+		</tr>
+		<tr>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp; --segments | -s 
+			<i>ids</i></font></td>
+			<td><font face="Courier New" size="2" color="#000080">&nbsp;&nbsp;</font></td>
+			<td><font face="Courier New" size="2" color="#000080">filter out all applications except those which belong to given 
+			segments</font></td>
+		</tr>
+	</table>
+</blockquote>
+<p>Example below shows how to get all template and run control applications on 
+host lxplus001 for a test partition:</p>
+<blockquote>
+	<pre><font color="#000080">bash$ dal_dump_app_config -d oksconfig:daq/partitions/lxplus_template_tests.data.xml \
+      -p lxplus-test -c lxplus001 -t TemplateApplication RunControlApplication
+===================================================================================================================================
+| num | Application Object        | Host               | Segment             | MP:id | Application unique id                      |
+===================================================================================================================================
+|   1 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32767 | test-L2@L2PUTemplateApp:01-19:lxplus001:0  |
+|   2 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32766 | test-L2@L2PUTemplateApp:01-19:lxplus001:1  |
+|   3 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32765 | test-L2@L2PUTemplateApp:01-19:lxplus001:2  |
+|   4 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32764 | test-L2@L2PUTemplateApp:01-19:lxplus001:3  |
+|   5 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32763 | test-L2@L2PUTemplateApp:01-19:lxplus001:4  |
+|   6 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32762 | test-L2@L2PUTemplateApp:01-19:lxplus001:5  |
+|   7 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32761 | test-L2@L2PUTemplateApp:01-19:lxplus001:6  |
+|   8 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32760 | test-L2@L2PUTemplateApp:01-19:lxplus001:7  |
+|   9 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32759 | test-L2@L2PUTemplateApp:01-19:lxplus001:8  |
+|  10 | test-L2@L2PUTemplateApp   | lxplus001@Computer | 01-19@HLTSegment    | 32758 | test-L2@L2PUTemplateApp:01-19:lxplus001:9  |
+|  11 | RC@RunControlApplication  | lxplus001@Computer | setup@OnlineSegment |     0 | RC@RunControlApplication                   |
+|  12 | 19@RunControlApplication  | lxplus001@Computer | 01-19@HLTSegment    |     0 | 19@RunControlApplication                   |
+|  13 | efd@RunControlApplication | lxplus001@Computer | efd_sf@EF_SubFarm   |     0 | efd@RunControlApplication                  |
+===================================================================================================================================</font></pre>
+</blockquote>
+<h5>Message Passing Node ID Calculation</h5>
+<p>The dal package implements algorithms for the Message Passing Node ID 
+calculations and replaces obsolete Application package. If you are using 
+Application package, do the following:</p>
+<ul>
+	<li>replace in CMT requirements file '<font color="#000080">use Application</font>' 
+	by '<font color="#000080">use dal</font>'</li>
+	<li>replace include &quot;<font color="#000080">Application/Application.h</font>&quot; 
+	by include &quot;<font color="#000080">dal/util.h</font>&quot;;</li>
+	<li>replace a <font color="#000080">Application::Application::xyz()</font> 
+	by <font color="#000080">daq::Application::xyz()</font>;</li>
+	<li>link your binaries and libraries with DAL library (i.e. use '<font color="#000080">-ldaq-core-dal 
+	-lconfig</font>') instead of Application library (i.e. '<font color="#000080">-lApplication</font>').</li>
+</ul>
+<p>The DAL's algorithm supports different ranges for node 16-bits IDs depending on 
+application type instead of fixed 1K range supported by obsolete Application package as 
+shown below:</p>
+<blockquote>
+	<table border="0" id="table2" cellpadding="2" cellspacing="0">
+		<tr>
+			<th nowrap bgcolor="#99CCFF"><font color="#000080">Application Type</font></th>
+			<th nowrap bgcolor="#99CCFF">&nbsp;</th>
+			<th nowrap bgcolor="#99CCFF"><font color="#000080">Number of 
+			instances</font></th>
+			<th nowrap bgcolor="#99CCFF">&nbsp;</th>
+			<th nowrap bgcolor="#99CCFF"><font color="#000080">Node ID Ranges&nbsp;
+			</font></th>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">PT</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">32K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[32K .. 64K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">L2PU</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">8K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[24K .. 32K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">SFI</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">4K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[20K .. 24K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">ROD</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">2K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[18K .. 20K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">ROB</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">2K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[16K .. 18K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">EFD</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">1K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[15K .. 16K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">SFO</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">1K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[14K .. 15K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">DFM</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">1K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[13K .. 14K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">L2SV</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">1K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[12K .. 13K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">ROS</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">1K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[11K .. 12K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right">ROIB</td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">1K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[10K .. 11K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right" bgcolor="#FFFFDD">L2RH</td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">1K </td>
+			<td align="right" bgcolor="#FFFFDD">&nbsp;</td>
+			<td align="right" bgcolor="#FFFFDD">[09K .. 10K[&nbsp;</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" align="right"><i>unknown / not used</i></td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">9K </td>
+			<td bgcolor="#CCCCCC" align="right">&nbsp;</td>
+			<td bgcolor="#CCCCCC" align="right">[00K .. 09K[&nbsp;</td>
+		</tr>
+	</table>
+</blockquote>
+<p>The node IDs of template applications go down from maximum range values; the 
+IDs of the non-template applications of the same type are growing from minimal 
+values to maximum. For correct node message passing node ID calculation a 
+database class is considered to be a template class describing PT, L2PU or SFI, 
+if it's name contains &quot;<i>Template</i>&quot; literal with one of the corresponding 
+literals &quot;<i>PT</i>&quot;, &quot;<i>L2PU</i>&quot; or &quot;<i>SFI</i>&quot;, e.g. classes with names <i>
+L2PUTemplateApplication</i> or <i>TemplateL2PUApp</i> are considered as classes 
+describing template L2PU applications. The attribute <i>
+TemplateApplication::Type</i> described by the proposal document is replaced by 
+above convention.</p>
+<h4>External Packages</h4>
+<p>There are several dependencies of the ATLAS online software from external 
+packages having non-CMT structure. To describe paths to shared libraries and 
+binaries mapped on CMT platforms and platform-dependent environment variables it 
+was proposed (see EDMS document <a href="https://edms.cern.ch/document/732735">https://edms.cern.ch/document/732735</a>) 
+to introduce several new configuration classes:</p>
+<ul>
+	<li><b>SW_Package</b> - describes common properties of a sw release (name, 
+	installation path, another used releases and required process environment) 
+	including existing <i>SW_Repository</i> and new <i>SW_ExternalPackage</i>;</li>
+	<li><b>SW_ExternalPackage</b> - describes details of platform tags mappings 
+	using <i>Binaries</i> and <i>SharedLibraries</i> relationships pointing to
+	<i>TagMapping</i> objects;</li>
+	<li><b>TagMapping</b> - is derived from existing Tag class and adds 
+	attribute to map CMT tag on to path suffix.</li>
+</ul>
+<p>The <b>Variable</b> class has been extended. There is new 0..N relationship
+<i>TagValues</i> pointing to the <i>TagMapping</i> object. In the context of an 
+application the DAL algorithms calculating value of variable checks platform for 
+application and if explicitly defined via <i>TagValues</i> relationship, the 
+algorithm takes variable value from the <i>Value</i> attribute of the <i>
+TagMapping</i> object.</p>
+<p>See also graphical view of above classes in the
+<a class="moz-txt-link-freetext" href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/*checkout*/DAQ/online/dal/data/schema/views/SoftwareRepository.view.ps?rev=dal-01-08-01&cvsroot=atlastdaq">
+dal/data/schema/views/SoftwareRepository.view.ps</a> file.</p>
+<p>The <i>SW_ExternalPackage</i> objects, related <i>TagMapping</i> and <i>
+Variable</i> objects are automatically generated by the <b>
+dal_create_sw_repository</b> utility running in the DAQRelease. For external 
+packages it uses the following data file syntax:</p>
+<blockquote>
+	<pre>macro sw.external.package.X:installation.path 'inst-path'  <font color="#006600"># <i>X</i> - any external package, <i>inst_path</i> - root directory of it's installation</font>
+macro sw.external.package.X:cmt.tag cmt-tag                <font color="#006600"># cmt tag for given platform, e.g. <i>i686-slc3-gcc323-dbg</i></font>
+macro sw.external.package.X:lib.mapping shared-lib-mapping <font color="#006600"># path to libraries from package root, e.g. slc3_ia32_gcc323/lib</font>
+macro sw.external.package.X:bin.mapping binary-mapping     <font color="#006600"># path to binaries from package root, e.g. slc3_ia32_gcc323/bin</font>
+macro sw.external.package.X:uses Y                         <font color="#006600"># Y - sw package, which is used by package X</font>
+macro sw.external.package.X:uses Z                         <font color="#006600"># Z - another sw package, which is used by package X
+</font>macro sw.external.package.X:needs.environment 'VAR1'       <font color="#006600"># package X needs process environment variable VAR1
+</font>macro sw.external.package.X:needs.environment 'VAR2'       <font color="#006600"># package X needs another process environment variable VAR2
+</font>macro sw.environment.variable.VAR3:value 'FOO'             <font color="#006600"># value of environment variable VAR3, e.g. '${X}/slc3_ia32_gcc323/root'</font></pre>
+</blockquote>
+<p>Above data file is generated for each cmt platform during <i>DAQRelease</i> 
+build and is passed to the dal_create_sw_repository utility.</p>
+<h5>Example of generated COOL Description</h5>
+<p>Below there are several generated interlinked config objects, that allow to 
+build correct run-time environment for online application using COOL package.</p>
+<p>The COOL package description:</p>
+<blockquote>
+	<table border="0" id="table3" cellspacing="0" cellpadding="2">
+		<tr>
+			<th colspan="3" nowrap align="left" bgcolor="#99CCFF">
+			<font color="#000080">Object <b>COOL@SW_ExternalPackage</b></font></th>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Name</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">CMT external package COOL</td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">InstallationPath</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">${COOL_HOME}</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Uses</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">XercesC@SW_ExternalPackage<br>
+			SEAL@SW_ExternalPackage<br>
+			CORAL@SW_ExternalPackage<br>
+			POOL@SW_ExternalPackage</td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">Binaries</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">i686-slc3-gcc323-opt-for-slc3_ia32_gcc323/bin@TagMapping<br>
+			i686-slc3-gcc323-dbg-for-slc3_ia32_gcc323/bin@TagMapping<br>
+			i686-slc3-gcc344-opt-for-slc3_ia32_gcc344/bin@TagMapping<br>
+			i686-slc3-gcc344-dbg-for-slc3_ia32_gcc344/bin@TagMapping</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">SharedLibraries</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">i686-slc3-gcc323-opt-for-slc3_ia32_gcc323/lib@TagMapping<br>
+			i686-slc3-gcc323-dbg-for-slc3_ia32_gcc323/lib@TagMapping<br>
+			i686-slc3-gcc344-opt-for-slc3_ia32_gcc344/lib@TagMapping<br>
+			i686-slc3-gcc344-dbg-for-slc3_ia32_gcc344/lib@TagMapping</td>
+		</tr>
+	</table>
+</blockquote>
+<p>SEAL is one of the packages used by COOL:</p>
+<blockquote>
+	<table border="0" id="table4" cellspacing="0" cellpadding="2">
+		<tr>
+			<th colspan="3" nowrap align="left" bgcolor="#99CCFF">
+			<font color="#000080">Object <b>SEAL@SW_ExternalPackage</b></font></th>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Name</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">CMT external package SEAL</td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">InstallationPath</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">${SEAL_HOME}</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Uses</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">XercesC@SW_ExternalPackage</td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">ProcessEnvironment</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">SEAL_KEEP_MODULES@Variable<br>
+			SEAL_PLUGINS@Variable<br>
+			SEAL_CONFIGURATION_FILE@Variable</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Binaries</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">&nbsp;<font color="#006600">... as in COOL ...</font></td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">SharedLibraries</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">&nbsp;<font color="#006600">... as in COOL ...</font></td>
+		</tr>
+	</table>
+</blockquote>
+<p>The SEAL_PLUGINS is one of the variables used by SEAL. It is multi-value 
+environment variable variable, which value depends on platform:</p>
+<blockquote>
+	<table border="0" id="table5" cellspacing="0" cellpadding="2">
+		<tr>
+			<th colspan="3" nowrap align="left" bgcolor="#99CCFF">
+			<font color="#000080">Object &quot;SEAL_PLUGINS@Variable&quot;</font></th>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">Name</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">SEAL_PLUGINS</td>
+		</tr>
+		<tr>
+			<td bgcolor="#FFFFDD" valign="top">Value</td>
+			<td bgcolor="#FFFFDD">&nbsp;</td>
+			<td bgcolor="#FFFFDD">/afs/cern.ch/sw/lcg/app/releases/COOL/COOL_1_3_1/slc3_ia32_gcc323/lib/modules:<br>
+			/afs/cern.ch/sw/lcg/app/releases/CORAL/CORAL_1_4_2/slc3_ia32_gcc323/lib/modules:<br>
+			/afs/cern.ch/sw/lcg/app/releases/POOL/POOL_2_4_1/slc3_ia32_gcc323/lib/modules:<br>
+			/afs/cern.ch/sw/lcg/app/releases/SEAL/SEAL_1_8_1/slc3_ia32_gcc323/lib/modules</td>
+		</tr>
+		<tr>
+			<td bgcolor="#CCCCCC" valign="top">TagValues</td>
+			<td bgcolor="#CCCCCC">&nbsp;</td>
+			<td bgcolor="#CCCCCC">
+			i686-slc3-gcc344-opt-to-SEAL_PLUGINS@TagMapping&nbsp;
+			<font color="#006600"># points on specific value for gcc344-opt</font><br>
+			i686-slc3-gcc344-dbg-to-SEAL_PLUGINS@TagMapping&nbsp;
+			<font color="#006600"># points on specific value for gcc344-dbg</font>
+			</td>
+		</tr>
+	</table>
+</blockquote>
+<p>For a binary, that belongs to the TDAQ sw repository (that in turn uses COOL) 
+the run-time environment will have all required variables and paths set, e.g.:</p>
+<blockquote>
+	<pre><font color="#000080">bash$ dal_dump_apps -d oksconfig:daq/partitions/be_test.data.xml -p be_test -a oks2cool -s
+Dump 1 non-template applications:
+### application 'oks2cool@ResourceApplication' ###
+- possible program file names:
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/installed/i686-slc3-gcc323-opt/bin/oks2cool
+- environment variables:
+  * ROOTSYS=&quot;/afs/cern.ch/sw/lcg/external/root/5.10.00c/slc3_ia32_gcc323/root&quot;
+  * SEAL_CONFIGURATION_FILE=&quot;/afs/cern.ch/sw/lcg/app/releases/COOL/COOL_1_3_1/src/RelationalCool/tests/seal.opts&quot;
+  * SEAL_KEEP_MODULES=&quot;true&quot;
+  * SEAL_PLUGINS=&quot;/afs/cern.ch/sw/lcg/app/releases/COOL/COOL_1_3_1/slc3_ia32_gcc323/lib/modules:
+                  /afs/cern.ch/sw/lcg/app/releases/CORAL/CORAL_1_4_2/slc3_ia32_gcc323/lib/modules:
+                  /afs/cern.ch/sw/lcg/app/releases/POOL/POOL_2_4_1/slc3_ia32_gcc323/lib/modules:
+                  /afs/cern.ch/sw/lcg/app/releases/SEAL/SEAL_1_8_1/slc3_ia32_gcc323/lib/modules&quot;
+  * TDAQ_APPLICATION_OBJECT_ID=&quot;oks2cool@ResourceApplication&quot;
+  </font><font color="#006600"># ... skip the rest ...</font><font color="#000080">
+- binary search paths:  </font><font color="#006600"># i.e. what goes into PATH variable</font><font color="#000080">
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/installed/share/bin
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/installed/i686-slc3-gcc323-opt/bin
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/external/share/bin
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/external/i686-slc3-gcc323-opt/bin
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/installed/share/bin
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/installed/i686-slc3-gcc323-opt/bin
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/external/share/bin
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/external/i686-slc3-gcc323-opt/bin
+  * /afs/cern.ch/sw/lcg/external/Boost/1.33.1/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/app/releases/COOL/COOL_1_3_1/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/XercesC/2.7.0/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/app/releases/SEAL/SEAL_1_8_1/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/app/releases/CORAL/CORAL_1_4_2/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/app/releases/POOL/POOL_2_4_1/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/root/5.10.00c/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/oracle/10.2.0.1/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/mysql/5.0.18/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/uuid/1.38/slc3_ia32_gcc323/bin/
+  * /afs/cern.ch/sw/lcg/external/pcre/4.4/slc3_ia32_gcc323/bin/
+- paths to shared libraries:  </font><font color="#006600"># i.e. what goes into LD_LIBRARY_PATH variable</font><font color="#000080">
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/installed/i686-slc3-gcc323-opt/lib
+  * /afs/cern.ch/atlas/project/tdaq/cmt/pre-01-06-00/external/i686-slc3-gcc323-opt/lib
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/installed/i686-slc3-gcc323-opt/lib
+  * /afs/cern.ch/atlas/project/tdaq/DataFlow/releases/tdaq-common-01-04-00/external/i686-slc3-gcc323-opt/lib
+  * /afs/cern.ch/sw/lcg/external/Boost/1.33.1/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/app/releases/COOL/COOL_1_3_1/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/XercesC/2.7.0/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/app/releases/SEAL/SEAL_1_8_1/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/app/releases/CORAL/CORAL_1_4_2/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/app/releases/POOL/POOL_2_4_1/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/root/5.10.00c/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/oracle/10.2.0.1/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/mysql/5.0.18/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/uuid/1.38/slc3_ia32_gcc323/lib/
+  * /afs/cern.ch/sw/lcg/external/pcre/4.4/slc3_ia32_gcc323/lib/</font></pre>
+</blockquote>
+<p>Note, the PATH and LD_LIBRARY_PATH are fully constructed from used sw 
+packages and partition's repository root. They cannot be defined by any other 
+mean (e.g. creating in database explicit LD_LIBRARY_PATH variable).</p>
+<h4>Resource Set</h4>
+<ul>
+	<li>new <b>ResourceSet</b> class is used as a container of interconnected 
+resource objects to enable/disable them by single db change;</li>
+	<li>new <b>ResourceBase</b> class is abstract parent class for the above <i>
+	ResourceSet</i> and existing <i>Resource</i> classes; the <i>ResourceSet</i> 
+	contains non-empty list of resource base objects;</li>
+	<li>to get list of resources it is possible to use <i>ResourceBase::get_resources(::Configuration&amp; 
+	db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const</i> 
+	algorithm; the resources are returned by out parameter; if partition object
+	<i>p</i> is provided, the only <i>enabled</i> resources are returned.</li>
+</ul>
+<h4>Backup hosts</h4>
+<ul>
+	<li>all essential applications (e.g. online infrastructure, DFM, run controllers) 
+should be restarted, if their host fails for above applications it is proposed to introduce infrastructure 
+application with list of back hosts</li>
+	<li>to describe such applications new class <b>InfrastructureApplication</b> 
+	has been created;</li>
+	<li>the algorithm <i>InfrastructureApplication::get_backup_hosts(std::vector&lt;const 
+	Computer *&gt;&amp; result) const</i> can be used to get list of backup hosts.</li>
+</ul>
+
+</body>
+
+</html>

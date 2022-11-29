@@ -1,0 +1,267 @@
+package dal
+use Boost * TDAQCExternal
+
+##########################################################################################
+
+author	Igor.Soloviev@cern.ch
+manager	Igor.Soloviev@cern.ch
+
+##########################################################################################
+
+macro sw.repository.script.dal_load_is_info_files.sh:name        "load IS info files on rdb server"
+macro sw.repository.binary.dal_create_db_connection_files:name   "create dblookup and authentication xml files out of information in OKS."
+
+macro sw.repository.java.dal.jar:name                            "core dal"
+macro sw.repository.java.dal.jar:description                     "automatically generated dal for database classes defined by the core.schema.xml"
+macro sw.repository.java.dal.jar:help.url                        "http://atlas-onlsw.web.cern.ch/Atlas-onlsw/components/configdb/"
+
+##########################################################################################
+
+use OnlinePolicy
+use config
+
+##########################################################################################
+
+path_append	OKS_GUI_INIT_DATA			"dal/gui/online.data.xml"
+path_append	OKS_GUI_XPM_DIRS			"dal/gui/pixmaps"
+path_append	OKS_GUI_XBM_DIRS			"dal/gui/bitmaps"
+
+##########################################################################################
+
+apply_pattern   install_jar name=dal                    files=dal.jar
+
+##########################################################################################
+
+private
+
+use Boost * TDAQCExternal
+use genconfig
+use cmdl
+use ipc
+use rdb
+use ers
+use system
+
+macro_remove    pp_cppflags                             "-DERS_NO_DEBUG"
+
+
+##########################################################################################
+
+# generate dal
+
+document        generate-config generate-dal            -s=..                                 \
+                                                        namespace="daq::core"                 \
+                                                        include="dal"                         \
+                                                        data/schema/core.schema.xml
+
+macro           gdir                                    "$(bin)generate-dal.tmp"
+
+library         daq-core-dal $(lib_opts)                "$(gdir)/*.cpp                        \
+                                                        ../src/algorithms.cpp                 \
+                                                        ../src/disabled-components.cpp        \
+                                                        ../src/util.cpp                       \
+                                                        ../src/test_circular_dependency.cpp"
+
+macro           daq-core-dal_shlibflags                 "-lconfig -losw"
+
+apply_pattern   build_jar name=dal                      src_dir='../jsrc'                     \
+                                                        sources="$(gdir)/dal/*.java           \
+                                                        dal/*.java
+
+apply_pattern   javadoc name=dal                        src_dir="$(gdir):../jsrc"
+
+macro           daq-core-dal_dependencies               "generate-dal"
+macro           dal.jar_dependencies                    "generate-dal"
+
+##########################################################################################
+
+# build generated dump applications
+
+application     dal_dump -no_prototypes                 $(gdir)/dump/dump_daq__core.cpp
+macro           dal_dumplinkopts                        "-ldaq-core-dal -lconfig -lipc"
+macro           dal_dump_dependencies                   "daq-core-dal"
+
+##########################################################################################
+
+application     dal_add_host -no_prototypes             ../src/dal_add_host.cpp
+macro           dal_add_hostlinkopts                    "-ldaq-core-dal -lconfig -lcmdline"
+macro           dal_add_host_dependencies               "daq-core-dal generate-dal"
+
+application     dal_print_hosts -no_prototypes          ../src/dal_print_hosts.cpp
+macro           dal_print_hostslinkopts                 "-ldaq-core-dal -lconfig -lipc -lcmdline"
+macro           dal_print_hosts_dependencies            "daq-core-dal generate-dal"
+
+application     dal_test_rw -no_prototypes              ../examples/dal_test_rw.cpp
+macro           dal_test_rwlinkopts                     "-ldaq-core-dal -lconfig"
+macro           dal_test_rw_dependencies                "daq-core-dal generate-dal"
+
+application     dal_test_timeouts -no_prototypes        ../examples/dal_test_timeouts.cpp
+macro           dal_test_timeoutslinkopts               "-ldaq-core-dal -lconfig"
+macro           dal_test_timeouts_dependencies          "daq-core-dal generate-dal"
+
+application     dal_dump_apps -no_prototypes            ../examples/dal_dump_apps.cpp
+macro           dal_dump_appslinkopts                   "-ldaq-core-dal -lconfig"
+macro           dal_dump_apps_dependencies              "daq-core-dal generate-dal"
+
+application     dal_dump_apps_mt -no_prototypes            ../examples/dal_dump_apps_mt.cpp
+macro           dal_dump_apps_mtlinkopts                   "-ldaq-core-dal -lconfig"
+macro           dal_dump_apps_mt_dependencies              "daq-core-dal generate-dal"
+
+application     dal_dump_app_config -no_prototypes      ../examples/dal_dump_app_config.cpp
+macro           dal_dump_app_configlinkopts             "-ldaq-core-dal -lconfig -lipc -lcmdline"
+macro           dal_dump_app_config_dependencies        "daq-core-dal generate-dal"
+
+application     dal_dump_app_depends -no_prototypes     ../examples/dal_dump_app_depends.cpp
+macro           dal_dump_app_dependslinkopts            "-ldaq-core-dal -lconfig -lipc -lcmdline"
+macro           dal_dump_app_depends_dependencies       "daq-core-dal generate-dal"
+
+application     dal_print_segments -no_prototypes       ../examples/dal_print_segments.cpp
+macro           dal_print_segmentslinkopts              "-ldaq-core-dal -lconfig -lboost_program_options-$(boost_libsuffix)"
+macro           dal_print_segments_dependencies         "daq-core-dal generate-dal"
+
+application     dal_get_app_env -no_prototypes          ../src/dal_get_app_env.cpp
+macro           dal_get_app_envlinkopts                 "-ldaq-core-dal -lconfig"
+macro           dal_get_app_env_dependencies            "daq-core-dal generate-dal"
+
+application     dal_get_igui_setup -no_prototypes       ../src/dal_get_igui_setup.cpp
+macro           dal_get_igui_setuplinkopts              "-ldaq-core-dal -lconfig -lipc -lcmdline"
+macro           dal_get_igui_setup_dependencies         "daq-core-dal generate-dal"
+
+application     dal_notify -no_prototypes               ../examples/dal_notify.cpp
+macro           dal_notifylinkopts                      "-ldaq-core-dal -lconfig -lipc"
+macro           dal_notify_dependencies                 "daq-core-dal generate-dal"
+
+application     dal_control_view -no_prototypes         ../examples/dal_control_view.cpp
+macro           dal_control_viewlinkopts                "-ldaq-core-dal -lconfig -lipc"
+macro           dal_control_view_dependencies           "daq-core-dal generate-dal"
+
+application     dal_test_disabled -no_prototypes        ../examples/dal_test_disabled.cpp
+macro           dal_test_disabledlinkopts               "-ldaq-core-dal -lconfig -lipc -lcmdline"
+macro           dal_test_disabled_dependencies          "daq-core-dal generate-dal"
+
+application     dal_create_sw_repository -no_prototypes ../src/dal_create_sw_repository.cpp
+macro           dal_create_sw_repositorylinkopts        "-ldaq-core-dal -lconfig -lcmdline -lipc"
+macro           dal_create_sw_repository_dependencies   "daq-core-dal generate-dal"
+
+application     dal_load_is_info_files -no_prototypes   ../src/dal_load_is_info_files.cpp
+macro           dal_load_is_info_fileslinkopts          "-ldaq-core-dal -lconfig -lboost_program_options-$(boost_libsuffix)"
+macro           dal_load_is_info_files_dependencies     "daq-core-dal generate-dal"
+
+application     dal_create_db_connection_files -no_prototypes   ../src/dal_create_db_connection_files.cpp
+macro           dal_create_db_connection_fileslinkopts          "-ldaq-core-dal -lconfig -lipc -lboost_program_options-$(boost_libsuffix) -lboost_filesystem-$(boost_libsuffix) -lers"
+macro           dal_create_db_connection_files_dependencies     "daq-core-dal generate-dal"
+
+#application     dal_test_rcd_pointers -no_prototypes    ../examples/test_rcd_pointers.cpp
+#macro           dal_test_rcd_pointerslinkopts           "-lrodbusydal -ldaq-core-dal -lconfig -lipc"
+#macro           dal_test_rcd_pointers_dependencies      "daq-core-dal generate-dal"
+
+##########################################################################################
+
+#### install libraries ####
+
+apply_pattern   install_libs                            files="libdaq-core-dal.so"
+
+
+#### install binaries ####
+
+apply_pattern   install_apps                            files="				                          \
+                                                                dal_notify                      \
+                                                                dal_dump_apps                   \
+                                                                dal_dump_app_config             \
+                                                                dal_print_hosts                 \
+                                                                dal_get_app_env                 \
+                                                                dal_get_igui_setup              \
+                                                                dal_control_view                \
+                                                                dal_add_host                    \
+                                                                dal_test_timeouts               \
+                                                                dal_test_disabled               \
+                                                                dal_dump                        \
+                                                                dal_create_sw_repository        \
+                                                                dal_load_is_info_files	        \
+                                                                dal_create_db_connection_files  \
+                                                        "
+
+apply_pattern   install_scripts                         name=is-info                            \
+                                                        src_dir=../scripts                      \
+                                                        files=dal_load_is_info_files.sh
+
+#### install headers ####
+
+ignore_pattern	inst_headers_bin_auto
+
+apply_pattern   install_headers                         src_dir="$(bin)dal" files=*.h
+
+
+#### install online schema file ####
+
+apply_pattern   install_db_files                        name=core.schema.file                   \
+                                                        target_dir="schema"                     \
+                                                        files="../data/schema/core.schema.xml"
+
+#### install gui config-file, pixmaps and bitmaps ####
+
+apply_pattern   install_data                            name=online_dal_xml                     \
+                                                        src_dir="../data/gui"                   \
+                                                        target_dir="gui"                        \
+                                                        files="*.xml"
+
+apply_pattern   install_data                            name=online_dal_xpm                     \
+                                                        src_dir="../data/gui/pixmaps"           \
+                                                        target_dir="gui/pixmaps"                \
+                                                        files="*.xpm"
+
+apply_pattern   install_data                            name=online_dal_xbm                     \
+                                                        src_dir="../data/gui/bitmaps"           \
+                                                        target_dir="gui/bitmaps"                \
+                                                        files="*.xbm"
+
+##########################################################################################
+
+apply_pattern   check_target name=check_dal             file="../cmt/test.sh" args="$(bin)"
+
+##########################################################################################
+
+macro_prepend   classpath                               "$(bin)java/dal.jar:"
+macro_append    classpath                               ":$(CLASSPATH)"
+
+apply_pattern   build_jar                               name=test                               \
+                                                        src_dir="../jexamples"                  \
+                                                        sources=Test.java
+
+apply_pattern   build_jar                               name=dump                               \
+                                                        src_dir="../jexamples"                  \
+                                                        sources=Dump.java
+
+apply_pattern   build_jar                               name=test-oks                           \
+                                                        src_dir="../jexamples"                  \
+                                                        sources=TestOks.java
+
+apply_pattern   build_jar                               name=test-rw                            \
+                                                        src_dir="../jexamples"                  \
+                                                        sources=TestRW.java
+
+apply_pattern   build_jar                               name=test-app-config-mt                 \
+                                                        src_dir="../jexamples"                  \
+                                                        sources=TestAppConfigMT.java
+
+macro           test.jar_dependencies                   "dal.jar"
+macro           test-oks.jar_dependencies               "dal.jar"
+macro           test-rw.jar_dependencies                "dal.jar"
+macro           dump.jar_dependencies                   "dal.jar"
+macro           test-app-config-mt.jar_dependencies     "dal.jar"
+
+##########################################################################################
+
+apply_pattern   install_docs name="xml"                 target_dir="views"              \
+                                                        src_dir="../data/schema/views"  \
+                                                        files="*.xml"
+
+apply_pattern   install_docs name="ps"                  target_dir="views"              \
+                                                        src_dir="../data/schema/views"  \
+                                                        files="*.ps"
+
+apply_pattern   install_docs name="mif"                 target_dir="views"              \
+                                                        src_dir="../data/schema/views"  \
+                                                        files="*.mif"
+
+##########################################################################################

@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="content-type">
+    <title>RELEASE_NOTES</title>
+    <style>
+<!--
+pre          {  }
+-->
+  </style>
+  </head>
+  <body>
+    <h3> Changes in SegConfig and AppConfig Classes</h3>
+    <h3> </h3>
+    <p>Depending on parameters of the Partition's get_segment()
+      algorithm some <i>SegConfig</i> and <i>AppConfig</i> classes may
+      be returned partially initialized, e.g. one can get a tree of
+      segments without applications or initialized up to certain level
+      of inclusion. Also, if segment is disabled, it has no applications
+      initialized. A call of a method returning details of such segments
+      may give incorrect data (such as reference on uninitialized
+      object, e.g. <i>get_controller()</i> of segment with no
+      applications initialized), if status of the segment's
+      initialization and enabling is not checked explicitly.<br>
+    </p>
+    <p>It was decided to throw an exception in case if user tries to
+      access uninitialized data. In particular:<br>
+    </p>
+    <ul>
+      <li>throw <b>daq::core::NotInitedObject</b> if the object was not
+        initialized and cannot be used<br>
+      </li>
+      <li>throw <b>daq::core::SegmentDisabled</b> if the segment was
+        disabled (applications are not initialized in this case) and
+        user calls a method returning an application of such segment</li>
+    </ul>
+    <h3>Schema Changes</h3>
+    Remove <i>RM_Computer_Resource</i> and <i>ComputerParameters</i>
+    classes, and made other relevant changes caused by re-implementation
+    of the ResourceManager and it's configuration database
+    simplification.<br>
+    <br>
+    <h4> </h4>
+  </body>
+</html>

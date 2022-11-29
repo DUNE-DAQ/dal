@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+ xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta http-equiv="Content-Language" content="en-gb">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Untitled 1</title>
+</head>
+<body>
+<span style="font-weight: bold;"></span>Visit DAL package TWiki
+page <a href="https://twiki.cern.ch/twiki/bin/view/Atlas/DaqHltDal">https://twiki.cern.ch/twiki/bin/view/Atlas/DaqHltDal</a><br>
+<h4>Algorithms</h4>
+<ul>
+  <li>if Segment's default host is defined, it is used as a host for
+"localhost" applications (i.e. when "<span style="font-weight: bold;">RunsOn</span>"
+is not set) of that segment;</li>
+  <li><span style="font-family: monospace;"></span>remove non-used <span
+ style="font-weight: bold;">Partition:get_applications()</span>
+algorithm; modify <span style="font-weight: bold;">Application:get_host()</span>
+algorithm (add segment);</li>
+  <li><span style="font-family: monospace;"></span>add template
+applications instance "magic number": if the <span
+ style="font-weight: bold;">TemplateApplication::Instances</span>
+attribute value is 0, then set number of template application instances
+for given host equal to the number of CPU cores;<span
+ style="font-family: monospace;"></span></li>
+  <li><span style="font-family: monospace;"></span>bug fix:
+re-implmenet the <span style="font-weight: bold;">Component::disabled()</span>
+algorithm using iterations over auto-disabling resource sets:</li>
+  <ul>
+    <li>new algorithm calculates full set of all disabled components
+when is called first time;</li>
+    <li>when it is called next time, the result is returned by
+seraching in the disabled set, that is efficient from performance and
+scalability points of view;</li>
+    <li>when database is reloaded, opened, closed or modified, the
+disabled set is automatically clearned and initialized on next call of
+the disabled() algorithm.<br>
+    </li>
+  </ul>
+</ul>
+<h4>Schema Changes</h4>
+<ul>
+  <li>remove <span style="font-weight: bold;">Partition:get_applications()</span>
+algorithm;</li>
+  <li>modify
+    <span style="font-weight: bold;">Application:get_host()</span>
+algorithm (add segment);<span style="font-family: monospace;"></span></li>
+  <li><span style="font-family: monospace;"></span>removed <span
+ style="font-weight: bold;">ControlledByOnline</span> attribute from
+the <span style="font-weight: bold;">BaseApplication</span> class;<span
+ style="font-family: monospace;"></span></li>
+  <li><span style="font-family: monospace;"></span>remove Java
+    <span style="font-weight: bold;">dal.Algorithms.get_template_applications()</span>
+algorithm since no one is
+using it (is going to do the same in C++ as soon as opmon package will
+be fixed);<br>
+  </li>
+  <li>add abstract <span style="font-weight: bold;">TestableObject</span>
+class;</li>
+  <li>modify <span style="font-weight: bold;">MasterTrigger</span>
+relationship in the Partition class;</li>
+  <li>add <span style="font-weight: bold;">MasterTrigger</span> class;</li>
+  <li>split <span style="font-weight: bold;">InfrastructureApplication</span>
+class on the normal and the template branches:</li>
+  <ul>
+    <li><span style="font-weight: bold;">InfrastructureApplication</span>
+is derived from abstract <span style="font-weight: bold;">InfrastructureBase</span>;</li>
+    <li><span style="font-weight: bold;">InfrastructureTemplateApplication</span>
+is derived from abstract <span style="font-weight: bold;">InfrastructureBase</span>;</li>
+  </ul>
+</ul>
+<h4>Changes in dal_create_sw_repository</h4>
+<ul>
+</ul>
+<ul>
+  <li><span style="color: rgb(0, 0, 102);">command line change:</span>
+do not create the "External Libraries" obsolete
+external-software-repository
+object; <span style="color: rgb(102, 0, 0);">first parameter passed
+via -e has to be removed</span>;</li>
+  <li>
+    <div><span style="color: rgb(0, 0, 102);">new feature:</span>
+support next-line symbol <span style="font-weight: bold;">\</span> in
+macro's value;<span style="font-family: monospace;"></span></div>
+  </li>
+  <li>
+    <div><span style="font-family: monospace;"></span><span
+ style="color: rgb(0, 0, 102);">bug fix:</span> cut long
+descriptions to avoid OKS exception.</div>
+  </li>
+</ul>
+<h4>Changes in dal_dump_apps</h4>
+<ul>
+  <li>remove option -c host-id to provide ID of the partition's default
+computer object (this is n ot supported by used
+Partition::get_all_applications() algorithm);</li>
+  <li>change meaning of -g seg-id option: when defined, print all
+applications of this segment (before only template applications).<br>
+  </li>
+</ul>
+<br>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>RELEASE_NOTES</title>
+  <style>
+<!--
+pre          {  }
+-->
+  </style>
+</head>
+<body>
+<p><font color="#FF0000">There are several important changes, which require
+modifications of user's code and existing databases. Read carefully release
+notes and apply a conversion script (see release download page for details).</font></p>
+<h4>Schema and Algorithms Changes</h4>
+<p>The old schema file <i> online/schema/online.schema.xml</i> was renamed to <i>
+dal/schema/core.schema.xml</i> and their has been changed. There are several views
+available with release installation:</p>
+<blockquote>
+  <table border="0" cellspacing="1" cellpadding="0">
+    <tr>
+      <td valign="top" align="left"><b>Software Repository</b> description
+        classes&nbsp;&nbsp;</td>
+      <td>${TDAQ_INST_PATH}/share/doc/dal/views/ SoftwareRepository.view.ps</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left">Classes using <b>Parameter</b> class&nbsp;&nbsp;</td>
+      <td>${TDAQ_INST_PATH}/share/doc/dal/views/Parameter.view.ps</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left"><b>Hardware</b> description classes&nbsp;&nbsp;</td>
+      <td>${TDAQ_INST_PATH}/share/doc/dal/views/Hardware.view.ps</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left"><b>Control</b> classes&nbsp;&nbsp;</td>
+      <td>${TDAQ_INST_PATH}/share/doc/dal/views/Control.view.ps</td>
+    </tr>
+  </table>
+</blockquote>
+<p>Below there is a list of changes:</p>
+<h5 ALIGN="LEFT">Database parameterisation and environment</h5>
+<p ALIGN="LEFT">Run-time process environment is not taken
+anymore into account in order to parameterize database information
+via dal converters as it was in the past. The only way to parameterize database
+is the usage of variables associated with partition object in the database.
+There is no way to provide user custom variables
+via <i>~/.onlinerc</i> file. Each time when a parameter needs to be changed, it
+is necessary to modify the database.</p>
+<p ALIGN="LEFT">A variable is described by new <b>Variable</b>
+class allowing to define name and string value. A group of variables can be
+combined together into a set-of-variables described by the <b>VariableSet</b>
+class. Both, a variable or a variable set objects can be associated with
+partition, segment, computer program or application object (see for details the
+parameter view mentioned above).</p>
+<p ALIGN="LEFT">To define an environment variable to be passed to the
+application one has to create or find an existent variable object and link it
+with either partition / segment object containing the application, to the
+computer object or to the application itself using <i>ProcessEnvironment</i>
+relationship. The same is relevant to set-of-variables object.</p>
+<p ALIGN="LEFT">To define a variable to be used for substitution of string
+attributes values one has to create or to find an existent variable object and
+link it with either partition or it's segment objects using <i>Parameters</i>
+relationship. The same is relevant to set-of-variables object. If a variable <i>FOO</i>
+with value <i>BAR</i> is linked with configuration, then the <i>daq::core::SubstituteVariables</i>
+converter object substitutes all string values containing &quot;<i>${FOO}</i>&quot;
+by the &quot;<i>BAR</i>&quot;. Note, value of a variable can be defined using
+other variables (the depth of such inclusion is limited to 20 to avoid infinite
+recursion in case of a circular dependency).</p>
+<p ALIGN="LEFT">Several TDAQ infrastructure global environment variables and
+parameters are automatically defined for all applications, as it is described in
+next section.</p>
+<h5 ALIGN="LEFT">Partition class</h5>
+<p ALIGN="LEFT">Five new attributes have been defined in the partition class.
+They are used to describe common TDAQ parameters in a way, which is clear and
+comfortable for any database user:</p>
+<ul>
+  <li>
+    <p ALIGN="LEFT"><b>DBPath</b> describes path to the database repositories.
+    The algorithm <i>dal::Application::get_parameters()</i> creates variable <i>TDAQ_DB_PATH</i>
+    and sets it's value to the value of this attribute. If the value is set to
+    $(<i>TDAQ_DB_PATH</i> ), then the attribute's value is equal to the value of
+    <i>TDAQ_DB_PATH</i> variable defined in the user's environment.</li>
+  <li>
+    <p ALIGN="LEFT"><b>DBName</b> describes name of the database. It works in
+    the way similar to described above, where variable name is <i>TDAQ_DB_DATA</i>.</li>
+  <li>
+    <p ALIGN="LEFT"><b>IPCRef</b> defines IPC reference. It works in the way
+    similar to described above, where variable name is <i>TDAQ_IPC_INIT_REF</i>.</li>
+  <li>
+    <p ALIGN="LEFT"><b>LoogRoot</b> defines default root directory used for
+    logs.</li>
+  <li>
+    <p ALIGN="LEFT"><b>WorkingDir</b> defines default working directory for all
+    applications.</li>
+</ul>
+<p ALIGN="LEFT">The value of the Name attribute automatically defines <b>TDAQ_PARTITION</b>
+environment variable and parameter.</p>
+<p ALIGN="LEFT">Above mentioned environment variable and parameter objects
+should not be created or linked with configuration anymore. They are defined
+only and only by the attributes of partition object.</p>
+<p ALIGN="LEFT">Note, some variables are external to the database, e.g. DBPath
+and DBName define the database location and the IPCRef is used to find the
+database server, so the setup or the play_daq program can not read them from the
+database itself, since they do not know which database to use. The setup or
+play_daq needs to use a different way to define them (i.e. to set via
+environment).</p>
+<h5 ALIGN="LEFT">Generic Application class</h5>
+<ul>
+  <li>
+    <p ALIGN="LEFT">Three attributes <b>OutputDevice</b>, <b>ErrorDevice </b>and
+    <b>StartIn</b> are replaced by two new Partition.s attributes LogRoot and
+    WorkingDir and knowledges, how standard output and error files are created
+    relative to the log root.</li>
+  <li>
+    <p ALIGN="LEFT">The existing attributes <b>RestartIfDies </b>and <b>RestartIfFails</b>,<b>
+    </b>which were <i>booleans</i> are renamed to <b>IfDies </b>and <b>IfFails </b>and
+    have enumeration type with range <i>Ignore</i>,<i>Restart</i>,<i>Error</i>.</li>
+  <li>
+    <p ALIGN="LEFT">The algorithm <i>Application::get_host()</i> has new
+    additional parameter <i>::Configuration&amp;</i>. If application's host and
+    partition's default hosts are not defined, it is assumed the application has
+    to be started on the host, where the algorithm is executed. The name of the
+    host is taken using <i>gethostname()</i> function.</li>
+</ul>
+<b>
+<h5 ALIGN="LEFT">Run Control Applications</h5>
+</b>
+<ul>
+  <li>
+    <p ALIGN="LEFT">Add new attribute <b>ShortActionTimeout</b>.</li>
+  <li>
+    <p ALIGN="LEFT">The timeout values in the database are local timeouts, i.e.
+    to indicate the maximum amount of time that application can take to perform
+    its own transition. If the application is a controller with controlled
+    items, the real transition timeout shall be calculated as: <i>ActionTimeout
+    = my Action-Timeout in DB + max(controlled items ActionTimeouts in DB)</i>.</li>
+  <li>
+    <p ALIGN="LEFT">Add attribute <b>IfError </b>which allows values: <i>Ignore</i>,
+    <i>Restart</i>, <i>Handle</i>, <i>ErrorIgnore</i>, <i>Restart</i>, <i>Handle</i>,
+    <i>Error</i>. This attribute is used by the parent controller to know how to
+    react in case that this controlled application goes in Error state or sends
+    a FATAL error.</li>
+</ul>
+<h5>Software Repository</h5>
+<ul>
+  <li>Add new attribute <b>ISInfoDescriptionFiles</b>. It contains list of
+    schema files, which are used for IS information description (to be loaded by
+    special RDB server). Such files are relative either to the value of the
+    partition's repository root attribute, or to the installation path of given
+    software repository. The attribute <b>ISInfoDescriptionFiles </b>replaces
+    obsolete<b> TDAQ_IS_REPOSITORY</b> environment variable.</li>
+</ul>
+<h4>Files and Directories Structure Changes</h4>
+<p>The structure of the database directories and names of files were changed. It
+happened because of TDAQ internal reorganisation and a decision to separate
+release-specific and site-dependent configuration files. The TDAQ_DB_PATH is set
+by the release setup script and points to two areas: release-dependent area and
+site-specific area, e.g.:</p>
+<blockquote>
+  <pre>TDAQ_DB_PATH=${TDAQ_INST_PATH}/share/data:${TDAQ_INST_PATH}/databases</pre>
+</blockquote>
+<p>The files from the former area must not be modified by any way except release
+patches. The latter token from the path points to site-specific area.</p>
+<p>Now the release-dependent files (e.g. the schema files, generated description
+of the release software repository, templates, examples) belong to the packages,
+which define or generate them during release build. If database file <i>x.xml</i>
+is defined by package <i>A</i>, it has to be installed as <i><font color="#000080">${TDAQ_INST_PATH}/share/data</font>/A/x.xml</i>.
+For example, new <i>schema/core.schema.xml</i> file is defined by the package <i>dal</i>
+and it is installed as <i><font color="#000080">${TDAQ_INST_PATH}/share/data</font>/dal/schema/core.schema.xml.</i></p>
+<p>The site-specific area contains description of hardware objects, segments and
+partitions.</p>
+<p><font color="#FF0000">The conversion script makes required changes of
+database file names.</font> Run it from the root directory of database
+repository.</p>
+<h4>DAL Namespace Change</h4>
+<p>The C++ DAL namespace was changed from <i>dal</i> to the <i>daq::core</i>.</p>
+<p><font color="#FF0000">The conversion script makes such change in the code.</font>
+Run it from the root directory of C++ package using DAL.</p>
+<h4>Change Attribute Values Substitution Mechanism</h4>
+<p>The mechanism for user-defined attribute values modifications was changed
+(see <a href="#config">changes</a> in config package). The <i>dal::SubstituteVariables::from_environment()</i>
+and <i>dal::SubstituteVariables::from_db()</i> substitution functions defined in
+the dal package are replaced by new <i>daq::core::SubstituteVariables</i>
+object.</p>
+<p>Originally the mechanism allowing attribute values changes was designed for
+substitution of variables from the user's process environment. Later the
+substitution took into account db objects of the <i>Environment</i> class. By
+design it should see only environment objects associated with
+partition/segment/application objects. In practice it took into account <u>ALL</u>
+defined environment variables, since there was no way to pass to the old
+converter function an additional parameter. Such approach can not be used with
+latest proposal on database schema changes, since it says: &quot;<i>the only
+parameters taking into account are those, which are linked with partition object</i>&quot;.
+The old method does not work, if a database contains more then one partition
+object, which need to be parameterized differently. The original converter was
+implemented as a function knowing only type of attribute and nothing also. Now
+the function is replaced by the converter object, which gives more flexibility.
+In particular, it's constructor uses reference on partition object.<br>
+<br>
+If your code is using a database converter function (i.e. calls the&nbsp; <i>::Configuration::register_convert_function()</i>
+method), then you need to do the modification. To make a substitution you need
+to get a partition object first. If it is unknown, you can not make a
+substitution of variables using the dal . The recommended code is shown below:</p>
+<blockquote>
+<p>&nbsp; <font color="#008000"><i>// database initialization as before</i></font><br>
+::Configuration db(...);&nbsp;<br>
+<br>
+&nbsp; <font color="#008000"><i>// check database status</i></font><br>
+if(!db.loaded()) {std::cerr &lt;&lt; &quot;Can not load database: &quot;
+&lt;&lt; db_name &lt;&lt; std::endl; return ...}<br>
+<br>
+&nbsp; <font color="#008000"><i>// find partition; stop, if there is no
+partition object</i></font><br>
+const daq::core::Partition * partition = daq::core::get_partition(db,
+partition_name); if(!partition) {return ...;}<br>
+<br>
+&nbsp; <font color="#008000"><i>// register variables converter</i></font><br>
+db.register_converter(new daq::core::SubstituteVariables(db, *partition));<br>
+<br>
+&nbsp; <font color="#008000"><i>// remove any previously used conversions
+functions, which do not exist anymore</i></font><br>
+<font color="#000080">/***<br>
+db-&gt;register_convert_function(dal::SubstituteVariables::from_environment);<br>
+db-&gt;register_convert_function(dal::SubstituteVariables::from_db);<br>
+***/</font></p>
+</blockquote>
+<p>When you reload configuration, you may need to reset the variables
+substitution, since the partition object or parameters can be different. In this
+case you need to keep the pointer on the substitution object and call <i>reset()</i>
+methods with the same arguments, which are used in the object's constructor,
+e.g.:</p>
+<blockquote>
+  <p>&nbsp; <font color="#008000"><i>// initialize database and find partition
+  object</i></font><br>
+  ::Configuration db(...);&nbsp;<br>
+  const daq::core::Partition * partition1 = daq::core::get_partition(db,
+  partition_name1);<br>
+  <br>
+  &nbsp; <font color="#008000"><i>// create and register variable converter
+  object</i></font><br>
+  daq::core::SubstituteVariables * sv_obj = new
+  daq::core::SubstituteVariables(db, *partition1);<br>
+  db.register_converter(sv_obj);<br>
+  ...<br>
+  ...<br>
+  &nbsp;<i><font color="#008000"> // unload configuration and read updated or
+  different one</font></i><br>
+  db.unload(); db.load(...);<br>
+  <br>
+  &nbsp; <font color="#008000"><i>// find partition object</i></font><br>
+  const daq::core::Partition * partition2 = daq::core::get_partition(db,
+  partition_name2);<br>
+  <br>
+  &nbsp; <font color="#008000"><i>// create and register variable converter
+  object</i></font><br>
+  sv_obj-&gt;reset(db, *partition2);</p>
+</blockquote>
+<p>Note several important rules:</p>
+<ul>
+  <li>the user must not to destroy substitution object himself; it will be done
+    by the configuration object destructor;</li>
+  <li>if the configuration is reloaded and the substitution of variables is
+    used, then the registered substitution objects need to be reset.</li>
+</ul>
+</body>
+</html>

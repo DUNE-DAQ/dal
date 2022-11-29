@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="ASCII"?>
+
+<!-- oks-data version 2.2 -->
+
+
+<!DOCTYPE oks-data [
+  <!ELEMENT oks-data (info, (include)?, (comments)?, (obj)+)>
+  <!ELEMENT info EMPTY>
+  <!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "data"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+  <!ELEMENT include (file)*>
+  <!ELEMENT file EMPTY>
+  <!ATTLIST file
+      path CDATA #REQUIRED
+  >
+  <!ELEMENT comments (comment)*>
+  <!ELEMENT comment EMPTY>
+  <!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+  <!ELEMENT obj (attr | rel)*>
+  <!ATTLIST obj
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+  <!ELEMENT attr (data)*>
+  <!ATTLIST attr
+      name CDATA #REQUIRED
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class|-) "-"
+      val CDATA ""
+  >
+  <!ELEMENT data EMPTY>
+  <!ATTLIST data
+      val CDATA #REQUIRED
+  >
+  <!ELEMENT rel (ref)*>
+  <!ATTLIST rel
+      name CDATA #REQUIRED
+      class CDATA ""
+      id CDATA ""
+  >
+  <!ELEMENT ref EMPTY>
+  <!ATTLIST ref
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+]>
+
+<oks-data>
+
+<info name="" type="" num-of-items="156" oks-format="data" oks-version="oks-08-03-02-13-gebf8a70 built &quot;Mar 10 2021&quot;" created-by="isolov" created-on="pcatd79.cern.ch" creation-time="20141020T125932" last-modified-by="isolov" last-modified-on="pcatd79.cern.ch" last-modification-time="20210311T182849"/>
+
+<obj class="ALink" id="Binary-2-BinaryFile-via-ExactImplementations">
+ <attr name="Name" type="string" val="ExactImplementations"/>
+ <rel name="From" class="Class" id="Binary"/>
+ <rel name="To" class="Class" id="BinaryFile"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Binary-2-BinaryFile-via-ExactImplementations"/>
+  <ref class="Point" id="2 Binary-2-BinaryFile-via-ExactImplementations"/>
+  <ref class="Point" id="3 Binary-2-BinaryFile-via-ExactImplementations"/>
+  <ref class="Point" id="4 Binary-2-BinaryFile-via-ExactImplementations"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="BinaryFile-2-Tag-via-Tag">
+ <attr name="Name" type="string" val="Tag"/>
+ <rel name="From" class="Class" id="BinaryFile"/>
+ <rel name="To" class="Class" id="Tag"/>
+ <rel name="Points">
+  <ref class="Point" id="1 BinaryFile-2-Tag-via-Tag"/>
+  <ref class="Point" id="2 BinaryFile-2-Tag-via-Tag"/>
+  <ref class="Point" id="3 BinaryFile-2-Tag-via-Tag"/>
+  <ref class="Point" id="4 BinaryFile-2-Tag-via-Tag"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="ComputerProgram-2-Parameter-via-ProcessEnvironment">
+ <attr name="Name" type="string" val="ProcessEnvironment"/>
+ <rel name="From" class="Class" id="ComputerProgram"/>
+ <rel name="To" class="Class" id="Parameter"/>
+ <rel name="Points">
+  <ref class="Point" id="1 ComputerProgram-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="2 ComputerProgram-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="3 ComputerProgram-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="4 ComputerProgram-2-Parameter-via-ProcessEnvironment"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_ExternalPackage-2-TagMapping-via-Binaries">
+ <attr name="Name" type="string" val="Binaries"/>
+ <rel name="From" class="Class" id="SW_ExternalPackage"/>
+ <rel name="To" class="Class" id="TagMapping"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_ExternalPackage-2-TagMapping-via-Binaries"/>
+  <ref class="Point" id="2 SW_ExternalPackage-2-TagMapping-via-Binaries"/>
+  <ref class="Point" id="3 SW_ExternalPackage-2-TagMapping-via-Binaries"/>
+  <ref class="Point" id="4 SW_ExternalPackage-2-TagMapping-via-Binaries"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_ExternalPackage-2-TagMapping-via-SharedLibraries">
+ <attr name="Name" type="string" val="SharedLibraries"/>
+ <rel name="From" class="Class" id="SW_ExternalPackage"/>
+ <rel name="To" class="Class" id="TagMapping"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_ExternalPackage-2-TagMapping-via-SharedLibraries"/>
+  <ref class="Point" id="2 SW_ExternalPackage-2-TagMapping-via-SharedLibraries"/>
+  <ref class="Point" id="3 SW_ExternalPackage-2-TagMapping-via-SharedLibraries"/>
+  <ref class="Point" id="4 SW_ExternalPackage-2-TagMapping-via-SharedLibraries"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Object-2-RM_Resource-via-Needs">
+ <attr name="Name" type="string" val="Needs"/>
+ <rel name="From" class="Class" id="SW_Object"/>
+ <rel name="To" class="Class" id="RM_Resource"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Object-2-RM_Resource-via-Needs"/>
+  <ref class="Point" id="2 SW_Object-2-RM_Resource-via-Needs"/>
+  <ref class="Point" id="3 SW_Object-2-RM_Resource-via-Needs"/>
+  <ref class="Point" id="4 SW_Object-2-RM_Resource-via-Needs"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Object-2-SW_Package-via-Uses">
+ <attr name="Name" type="string" val="Uses"/>
+ <rel name="From" class="Class" id="SW_Object"/>
+ <rel name="To" class="Class" id="SW_Package"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Object-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="2 SW_Object-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="3 SW_Object-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="4 SW_Object-2-SW_Package-via-Uses"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Object-2-SW_Repository-via-BelongsTo">
+ <attr name="Name" type="string" val="BelongsTo"/>
+ <rel name="From" class="Class" id="SW_Object"/>
+ <rel name="To" class="Class" id="SW_Repository"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Object-2-SW_Repository-via-BelongsTo"/>
+  <ref class="Point" id="2 SW_Object-2-SW_Repository-via-BelongsTo"/>
+  <ref class="Point" id="3 SW_Object-2-SW_Repository-via-BelongsTo"/>
+  <ref class="Point" id="4 SW_Object-2-SW_Repository-via-BelongsTo"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Package-2-Parameter-via-ProcessEnvironment">
+ <attr name="Name" type="string" val="ProcessEnvironment"/>
+ <rel name="From" class="Class" id="SW_Package"/>
+ <rel name="To" class="Class" id="Parameter"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Package-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="2 SW_Package-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="3 SW_Package-2-Parameter-via-ProcessEnvironment"/>
+  <ref class="Point" id="4 SW_Package-2-Parameter-via-ProcessEnvironment"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Package-2-SW_Package-via-Uses">
+ <attr name="Name" type="string" val="Uses"/>
+ <rel name="From" class="Class" id="SW_Package"/>
+ <rel name="To" class="Class" id="SW_Package"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Package-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="2 SW_Package-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="3 SW_Package-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="4 SW_Package-2-SW_Package-via-Uses"/>
+  <ref class="Point" id="5 SW_Package-2-SW_Package-via-Uses"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment">
+ <attr name="Name" type="string" val="AddProcessEnvironment"/>
+ <rel name="From" class="Class" id="SW_Package"/>
+ <rel name="To" class="Class" id="SW_PackageVariable"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment"/>
+  <ref class="Point" id="2 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment"/>
+  <ref class="Point" id="3 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment"/>
+  <ref class="Point" id="4 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Repository-2-SW_Object-via-SW_Objects">
+ <attr name="Name" type="string" val="SW_Objects"/>
+ <rel name="From" class="Class" id="SW_Repository"/>
+ <rel name="To" class="Class" id="SW_Object"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Repository-2-SW_Object-via-SW_Objects"/>
+  <ref class="Point" id="2 SW_Repository-2-SW_Object-via-SW_Objects"/>
+  <ref class="Point" id="3 SW_Repository-2-SW_Object-via-SW_Objects"/>
+  <ref class="Point" id="4 SW_Repository-2-SW_Object-via-SW_Objects"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="SW_Repository-2-Tag-via-Tags">
+ <attr name="Name" type="string" val="Tags"/>
+ <rel name="From" class="Class" id="SW_Repository"/>
+ <rel name="To" class="Class" id="Tag"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Repository-2-Tag-via-Tags"/>
+  <ref class="Point" id="2 SW_Repository-2-Tag-via-Tags"/>
+  <ref class="Point" id="3 SW_Repository-2-Tag-via-Tags"/>
+  <ref class="Point" id="4 SW_Repository-2-Tag-via-Tags"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="Variable-2-TagMapping-via-TagValues">
+ <attr name="Name" type="string" val="TagValues"/>
+ <rel name="From" class="Class" id="Variable"/>
+ <rel name="To" class="Class" id="TagMapping"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Variable-2-TagMapping-via-TagValues"/>
+  <ref class="Point" id="2 Variable-2-TagMapping-via-TagValues"/>
+  <ref class="Point" id="3 Variable-2-TagMapping-via-TagValues"/>
+  <ref class="Point" id="4 Variable-2-TagMapping-via-TagValues"/>
+ </rel>
+</obj>
+
+<obj class="ALink" id="VariableSet-2-Parameter-via-Contains">
+ <attr name="Name" type="string" val="Contains"/>
+ <rel name="From" class="Class" id="VariableSet"/>
+ <rel name="To" class="Class" id="Parameter"/>
+ <rel name="Points">
+  <ref class="Point" id="1 VariableSet-2-Parameter-via-Contains"/>
+  <ref class="Point" id="2 VariableSet-2-Parameter-via-Contains"/>
+  <ref class="Point" id="3 VariableSet-2-Parameter-via-Contains"/>
+  <ref class="Point" id="4 VariableSet-2-Parameter-via-Contains"/>
+ </rel>
+</obj>
+
+<obj class="Class" id="Binary">
+ <attr name="x" type="s16" val="441"/>
+ <attr name="y" type="s16" val="361"/>
+</obj>
+
+<obj class="Class" id="BinaryFile">
+ <attr name="x" type="s16" val="406"/>
+ <attr name="y" type="s16" val="518"/>
+</obj>
+
+<obj class="Class" id="ComputerProgram">
+ <attr name="x" type="s16" val="434"/>
+ <attr name="y" type="s16" val="227"/>
+</obj>
+
+<obj class="Class" id="FpgaProgram">
+ <attr name="x" type="s16" val="591"/>
+ <attr name="y" type="s16" val="228"/>
+</obj>
+
+<obj class="Class" id="Parameter">
+ <attr name="x" type="s16" val="194"/>
+ <attr name="y" type="s16" val="375"/>
+</obj>
+
+<obj class="Class" id="Platform">
+ <attr name="x" type="s16" val="589"/>
+ <attr name="y" type="s16" val="429"/>
+</obj>
+
+<obj class="Class" id="RM_HW_Resource">
+ <attr name="x" type="s16" val="293"/>
+ <attr name="y" type="s16" val="216"/>
+</obj>
+
+<obj class="Class" id="RM_Resource">
+ <attr name="x" type="s16" val="173"/>
+ <attr name="y" type="s16" val="52"/>
+</obj>
+
+<obj class="Class" id="RM_SW_Resource">
+ <attr name="x" type="s16" val="170"/>
+ <attr name="y" type="s16" val="216"/>
+</obj>
+
+<obj class="Class" id="SW_ExternalPackage">
+ <attr name="x" type="s16" val="905"/>
+ <attr name="y" type="s16" val="130"/>
+</obj>
+
+<obj class="Class" id="SW_Object">
+ <attr name="x" type="s16" val="425"/>
+ <attr name="y" type="s16" val="49"/>
+</obj>
+
+<obj class="Class" id="SW_Package">
+ <attr name="x" type="s16" val="912"/>
+ <attr name="y" type="s16" val="5"/>
+</obj>
+
+<obj class="Class" id="SW_PackageVariable">
+ <attr name="x" type="s16" val="58"/>
+ <attr name="y" type="s16" val="503"/>
+</obj>
+
+<obj class="Class" id="SW_Repository">
+ <attr name="x" type="s16" val="679"/>
+ <attr name="y" type="s16" val="129"/>
+</obj>
+
+<obj class="Class" id="Script">
+ <attr name="x" type="s16" val="506"/>
+ <attr name="y" type="s16" val="359"/>
+</obj>
+
+<obj class="Class" id="Tag">
+ <attr name="x" type="s16" val="590"/>
+ <attr name="y" type="s16" val="516"/>
+</obj>
+
+<obj class="Class" id="TagMapping">
+ <attr name="x" type="s16" val="925"/>
+ <attr name="y" type="s16" val="510"/>
+</obj>
+
+<obj class="Class" id="Variable">
+ <attr name="x" type="s16" val="299"/>
+ <attr name="y" type="s16" val="498"/>
+</obj>
+
+<obj class="Class" id="VariableSet">
+ <attr name="x" type="s16" val="215"/>
+ <attr name="y" type="s16" val="498"/>
+</obj>
+
+<obj class="GLink" id="ComputerProgram-2-Binary">
+ <rel name="From" class="Class" id="ComputerProgram"/>
+ <rel name="To" class="Class" id="Binary"/>
+ <rel name="Points">
+  <ref class="Point" id="1 ComputerProgram-2-Binary"/>
+  <ref class="Point" id="2 ComputerProgram-2-Binary"/>
+  <ref class="Point" id="3 ComputerProgram-2-Binary"/>
+  <ref class="Point" id="4 ComputerProgram-2-Binary"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="ComputerProgram-2-Script">
+ <rel name="From" class="Class" id="ComputerProgram"/>
+ <rel name="To" class="Class" id="Script"/>
+ <rel name="Points">
+  <ref class="Point" id="1 ComputerProgram-2-Script"/>
+  <ref class="Point" id="2 ComputerProgram-2-Script"/>
+  <ref class="Point" id="3 ComputerProgram-2-Script"/>
+  <ref class="Point" id="4 ComputerProgram-2-Script"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="Parameter-2-Variable">
+ <rel name="From" class="Class" id="Parameter"/>
+ <rel name="To" class="Class" id="Variable"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Parameter-2-Variable"/>
+  <ref class="Point" id="2 Parameter-2-Variable"/>
+  <ref class="Point" id="3 Parameter-2-Variable"/>
+  <ref class="Point" id="4 Parameter-2-Variable"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="Parameter-2-VariableSet">
+ <rel name="From" class="Class" id="Parameter"/>
+ <rel name="To" class="Class" id="VariableSet"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Parameter-2-VariableSet"/>
+  <ref class="Point" id="2 Parameter-2-VariableSet"/>
+  <ref class="Point" id="3 Parameter-2-VariableSet"/>
+  <ref class="Point" id="4 Parameter-2-VariableSet"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="Platform-2-Tag">
+ <rel name="From" class="Class" id="Platform"/>
+ <rel name="To" class="Class" id="Tag"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Platform-2-Tag"/>
+  <ref class="Point" id="2 Platform-2-Tag"/>
+  <ref class="Point" id="3 Platform-2-Tag"/>
+  <ref class="Point" id="4 Platform-2-Tag"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="RM_Resource-2-RM_HW_Resource">
+ <rel name="From" class="Class" id="RM_Resource"/>
+ <rel name="To" class="Class" id="RM_HW_Resource"/>
+ <rel name="Points">
+  <ref class="Point" id="1 RM_Resource-2-RM_HW_Resource"/>
+  <ref class="Point" id="2 RM_Resource-2-RM_HW_Resource"/>
+  <ref class="Point" id="3 RM_Resource-2-RM_HW_Resource"/>
+  <ref class="Point" id="4 RM_Resource-2-RM_HW_Resource"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="RM_Resource-2-RM_SW_Resource">
+ <rel name="From" class="Class" id="RM_Resource"/>
+ <rel name="To" class="Class" id="RM_SW_Resource"/>
+ <rel name="Points">
+  <ref class="Point" id="1 RM_Resource-2-RM_SW_Resource"/>
+  <ref class="Point" id="2 RM_Resource-2-RM_SW_Resource"/>
+  <ref class="Point" id="3 RM_Resource-2-RM_SW_Resource"/>
+  <ref class="Point" id="4 RM_Resource-2-RM_SW_Resource"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="SW_Object-2-ComputerProgram">
+ <rel name="From" class="Class" id="SW_Object"/>
+ <rel name="To" class="Class" id="ComputerProgram"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Object-2-ComputerProgram"/>
+  <ref class="Point" id="2 SW_Object-2-ComputerProgram"/>
+  <ref class="Point" id="3 SW_Object-2-ComputerProgram"/>
+  <ref class="Point" id="4 SW_Object-2-ComputerProgram"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="SW_Object-2-FpgaProgram">
+ <rel name="From" class="Class" id="SW_Object"/>
+ <rel name="To" class="Class" id="FpgaProgram"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Object-2-FpgaProgram"/>
+  <ref class="Point" id="2 SW_Object-2-FpgaProgram"/>
+  <ref class="Point" id="3 SW_Object-2-FpgaProgram"/>
+  <ref class="Point" id="4 SW_Object-2-FpgaProgram"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="SW_Package-2-SW_ExternalPackage">
+ <rel name="From" class="Class" id="SW_Package"/>
+ <rel name="To" class="Class" id="SW_ExternalPackage"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Package-2-SW_ExternalPackage"/>
+  <ref class="Point" id="2 SW_Package-2-SW_ExternalPackage"/>
+  <ref class="Point" id="3 SW_Package-2-SW_ExternalPackage"/>
+  <ref class="Point" id="4 SW_Package-2-SW_ExternalPackage"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="SW_Package-2-SW_Repository">
+ <rel name="From" class="Class" id="SW_Package"/>
+ <rel name="To" class="Class" id="SW_Repository"/>
+ <rel name="Points">
+  <ref class="Point" id="1 SW_Package-2-SW_Repository"/>
+  <ref class="Point" id="2 SW_Package-2-SW_Repository"/>
+  <ref class="Point" id="3 SW_Package-2-SW_Repository"/>
+  <ref class="Point" id="4 SW_Package-2-SW_Repository"/>
+ </rel>
+</obj>
+
+<obj class="GLink" id="Tag-2-TagMapping">
+ <rel name="From" class="Class" id="Tag"/>
+ <rel name="To" class="Class" id="TagMapping"/>
+ <rel name="Points">
+  <ref class="Point" id="1 Tag-2-TagMapping"/>
+  <ref class="Point" id="2 Tag-2-TagMapping"/>
+  <ref class="Point" id="3 Tag-2-TagMapping"/>
+  <ref class="Point" id="4 Tag-2-TagMapping"/>
+ </rel>
+</obj>
+
+<obj class="Point" id="1 Binary-2-BinaryFile-via-ExactImplementations">
+ <attr name="x" type="s16" val="19"/>
+ <attr name="y" type="s16" val="23"/>
+</obj>
+
+<obj class="Point" id="1 BinaryFile-2-Tag-via-Tag">
+ <attr name="x" type="s16" val="90"/>
+ <attr name="y" type="s16" val="46"/>
+</obj>
+
+<obj class="Point" id="1 ComputerProgram-2-Binary">
+ <attr name="x" type="s16" val="73"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 ComputerProgram-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="29"/>
+ <attr name="y" type="s16" val="65"/>
+</obj>
+
+<obj class="Point" id="1 ComputerProgram-2-Script">
+ <attr name="x" type="s16" val="73"/>
+ <attr name="y" type="s16" val="24"/>
+</obj>
+
+<obj class="Point" id="1 Parameter-2-Variable">
+ <attr name="x" type="s16" val="106"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 Parameter-2-VariableSet">
+ <attr name="x" type="s16" val="106"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 Platform-2-Tag">
+ <attr name="x" type="s16" val="66"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 RM_Resource-2-RM_HW_Resource">
+ <attr name="x" type="s16" val="93"/>
+ <attr name="y" type="s16" val="83"/>
+</obj>
+
+<obj class="Point" id="1 RM_Resource-2-RM_SW_Resource">
+ <attr name="x" type="s16" val="93"/>
+ <attr name="y" type="s16" val="83"/>
+</obj>
+
+<obj class="Point" id="1 SW_ExternalPackage-2-TagMapping-via-Binaries">
+ <attr name="x" type="s16" val="47"/>
+ <attr name="y" type="s16" val="24"/>
+</obj>
+
+<obj class="Point" id="1 SW_ExternalPackage-2-TagMapping-via-SharedLibraries">
+ <attr name="x" type="s16" val="94"/>
+ <attr name="y" type="s16" val="24"/>
+</obj>
+
+<obj class="Point" id="1 SW_Object-2-ComputerProgram">
+ <attr name="x" type="s16" val="75"/>
+ <attr name="y" type="s16" val="105"/>
+</obj>
+
+<obj class="Point" id="1 SW_Object-2-FpgaProgram">
+ <attr name="x" type="s16" val="75"/>
+ <attr name="y" type="s16" val="105"/>
+</obj>
+
+<obj class="Point" id="1 SW_Object-2-RM_Resource-via-Needs">
+ <attr name="x" type="s16" val="114"/>
+ <attr name="y" type="s16" val="92"/>
+</obj>
+
+<obj class="Point" id="1 SW_Object-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="114"/>
+ <attr name="y" type="s16" val="92"/>
+</obj>
+
+<obj class="Point" id="1 SW_Object-2-SW_Repository-via-BelongsTo">
+ <attr name="x" type="s16" val="91"/>
+ <attr name="y" type="s16" val="95"/>
+</obj>
+
+<obj class="Point" id="1 SW_Package-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="185"/>
+ <attr name="y" type="s16" val="51"/>
+</obj>
+
+<obj class="Point" id="1 SW_Package-2-SW_ExternalPackage">
+ <attr name="x" type="s16" val="16"/>
+ <attr name="y" type="s16" val="51"/>
+</obj>
+
+<obj class="Point" id="1 SW_Package-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="45"/>
+ <attr name="y" type="s16" val="69"/>
+</obj>
+
+<obj class="Point" id="1 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment">
+ <attr name="x" type="s16" val="197"/>
+ <attr name="y" type="s16" val="51"/>
+</obj>
+
+<obj class="Point" id="1 SW_Package-2-SW_Repository">
+ <attr name="x" type="s16" val="16"/>
+ <attr name="y" type="s16" val="51"/>
+</obj>
+
+<obj class="Point" id="1 SW_Repository-2-SW_Object-via-SW_Objects">
+ <attr name="x" type="s16" val="43"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 SW_Repository-2-Tag-via-Tags">
+ <attr name="x" type="s16" val="153"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 Tag-2-TagMapping">
+ <attr name="x" type="s16" val="137"/>
+ <attr name="y" type="s16" val="38"/>
+</obj>
+
+<obj class="Point" id="1 Variable-2-TagMapping-via-TagValues">
+ <attr name="x" type="s16" val="60"/>
+ <attr name="y" type="s16" val="65"/>
+</obj>
+
+<obj class="Point" id="1 VariableSet-2-Parameter-via-Contains">
+ <attr name="x" type="s16" val="48"/>
+ <attr name="y" type="s16" val="24"/>
+</obj>
+
+<obj class="Point" id="2 Binary-2-BinaryFile-via-ExactImplementations">
+ <attr name="x" type="s16" val="19"/>
+ <attr name="y" type="s16" val="425"/>
+</obj>
+
+<obj class="Point" id="2 BinaryFile-2-Tag-via-Tag">
+ <attr name="x" type="s16" val="90"/>
+ <attr name="y" type="s16" val="532"/>
+</obj>
+
+<obj class="Point" id="2 ComputerProgram-2-Binary">
+ <attr name="x" type="s16" val="73"/>
+ <attr name="y" type="s16" val="347"/>
+</obj>
+
+<obj class="Point" id="2 ComputerProgram-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="29"/>
+ <attr name="y" type="s16" val="333"/>
+</obj>
+
+<obj class="Point" id="2 ComputerProgram-2-Script">
+ <attr name="x" type="s16" val="73"/>
+ <attr name="y" type="s16" val="347"/>
+</obj>
+
+<obj class="Point" id="2 Parameter-2-Variable">
+ <attr name="x" type="s16" val="106"/>
+ <attr name="y" type="s16" val="489"/>
+</obj>
+
+<obj class="Point" id="2 Parameter-2-VariableSet">
+ <attr name="x" type="s16" val="106"/>
+ <attr name="y" type="s16" val="489"/>
+</obj>
+
+<obj class="Point" id="2 Platform-2-Tag">
+ <attr name="x" type="s16" val="66"/>
+ <attr name="y" type="s16" val="472"/>
+</obj>
+
+<obj class="Point" id="2 RM_Resource-2-RM_HW_Resource">
+ <attr name="x" type="s16" val="93"/>
+ <attr name="y" type="s16" val="206"/>
+</obj>
+
+<obj class="Point" id="2 RM_Resource-2-RM_SW_Resource">
+ <attr name="x" type="s16" val="93"/>
+ <attr name="y" type="s16" val="206"/>
+</obj>
+
+<obj class="Point" id="2 SW_ExternalPackage-2-TagMapping-via-Binaries">
+ <attr name="x" type="s16" val="47"/>
+ <attr name="y" type="s16" val="133"/>
+</obj>
+
+<obj class="Point" id="2 SW_ExternalPackage-2-TagMapping-via-SharedLibraries">
+ <attr name="x" type="s16" val="94"/>
+ <attr name="y" type="s16" val="519"/>
+</obj>
+
+<obj class="Point" id="2 SW_Object-2-ComputerProgram">
+ <attr name="x" type="s16" val="75"/>
+ <attr name="y" type="s16" val="214"/>
+</obj>
+
+<obj class="Point" id="2 SW_Object-2-FpgaProgram">
+ <attr name="x" type="s16" val="75"/>
+ <attr name="y" type="s16" val="214"/>
+</obj>
+
+<obj class="Point" id="2 SW_Object-2-RM_Resource-via-Needs">
+ <attr name="x" type="s16" val="114"/>
+ <attr name="y" type="s16" val="112"/>
+</obj>
+
+<obj class="Point" id="2 SW_Object-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="114"/>
+ <attr name="y" type="s16" val="61"/>
+</obj>
+
+<obj class="Point" id="2 SW_Object-2-SW_Repository-via-BelongsTo">
+ <attr name="x" type="s16" val="91"/>
+ <attr name="y" type="s16" val="182"/>
+</obj>
+
+<obj class="Point" id="2 SW_Package-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="185"/>
+ <attr name="y" type="s16" val="619"/>
+</obj>
+
+<obj class="Point" id="2 SW_Package-2-SW_ExternalPackage">
+ <attr name="x" type="s16" val="16"/>
+ <attr name="y" type="s16" val="117"/>
+</obj>
+
+<obj class="Point" id="2 SW_Package-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="45"/>
+ <attr name="y" type="s16" val="9"/>
+</obj>
+
+<obj class="Point" id="2 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment">
+ <attr name="x" type="s16" val="197"/>
+ <attr name="y" type="s16" val="644"/>
+</obj>
+
+<obj class="Point" id="2 SW_Package-2-SW_Repository">
+ <attr name="x" type="s16" val="16"/>
+ <attr name="y" type="s16" val="117"/>
+</obj>
+
+<obj class="Point" id="2 SW_Repository-2-SW_Object-via-SW_Objects">
+ <attr name="x" type="s16" val="43"/>
+ <attr name="y" type="s16" val="83"/>
+</obj>
+
+<obj class="Point" id="2 SW_Repository-2-Tag-via-Tags">
+ <attr name="x" type="s16" val="153"/>
+ <attr name="y" type="s16" val="521"/>
+</obj>
+
+<obj class="Point" id="2 Tag-2-TagMapping">
+ <attr name="x" type="s16" val="137"/>
+ <attr name="y" type="s16" val="542"/>
+</obj>
+
+<obj class="Point" id="2 Variable-2-TagMapping-via-TagValues">
+ <attr name="x" type="s16" val="60"/>
+ <attr name="y" type="s16" val="597"/>
+</obj>
+
+<obj class="Point" id="2 VariableSet-2-Parameter-via-Contains">
+ <attr name="x" type="s16" val="48"/>
+ <attr name="y" type="s16" val="381"/>
+</obj>
+
+<obj class="Point" id="3 Binary-2-BinaryFile-via-ExactImplementations">
+ <attr name="x" type="s16" val="54"/>
+ <attr name="y" type="s16" val="425"/>
+</obj>
+
+<obj class="Point" id="3 BinaryFile-2-Tag-via-Tag">
+ <attr name="x" type="s16" val="7"/>
+ <attr name="y" type="s16" val="532"/>
+</obj>
+
+<obj class="Point" id="3 ComputerProgram-2-Binary">
+ <attr name="x" type="s16" val="22"/>
+ <attr name="y" type="s16" val="347"/>
+</obj>
+
+<obj class="Point" id="3 ComputerProgram-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="57"/>
+ <attr name="y" type="s16" val="333"/>
+</obj>
+
+<obj class="Point" id="3 ComputerProgram-2-Script">
+ <attr name="x" type="s16" val="39"/>
+ <attr name="y" type="s16" val="347"/>
+</obj>
+
+<obj class="Point" id="3 Parameter-2-Variable">
+ <attr name="x" type="s16" val="18"/>
+ <attr name="y" type="s16" val="489"/>
+</obj>
+
+<obj class="Point" id="3 Parameter-2-VariableSet">
+ <attr name="x" type="s16" val="56"/>
+ <attr name="y" type="s16" val="489"/>
+</obj>
+
+<obj class="Point" id="3 Platform-2-Tag">
+ <attr name="x" type="s16" val="89"/>
+ <attr name="y" type="s16" val="472"/>
+</obj>
+
+<obj class="Point" id="3 RM_Resource-2-RM_HW_Resource">
+ <attr name="x" type="s16" val="65"/>
+ <attr name="y" type="s16" val="206"/>
+</obj>
+
+<obj class="Point" id="3 RM_Resource-2-RM_SW_Resource">
+ <attr name="x" type="s16" val="59"/>
+ <attr name="y" type="s16" val="206"/>
+</obj>
+
+<obj class="Point" id="3 SW_ExternalPackage-2-TagMapping-via-Binaries">
+ <attr name="x" type="s16" val="7"/>
+ <attr name="y" type="s16" val="133"/>
+</obj>
+
+<obj class="Point" id="3 SW_ExternalPackage-2-TagMapping-via-SharedLibraries">
+ <attr name="x" type="s16" val="23"/>
+ <attr name="y" type="s16" val="519"/>
+</obj>
+
+<obj class="Point" id="3 SW_Object-2-ComputerProgram">
+ <attr name="x" type="s16" val="48"/>
+ <attr name="y" type="s16" val="214"/>
+</obj>
+
+<obj class="Point" id="3 SW_Object-2-FpgaProgram">
+ <attr name="x" type="s16" val="38"/>
+ <attr name="y" type="s16" val="214"/>
+</obj>
+
+<obj class="Point" id="3 SW_Object-2-RM_Resource-via-Needs">
+ <attr name="x" type="s16" val="46"/>
+ <attr name="y" type="s16" val="112"/>
+</obj>
+
+<obj class="Point" id="3 SW_Object-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="52"/>
+ <attr name="y" type="s16" val="61"/>
+</obj>
+
+<obj class="Point" id="3 SW_Object-2-SW_Repository-via-BelongsTo">
+ <attr name="x" type="s16" val="22"/>
+ <attr name="y" type="s16" val="182"/>
+</obj>
+
+<obj class="Point" id="3 SW_Package-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="9"/>
+ <attr name="y" type="s16" val="619"/>
+</obj>
+
+<obj class="Point" id="3 SW_Package-2-SW_ExternalPackage">
+ <attr name="x" type="s16" val="69"/>
+ <attr name="y" type="s16" val="117"/>
+</obj>
+
+<obj class="Point" id="3 SW_Package-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="-76"/>
+ <attr name="y" type="s16" val="9"/>
+</obj>
+
+<obj class="Point" id="3 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment">
+ <attr name="x" type="s16" val="66"/>
+ <attr name="y" type="s16" val="644"/>
+</obj>
+
+<obj class="Point" id="3 SW_Package-2-SW_Repository">
+ <attr name="x" type="s16" val="137"/>
+ <attr name="y" type="s16" val="117"/>
+</obj>
+
+<obj class="Point" id="3 SW_Repository-2-SW_Object-via-SW_Objects">
+ <attr name="x" type="s16" val="38"/>
+ <attr name="y" type="s16" val="83"/>
+</obj>
+
+<obj class="Point" id="3 SW_Repository-2-Tag-via-Tags">
+ <attr name="x" type="s16" val="45"/>
+ <attr name="y" type="s16" val="521"/>
+</obj>
+
+<obj class="Point" id="3 Tag-2-TagMapping">
+ <attr name="x" type="s16" val="44"/>
+ <attr name="y" type="s16" val="542"/>
+</obj>
+
+<obj class="Point" id="3 Variable-2-TagMapping-via-TagValues">
+ <attr name="x" type="s16" val="42"/>
+ <attr name="y" type="s16" val="597"/>
+</obj>
+
+<obj class="Point" id="3 VariableSet-2-Parameter-via-Contains">
+ <attr name="x" type="s16" val="27"/>
+ <attr name="y" type="s16" val="381"/>
+</obj>
+
+<obj class="Point" id="4 Binary-2-BinaryFile-via-ExactImplementations">
+ <attr name="x" type="s16" val="54"/>
+ <attr name="y" type="s16" val="15"/>
+</obj>
+
+<obj class="Point" id="4 BinaryFile-2-Tag-via-Tag">
+ <attr name="x" type="s16" val="7"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 ComputerProgram-2-Binary">
+ <attr name="x" type="s16" val="22"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 ComputerProgram-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="57"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 ComputerProgram-2-Script">
+ <attr name="x" type="s16" val="39"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 Parameter-2-Variable">
+ <attr name="x" type="s16" val="18"/>
+ <attr name="y" type="s16" val="21"/>
+</obj>
+
+<obj class="Point" id="4 Parameter-2-VariableSet">
+ <attr name="x" type="s16" val="56"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 Platform-2-Tag">
+ <attr name="x" type="s16" val="89"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 RM_Resource-2-RM_HW_Resource">
+ <attr name="x" type="s16" val="65"/>
+ <attr name="y" type="s16" val="15"/>
+</obj>
+
+<obj class="Point" id="4 RM_Resource-2-RM_SW_Resource">
+ <attr name="x" type="s16" val="59"/>
+ <attr name="y" type="s16" val="7"/>
+</obj>
+
+<obj class="Point" id="4 SW_ExternalPackage-2-TagMapping-via-Binaries">
+ <attr name="x" type="s16" val="7"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 SW_ExternalPackage-2-TagMapping-via-SharedLibraries">
+ <attr name="x" type="s16" val="23"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 SW_Object-2-ComputerProgram">
+ <attr name="x" type="s16" val="48"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 SW_Object-2-FpgaProgram">
+ <attr name="x" type="s16" val="38"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 SW_Object-2-RM_Resource-via-Needs">
+ <attr name="x" type="s16" val="46"/>
+ <attr name="y" type="s16" val="30"/>
+</obj>
+
+<obj class="Point" id="4 SW_Object-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="52"/>
+ <attr name="y" type="s16" val="17"/>
+</obj>
+
+<obj class="Point" id="4 SW_Object-2-SW_Repository-via-BelongsTo">
+ <attr name="x" type="s16" val="22"/>
+ <attr name="y" type="s16" val="15"/>
+</obj>
+
+<obj class="Point" id="4 SW_Package-2-Parameter-via-ProcessEnvironment">
+ <attr name="x" type="s16" val="9"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 SW_Package-2-SW_ExternalPackage">
+ <attr name="x" type="s16" val="69"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 SW_Package-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="-76"/>
+ <attr name="y" type="s16" val="29"/>
+</obj>
+
+<obj class="Point" id="4 SW_Package-2-SW_PackageVariable-via-AddProcessEnvironment">
+ <attr name="x" type="s16" val="66"/>
+ <attr name="y" type="s16" val="8"/>
+</obj>
+
+<obj class="Point" id="4 SW_Package-2-SW_Repository">
+ <attr name="x" type="s16" val="137"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 SW_Repository-2-SW_Object-via-SW_Objects">
+ <attr name="x" type="s16" val="38"/>
+ <attr name="y" type="s16" val="30"/>
+</obj>
+
+<obj class="Point" id="4 SW_Repository-2-Tag-via-Tags">
+ <attr name="x" type="s16" val="45"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 Tag-2-TagMapping">
+ <attr name="x" type="s16" val="44"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 Variable-2-TagMapping-via-TagValues">
+ <attr name="x" type="s16" val="42"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="4 VariableSet-2-Parameter-via-Contains">
+ <attr name="x" type="s16" val="27"/>
+ <attr name="y" type="s16" val="12"/>
+</obj>
+
+<obj class="Point" id="5 SW_Package-2-SW_Package-via-Uses">
+ <attr name="x" type="s16" val="203"/>
+ <attr name="y" type="s16" val="29"/>
+</obj>
+
+<obj class="View" id="Software Repository View">
+ <attr name="drawing area x margin" type="u16" val="6"/>
+ <attr name="drawing area y margin" type="u16" val="4"/>
+ <attr name="font x margin" type="u16" val="3"/>
+ <attr name="font y margin" type="u16" val="2"/>
+ <attr name="font name" type="string" val="-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1"/>
+ <attr name="aggregation sign size" type="u16" val="18"/>
+ <attr name="generalization sign size" type="u16" val="16"/>
+</obj>
+
+</oks-data>

@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="content-type">
+    <title>RELEASE_NOTES</title>
+    <style>
+<!--
+pre          {  }
+-->
+  </style>
+  </head>
+  <body>
+    <h3 class="prioreclosed">Feature Requests in SW Packages Area</h3>
+    <ul>
+      <li>Implement <a
+          href="https://savannah.cern.ch/bugs/index.php?77922">feature
+          request 77922</a>: the dal_create_sw_repository utility allows
+        to set the PatchArea attribute using -p command line option.</li>
+      <li>Move <span style="font-style: italic;">PatchArea</span>
+        attribute from <span style="font-style: italic;">SW_Repository</span>
+        to base<span style="font-style: italic;"> SW_Package</span>
+        class to allow patches for external packages<br>
+      </li>
+      <li>One can use patch.area CMT macro to specify patch area for
+        external packages; this will be taken into account by the
+        dal_create_sw_repository utility</li>
+    </ul>
+    <h3 class="prioreclosed">Feature Request for CORAL Authentication
+      File Creation<br>
+    </h3>
+    Implement <a href="https://savannah.cern.ch/bugs/?76416">feature
+      request 76416</a>:&nbsp; the utility
+    dal_create_db_connection_files does not create any authentication
+    file, if the environment variable CORAL_AUTH_PATH is not set nor the
+    path to write the file to is specified in the command line.<br>
+    <h3 class="prioreclosed">Algorithms Bug Fixes and Feature Requests<br>
+    </h3>
+    <ul>
+      <li>Fix <a href="https://savannah.cern.ch/bugs/?81723">bug 81723</a>:
+        implement<span id="hidsubpartcontentdiscussion"> correct order
+          of package variables extensions, i.e. now SW_PackageVariable </span><span
+          id="hidsubpartcontentdiscussion">are prepended</span><span
+          id="hidsubpartcontentdiscussion"> instead of appended.</span></li>
+      <li><span id="hidsubpartcontentdiscussion">Add algorithm </span><span
+          style="font-style: italic;">std::string
+          Segment::find_is_server_by_mask(const std::string&amp; mask,
+          const daq::core::Partition&amp; partition)</span> to search
+        nearest IS server application (starting from given segment in
+        direction of partition) with name started from mask. If such
+        application is found, the name of corresponding IS server is
+        returned. Otherwise the mask value is returned, that means the
+        search has failed.</li>
+      <li>To improve performance of RDB servers with current ATLAS
+        partition set default depth-of-referenced-objects parameter of <span
+          class="change"><span style="font-style: italic;">get_partition()</span>
+          algorithm equal to 10. This allows to return all Run Control
+          related objects (i.e. components, applications, parameters) in
+          single RDB call.<br>
+        </span></li>
+    </ul>
+    <h3>New Message Passing NodeID Ranges</h3>
+    In new release one needs to increase ranges for L2PU and EFDs. It
+    was decided, that this can be done reducing the range of Node IDs
+    for PTs (the NodeID in fact is not needed for them at all, so all
+    PTs are sharing the same NodeID). The new ranges are shown in the
+    table below:<br>
+    <br>
+    <table style=" text-align: left;" border="0" cellpadding="3"
+      cellspacing="2">
+      <tbody>
+        <tr>
+          <th style="text-align: center; color: rgb(255, 255, 255);
+            background-color: rgb(153, 173, 194);">Application Type<br>
+          </th>
+          <th style="text-align: center; color: rgb(255, 255, 255);
+            background-color: rgb(153, 173, 194);">Max Number<br>
+            of Instances<br>
+          </th>
+          <th style="text-align: center; color: rgb(255, 255, 255);
+            background-color: rgb(153, 173, 194);">Range</th>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">L2PU</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">32K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[32K .. 64K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">EFD</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">16K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[16K .. 32K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">SFI</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[15K .. 16K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">ROD</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">2K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[13K .. 15K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">ROBIN</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">2K</td>
+          <td style=" vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[11K .. 13K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">SFO</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[10K .. 11K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">DFM</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[09K .. 10K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">L2SV</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[08K .. 09K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">ROS</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[07K .. 08K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">ROIB</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[06K .. 07K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">LVL2ResultHandler</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[05K .. 06K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(191,
+            204, 217);">TESTNODEID</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">1K</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(191, 204, 217);">[04K .. 05K[</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top; background-color: rgb(219,
+            228, 237);">PT</td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">any<br>
+          </td>
+          <td style="vertical-align: top; text-align: right;
+            background-color: rgb(219, 228, 237);">[1]<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+  </body>
+</html>
