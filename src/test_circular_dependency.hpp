@@ -3,7 +3,7 @@
 
 class DalObject;
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 namespace daq {
   namespace core {

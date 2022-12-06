@@ -3,8 +3,8 @@
 
 #include <exception>
 
-#include <config/Configuration.h>
-#include <config/DalObject.h>
+#include "config/Configuration.hpp"
+#include "config/DalObject.hpp"
 
 
 namespace daq {

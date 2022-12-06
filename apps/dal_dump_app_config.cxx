@@ -4,14 +4,14 @@
 
 #include <ipc/core.h>
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
-#include <dal/util.h>
+#include "dal/util.hpp"
 
-#include <dal/Partition.h>
-#include <dal/BaseApplication.h>
-#include <dal/Computer.h>
-#include <dal/Segment.h>
+#include "dal/Partition.hpp"
+#include "dal/BaseApplication.hpp"
+#include "dal/Computer.hpp"
+#include "dal/Segment.hpp"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

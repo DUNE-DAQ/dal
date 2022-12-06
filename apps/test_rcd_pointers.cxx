@@ -1,17 +1,17 @@
-#include "config/Schema.h"
-#include "config/Configuration.h"
-#include "config/ConfigObject.h"
+#include "config/Schema.hpp"
+#include "config/Configuration.hpp"
+#include "config/ConfigObject.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
-#include "dal/Partition.h"
-#include "dal/Segment.h"
-#include "dal/ResourceBase.h"
-#include "dal/RunControlApplicationBase.h"
+#include "dal/Partition.hpp"
+#include "dal/Segment.hpp"
+#include "dal/ResourceBase.hpp"
+#include "dal/RunControlApplicationBase.hpp"
 
-#include "RODBusydal/BusyChannel.h"
+#include "RODBusydal/BusyChannel.hpp"
 #include "RODBusyModule/BusyTimeoutAction.h"
-#include "RODBusydal/RODBusyModule.h"
+#include "RODBusydal/RODBusyModule.hpp"
 
      std::string m_rcd_name;
      std::map <std::string, std::string> m_busy_source;

@@ -7,21 +7,21 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/BaseApplication.h"
-#include "dal/Component.h"
-#include "dal/OnlineSegment.h"
-#include "dal/Partition.h"
+#include "dal/BaseApplication.hpp"
+#include "dal/Component.hpp"
+#include "dal/OnlineSegment.hpp"
+#include "dal/Partition.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void
 run_test(const daq::core::Component * obj, const daq::core::Partition * partition)
 {
-  ERS_DEBUG(1, "call disabled(" << partition << ") on object " << obj);
+  TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on object " << obj ;
 
   try
     {
@@ -39,7 +39,7 @@ test_application(const daq::core::BaseApplication * a, const daq::core::Partitio
 {
   if (const daq::core::Component * c = a->cast<daq::core::Component>())
     {
-      ERS_DEBUG(1, "call disabled(" << partition << ") on resource application " << a);
+      TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on resource application " << a ;
 
       try
         {
@@ -69,7 +69,7 @@ static void
 test_segment(const daq::core::Segment * s, const daq::core::Partition * partition)
 {
 
-  ERS_DEBUG(1, "call disabled(" << partition << ") on segment " << s);
+  TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on segment " << s ;
   try
     {
       std::cout << " * disabled(" << partition << ") on segment object " << s << " returns " << s->disabled(*partition) << std::endl;

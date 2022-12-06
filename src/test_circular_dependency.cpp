@@ -1,6 +1,6 @@
-#include <config/DalObject.h>
+#include "config/DalObject.hpp"
 
-#include "test_circular_dependency.h"
+#include "test_circular_dependency.hpp"
 
 void
 daq::core::TestCircularDependency::push(const DalObject * object)

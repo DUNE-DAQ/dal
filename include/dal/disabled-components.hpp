@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "config/Configuration.h"
-#include "config/ConfigAction.h"
+#include "config/Configuration.hpp"
+#include "config/ConfigAction.hpp"
 
-#include "dal/Component.h"
+#include "dal/Component.hpp"
 
 namespace daq
 {

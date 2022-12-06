@@ -1,13 +1,13 @@
 #include <boost/program_options.hpp>
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
-#include <dal/OnlineSegment.h>
-#include <dal/Partition.h>
-#include <dal/ResourceSet.h>
-#include <dal/Segment.h>
+#include "dal/OnlineSegment.hpp"
+#include "dal/Partition.hpp"
+#include "dal/ResourceSet.hpp"
+#include "dal/Segment.hpp"
 
-#include <dal/util.h>
+#include "dal/util.hpp"
 
 namespace po = boost::program_options;
 

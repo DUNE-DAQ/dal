@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "dal/Segment.h"
-#include "dal/app-config.h"
+#include "dal/Segment.hpp"
+#include "dal/app-config.hpp"
 
 
 namespace daq

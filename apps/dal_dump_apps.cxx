@@ -23,13 +23,13 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/Application.h"
-#include "dal/OnlineSegment.h"
-#include "dal/Partition.h"
+#include "dal/Application.hpp"
+#include "dal/OnlineSegment.hpp"
+#include "dal/Partition.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 
 

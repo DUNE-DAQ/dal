@@ -17,11 +17,11 @@
 
 #include <boost/program_options.hpp>
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
-#include "dal/SW_Repository.h"
-#include "dal/Partition.h"
-#include "dal/util.h"
+#include "dal/SW_Repository.hpp"
+#include "dal/Partition.hpp"
+#include "dal/util.hpp"
 
 namespace po = boost::program_options;
 

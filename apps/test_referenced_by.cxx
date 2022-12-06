@@ -1,4 +1,4 @@
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
 int
 main(int argc, char **argv)

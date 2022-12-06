@@ -24,19 +24,19 @@
 
   // include headers describing abstract configuration interface
 
-#include "config/Change.h"
-#include "config/Configuration.h"
+#include "config/Change.hpp"
+#include "config/Configuration.hpp"
 
 
   // include generated headers
 
-#include "dal/Application.h"
-#include "dal/Component.h"
-#include "dal/RunControlApplication.h"
-#include "dal/Partition.h"
-#include "dal/Variable.h"
+#include "dal/Application.hpp"
+#include "dal/Component.hpp"
+#include "dal/RunControlApplication.hpp"
+#include "dal/Partition.hpp"
+#include "dal/Variable.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 
   // keep pointers to objects used to test substitution (with command line option -s)

@@ -4,7 +4,7 @@
 #include <atomic>
 #include <mutex>
 
-#include "config/ConfigAction.h"
+#include "config/ConfigAction.hpp"
 
 class Configuration;
 

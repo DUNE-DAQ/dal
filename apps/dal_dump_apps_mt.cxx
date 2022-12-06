@@ -21,13 +21,13 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/BaseApplication.h"
-#include "dal/OnlineSegment.h"
-#include "dal/Partition.h"
-#include "dal/Segment.h"
-#include "dal/util.h"
+#include "dal/BaseApplication.hpp"
+#include "dal/OnlineSegment.hpp"
+#include "dal/Partition.hpp"
+#include "dal/Segment.hpp"
+#include "dal/util.hpp"
 
 
 static void

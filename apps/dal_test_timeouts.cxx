@@ -4,9 +4,9 @@
 
 #include <boost/program_options.hpp>
 
-#include "dal/Partition.h"
-#include "dal/Segment.h"
-#include "dal/util.h"
+#include "dal/Partition.hpp"
+#include "dal/Segment.hpp"
+#include "dal/util.hpp"
 
 int
 main(int argc, char *argv[])

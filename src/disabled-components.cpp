@@ -1,15 +1,17 @@
-#include "dal/Application.h"
-#include "dal/Partition.h"
-#include "dal/ResourceSet.h"
-#include "dal/ResourceSetAND.h"
-#include "dal/ResourceSetOR.h"
-#include "dal/Segment.h"
-#include "dal/TemplateApplication.h"
-#include "dal/OnlineSegment.h"
-#include "dal/util.h"
-#include "dal/disabled-components.h"
+#include "dal/Application.hpp"
+#include "dal/Partition.hpp"
+#include "dal/ResourceSet.hpp"
+#include "dal/ResourceSetAND.hpp"
+#include "dal/ResourceSetOR.hpp"
+#include "dal/Segment.hpp"
+#include "dal/TemplateApplication.hpp"
+#include "dal/OnlineSegment.hpp"
+#include "dal/util.hpp"
+#include "dal/disabled-components.hpp"
 
-#include "test_circular_dependency.h"
+#include "logging/Logging.hpp"
+
+#include "test_circular_dependency.hpp"
 
 
 daq::core::DisabledComponents::DisabledComponents(::Configuration& db) :
@@ -17,48 +19,48 @@ daq::core::DisabledComponents::DisabledComponents(::Configuration& db) :
   m_num_of_slr_enabled_resources(0),
   m_num_of_slr_disabled_resources(0)
 {
-  ERS_DEBUG(2, "construct the object " << (void *)this );
+  TLOG_DEBUG(2) <<  "construct the object " << (void *)this  ;
   m_db.add_action(this);
 }
 
 daq::core::DisabledComponents::~DisabledComponents()
 {
-  ERS_DEBUG(2, "destroy the object " << (void *)this);
+  TLOG_DEBUG(2) <<  "destroy the object " << (void *)this ;
   m_db.remove_action(this);
 }
 
 void
 daq::core::DisabledComponents::notify(std::vector<ConfigurationChange *>& /*changes*/) noexcept
 {
-  ERS_DEBUG(2, "reset partition components because of notification callback on object " << (void *)this);
+  TLOG_DEBUG(2) <<  "reset partition components because of notification callback on object " << (void *)this ;
   __clear();
 }
 
 void
 daq::core::DisabledComponents::load() noexcept
 {
-  ERS_DEBUG(2, "reset partition components because of configuration load on object " << (void *)this);
+  TLOG_DEBUG(2) <<  "reset partition components because of configuration load on object " << (void *)this ;
   __clear();
 }
 
 void
 daq::core::DisabledComponents::unload() noexcept
 {
-  ERS_DEBUG(2, "reset partition components because of configuration unload on object " << (void *)this);
+  TLOG_DEBUG(2) <<  "reset partition components because of configuration unload on object " << (void *)this ;
   __clear();
 }
 
 void
 daq::core::DisabledComponents::update(const ConfigObject& obj, const std::string& name) noexcept
 {
-  ERS_DEBUG(2, "reset partition components because of configuration update (obj = " << obj << ", name = \'" << name << "\') on object " << (void *)this);
+  TLOG_DEBUG(2) <<  "reset partition components because of configuration update (obj = " << obj << ", name = \'" << name << "\') on object " << (void *)this ;
   __clear();
 }
 
 void
 daq::core::DisabledComponents::reset() noexcept
 {
-  ERS_DEBUG(2, "reset disabled by explicit user call");
+  TLOG_DEBUG(2) <<  "reset disabled by explicit user call" ;
   m_disabled.clear(); // do not clear s_user_disabled && s_user_enabled !!!
 }
 
@@ -125,12 +127,12 @@ daq::core::DisabledComponents::disable_children(const daq::core::ResourceSet& rs
       //if (i->castable(&daq::core::TemplateApplication::s_class_name) == false)
       if (i->cast<daq::core::TemplateApplication>() == nullptr)
         {
-          ERS_DEBUG(6, "disable resource " << i << " because it's parent resource-set " << &rs << " is disabled");
+          TLOG_DEBUG(6) <<  "disable resource " << i << " because it's parent resource-set " << &rs << " is disabled" ;
           disable(*i);
         }
       else
         {
-          ERS_DEBUG(6, "do not disable template resource application " << i << " (it's parent resource-set " << &rs << " is disabled)");
+          TLOG_DEBUG(6) <<  "do not disable template resource application " << i << " (it's parent resource-set " << &rs << " is disabled)" ;
         }
 
       if (const daq::core::ResourceSet * rs2 = i->cast<daq::core::ResourceSet>())
@@ -149,12 +151,12 @@ daq::core::DisabledComponents::disable_children(const daq::core::Segment& s)
       //if (i->castable(&daq::core::TemplateApplication::s_class_name) == false)
       if (i->cast<daq::core::TemplateApplication>() == nullptr)
         {
-          ERS_DEBUG(6, "disable resource " << i << " because it's parent segment " << &s << " is disabled");
+          TLOG_DEBUG(6) <<  "disable resource " << i << " because it's parent segment " << &s << " is disabled" ;
           disable(*i);
         }
       else
         {
-          ERS_DEBUG(6, "do not disable template resource application " << i << " (it's parent segment " << &s << " is disabled)");
+          TLOG_DEBUG(6) <<  "do not disable template resource application " << i << " (it's parent segment " << &s << " is disabled)" ;
         }
 
       if (const daq::core::ResourceSet * rs = i->cast<daq::core::ResourceSet>())
@@ -165,7 +167,7 @@ daq::core::DisabledComponents::disable_children(const daq::core::Segment& s)
 
   for (auto & j : s.get_Segments())
     {
-      ERS_DEBUG(6, "disable segment " << j << " because it's parent segment " << &s << " is disabled");
+      TLOG_DEBUG(6) <<  "disable segment " << j << " because it's parent segment " << &s << " is disabled" ;
       disable(*j);
       disable_children(*j);
     }
@@ -303,22 +305,22 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
               for (auto & i : partition.m_disabled_components.m_user_disabled)
                 {
                   vector_of_disabled.push_back(i);
-                  ERS_DEBUG(6, "disable component " << i << " because it is explicitly disabled by user");
+                  TLOG_DEBUG(6) <<  "disable component " << i << " because it is explicitly disabled by user" ;
                 }
 
               // add partition-disabled components ignoring explicitly enabled by user
               for (auto & i : partition.get_Disabled())
                 {
-                  ERS_DEBUG(6, "check component " << i << " explicitly disabled in partition");
+                  TLOG_DEBUG(6) <<  "check component " << i << " explicitly disabled in partition" ;
 
                   if (partition.m_disabled_components.m_user_enabled.find(i) == partition.m_disabled_components.m_user_enabled.end())
                     {
                       vector_of_disabled.push_back(i);
-                      ERS_DEBUG(6, "disable component " << i << " because it is explicitly disabled in partition");
+                      TLOG_DEBUG(6) <<  "disable component " << i << " because it is explicitly disabled in partition" ;
                     }
                   else
                     {
-                      ERS_DEBUG(6, "skip component " << i << " because it is enabled by user");
+                      TLOG_DEBUG(6) <<  "skip component " << i << " because it is enabled by user" ;
                     }
                 }
 
@@ -342,7 +344,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
             {
               const unsigned long num(partition.m_disabled_components.size());
 
-              ERS_DEBUG(6, "before auto-disabling iteration " << count << " the number of disabled components is " << num);
+              TLOG_DEBUG(6) <<  "before auto-disabling iteration " << count << " the number of disabled components is " << num ;
 
               for (const auto& i : rs_or)
                 {
@@ -353,7 +355,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
                         {
                           if (!partition.m_disabled_components.is_enabled_short(i2))
                             {
-                              ERS_DEBUG(6, "disable resource-set-OR " << i << " because it's child " << i2 << " is disabled");
+                              TLOG_DEBUG(6) <<  "disable resource-set-OR " << i << " because it's child " << i2 << " is disabled" ;
                               partition.m_disabled_components.disable(*i);
                               partition.m_disabled_components.disable_children(*i);
                               break;
@@ -382,7 +384,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
                             }
                           if (found_enabled == false)
                             {
-                              ERS_DEBUG(6, "disable resource-set-AND " << j << " because all it's children are disabled");
+                              TLOG_DEBUG(6) <<  "disable resource-set-AND " << j << " because all it's children are disabled" ;
                               partition.m_disabled_components.disable(*j);
                               partition.m_disabled_components.disable_children(*j);
                             }
@@ -392,7 +394,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
 
               if (partition.m_disabled_components.size() == num)
                 {
-                  ERS_DEBUG(6, "after " << count << " iteration(s) auto-disabling algorithm found no newly disabled sets, exiting loop ...");
+                  TLOG_DEBUG(6) <<  "after " << count << " iteration(s) auto-disabling algorithm found no newly disabled sets, exiting loop ..." ;
                   break;
                 }
 
@@ -408,7 +410,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
     }
 
   bool result(skip_check ? !partition.m_disabled_components.is_enabled_short(this) : !partition.m_disabled_components.is_enabled(this));
-  ERS_DEBUG( 6, "disabled(" << this << ") returns " << std::boolalpha << result );
+  TLOG_DEBUG( 6) <<  "disabled(" << this << ") returns " << std::boolalpha << result  ;
   return result;
 }
 

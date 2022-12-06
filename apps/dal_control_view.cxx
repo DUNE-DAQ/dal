@@ -20,15 +20,15 @@
 
 #include <ipc/core.h>
 
-#include "config/Change.h"
-#include "config/Configuration.h"
+#include "config/Change.hpp"
+#include "config/Configuration.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
-#include "dal/OnlineSegment.h"
-#include "dal/Resource.h"
-#include "dal/ResourceSet.h"
-#include "dal/Partition.h"
+#include "dal/OnlineSegment.hpp"
+#include "dal/Resource.hpp"
+#include "dal/ResourceSet.hpp"
+#include "dal/Partition.hpp"
 
 
 // the struct stores callback's parameters

@@ -4,13 +4,13 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/BaseApplication.h"
-#include "dal/Component.h"
-#include "dal/Partition.h"
+#include "dal/BaseApplication.hpp"
+#include "dal/Component.hpp"
+#include "dal/Partition.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 template<class T>
 void

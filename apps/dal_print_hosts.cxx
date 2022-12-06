@@ -34,14 +34,14 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/BaseApplication.h"
-#include "dal/Computer.h"
-#include "dal/CustomLifetimeApplicationBase.h"
-#include "dal/Partition.h"
+#include "dal/BaseApplication.hpp"
+#include "dal/Computer.hpp"
+#include "dal/CustomLifetimeApplicationBase.hpp"
+#include "dal/Partition.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 
 static void

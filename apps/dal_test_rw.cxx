@@ -3,12 +3,12 @@
 
 #include <boost/program_options.hpp>
 
-#include <config/Configuration.h>
-#include <config/ConfigObject.h>
+#include "config/Configuration.hpp"
+#include "config/ConfigObject.hpp"
 
-#include "dal/Computer.h"
-#include "dal/Module.h"
-#include "dal/Rack.h"
+#include "dal/Computer.hpp"
+#include "dal/Module.hpp"
+#include "dal/Rack.hpp"
 
 ERS_DECLARE_ISSUE(
   dal_test_rw,

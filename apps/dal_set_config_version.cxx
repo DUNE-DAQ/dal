@@ -2,7 +2,7 @@
 
 #include <ipc/core.h>
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 #include "exit_status.h"
 
 int

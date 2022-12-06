@@ -16,12 +16,12 @@
 
 #include <ipc/core.h>
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
-#include "dal/SW_Repository.h"
-#include "dal/Partition.h"
+#include "dal/SW_Repository.hpp"
+#include "dal/Partition.hpp"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ main(int argc, char * argv[])
                     {
                       std::string key = j.substr(0, pos + 1);
                       std::string value = j.substr(pos + 1);
-                      ERS_DEBUG(3, "insert key=\'" << key << "\', value=\'" << value << "\'");
+                      TLOG_DEBUG(3) <<  "insert key=\'" << key << "\', value=\'" << value << "\'" ;
                       d_properties[key].insert(value);
                       continue;
                     }

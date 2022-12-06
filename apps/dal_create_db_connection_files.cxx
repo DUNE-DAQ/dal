@@ -14,18 +14,18 @@
 
 #include <boost/program_options.hpp>
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #include "ipc/core.h"
 
-#include "config/Configuration.h"
+#include "config/Configuration.hpp"
 
-#include "dal/Partition.h"
-#include "dal/TriggerConfiguration.h"
-#include "dal/DBConnection.h"
-#include "dal/TriggerDBConnection.h"
+#include "dal/Partition.hpp"
+#include "dal/TriggerConfiguration.hpp"
+#include "dal/DBConnection.hpp"
+#include "dal/TriggerDBConnection.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
 typedef   std::map<std::string,std::string> TranslationMap;
 
@@ -108,16 +108,16 @@ int main(int ac, char *av[])
   }
   if(vm.count("partition")) {
     tdaq_partition = vm["partition"].as<std::string>();
-    ERS_DEBUG(0, "Partition Name: " << tdaq_partition);
+    TLOG_DEBUG(0) <<  "Partition Name: " << tdaq_partition ;
   }
   if(vm.count("database")) {
     tdaq_db = vm["database"].as<std::string>();
-    ERS_DEBUG(0, "Database Name: " << tdaq_db);
+    TLOG_DEBUG(0) <<  "Database Name: " << tdaq_db ;
   }
 
   if(vm.count("lookup_path")) {
     lookup = vm["lookup_path"].as<std::string>();
-    ERS_DEBUG(0, "Path for dblookup.xml: " << lookup);
+    TLOG_DEBUG(0) <<  "Path for dblookup.xml: " << lookup ;
   }
 
   // Create translation maps between DB values and content to add
@@ -243,7 +243,7 @@ int main(int ac, char *av[])
     }
     catch (std::exception &e) {
     }
-    ERS_DEBUG(0, "Exiting now");
+    TLOG_DEBUG(0) <<  "Exiting now" ;
   }
   catch (ers::Issue & ex) {
     ers::fatal(ex);

@@ -17,54 +17,48 @@
 #include <sstream>
 #include <algorithm>
 
-#include <ers/ers.h>
-#include <ipc/core.h>
-#include <ipc/partition.h>
-#include <is/infodictionary.h>
-#include <rdb/rdb.hh>
-#include <rdb/errors.h>
-#include <system/Host.h>
+#include "ers/ers.hpp"
+#include "system/Host.hpp"
+#include "logging/Logging.hpp"
 
 #include <boost/spirit/include/karma.hpp>
 
-#include <config/ConfigObject.h>
-#include <config/ConfigAction.h>
-#include <config/Configuration.h>
-#include <config/map.h>
+#include "config/ConfigObject.hpp"
+#include "config/ConfigAction.hpp"
+#include "config/Configuration.hpp"
+#include "config/map.hpp"
 
-#include "dal/util.h"
+#include "dal/util.hpp"
 
-#include "dal/BinaryFile.h"
-#include "dal/Binary.h"
-#include "dal/Computer.h"
-#include "dal/ComputerSet.h"
-#include "dal/InfrastructureApplication.h"
-#include "dal/InfrastructureTemplateApplication.h"
-#include "dal/JarFile.h"
-#include "dal/OnlineSegment.h"
-#include "dal/Partition.h"
-#include "dal/PlatformCompatibility.h"
-#include "dal/Rack.h"
-#include "dal/Resource.h"
-#include "dal/ResourceSetAND.h"
-#include "dal/ResourceSetOR.h"
-#include "dal/RunControlTemplateApplication.h"
-#include "dal/RunControlApplication.h"
-#include "dal/Segment.h"
-#include "dal/Script.h"
-#include "dal/SW_ExternalPackage.h"
-#include "dal/SW_PackageVariable.h"
-#include "dal/SW_Repository.h"
-#include "dal/Tag.h"
-#include "dal/TagMapping.h"
-#include "dal/TemplateApplication.h"
-#include "dal/TemplateSegment.h"
-#include "dal/Variable.h"
-#include "dal/VariableSet.h"
+#include "dal/BinaryFile.hpp"
+#include "dal/Binary.hpp"
+#include "dal/Computer.hpp"
+#include "dal/ComputerSet.hpp"
+#include "dal/InfrastructureApplication.hpp"
+#include "dal/InfrastructureTemplateApplication.hpp"
+#include "dal/JarFile.hpp"
+#include "dal/OnlineSegment.hpp"
+#include "dal/Partition.hpp"
+#include "dal/PlatformCompatibility.hpp"
+#include "dal/Rack.hpp"
+#include "dal/Resource.hpp"
+#include "dal/ResourceSetAND.hpp"
+#include "dal/ResourceSetOR.hpp"
+#include "dal/RunControlTemplateApplication.hpp"
+#include "dal/RunControlApplication.hpp"
+#include "dal/Segment.hpp"
+#include "dal/Script.hpp"
+#include "dal/SW_ExternalPackage.hpp"
+#include "dal/SW_PackageVariable.hpp"
+#include "dal/SW_Repository.hpp"
+#include "dal/Tag.hpp"
+#include "dal/TagMapping.hpp"
+#include "dal/TemplateApplication.hpp"
+#include "dal/TemplateSegment.hpp"
+#include "dal/Variable.hpp"
+#include "dal/VariableSet.hpp"
 
-#include "dal/ConfigVersion.h"
-
-#include "test_circular_dependency.h"
+#include "test_circular_dependency.hpp"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +334,7 @@ get_paths(
 
       if (patch_area.empty())
         {
-          ERS_DEBUG(2, "skip empty \"PatchArea\" of " << repository);
+          TLOG_DEBUG(2) <<  "skip empty \"PatchArea\" of " << repository ;
         }
       else
         {
@@ -351,7 +345,7 @@ get_paths(
 
       if (installation_path.empty())
         {
-          ERS_DEBUG( 2 , "skip " << repository << " with empty \"InstallationPath\" attribute");
+          TLOG_DEBUG( 2 ) <<  "skip " << repository << " with empty \"InstallationPath\" attribute" ;
         }
       else
         {
@@ -595,7 +589,7 @@ daq::core::Component::get_parents(const daq::core::Partition& partition, std::li
           }
 
       if (parents.empty())
-        ERS_DEBUG(1, "cannot find segment/resource path(s) between Component " << this << " and partition " << &partition << " objects (check this object is linked with the partition as a segment or a resource)");
+        TLOG_DEBUG(1) <<  "cannot find segment/resource path(s) between Component " << this << " and partition " << &partition << " objects (check this object is linked with the partition as a segment or a resource)" ;
     }
   catch (ers::Issue & ex)
     {
@@ -724,7 +718,7 @@ add_front_partition_environment(std::map<std::string, std::string>& environment,
       if (const char * s_user_repository = get_env(s_tdaq_db_user_repository_str.c_str()))
         {
           add_env_var(environment, s_tdaq_db_path_str, s_user_repository);
-          ERS_DEBUG(2, "Set " << s_tdaq_db_path_str << "=" << s_user_repository << " and unset " << s_tdaq_db_user_repository_str << " and " << s_tdaq_db_repository_str);
+          TLOG_DEBUG(2) <<  "Set " << s_tdaq_db_path_str << "=" << s_user_repository << " and unset " << s_tdaq_db_user_repository_str << " and " << s_tdaq_db_repository_str ;
         }
       else
         {
@@ -732,12 +726,12 @@ add_front_partition_environment(std::map<std::string, std::string>& environment,
 
           add_env_var(environment, s_tdaq_db_repository_str, s_repository);
           add_env_var(environment, s_tdaq_db_path_str, "");
-          ERS_DEBUG(2, "Set " << s_tdaq_db_repository_str << '=' << s_repository << " and unset " << s_tdaq_db_path_str);
+          TLOG_DEBUG(2) <<  "Set " << s_tdaq_db_repository_str << '=' << s_repository << " and unset " << s_tdaq_db_path_str ;
 
           if (s_mapping_dir)
             {
               add_env_var(environment, s_oks_repository_mapping_dir_str, s_mapping_dir);
-              ERS_DEBUG(2, "Set " << s_oks_repository_mapping_dir_str << '=' << s_mapping_dir);
+              TLOG_DEBUG(2) <<  "Set " << s_oks_repository_mapping_dir_str << '=' << s_mapping_dir ;
             }
         }
     }
@@ -790,7 +784,7 @@ extend_env_var(std::map<std::string, std::string>& environment,
       val.append(old_value);
     }
 
-  ERS_DEBUG(4, "extend environment variable " << var->get_Name() << "=\'" << environment[var->get_Name()] << "\' as defined by object " << var << " linked with " << package);
+  TLOG_DEBUG(4) <<  "extend environment variable " << var->get_Name() << "=\'" << environment[var->get_Name()] << "\' as defined by object " << var << " linked with " << package ;
 }
 
 
@@ -828,7 +822,7 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
             {
               if (environment.emplace(rn, sr->get_InstallationPath()).second == true)
                 {
-                  ERS_DEBUG(4, "add environment variable " << rn << "=\'" << sr->get_InstallationPath() << "\' defined by object " << sr);
+                  TLOG_DEBUG(4) <<  "add environment variable " << rn << "=\'" << sr->get_InstallationPath() << "\' defined by object " << sr ;
                 }
               else
                 {
@@ -858,14 +852,14 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
     if (const daq::core::Script *script = computer_program->cast<daq::core::Script>())
       if (!strcasecmp("java", script->get_Shell().c_str()))
         {
-          ERS_DEBUG(5, "application " << base_application << " is Java script");
+          TLOG_DEBUG(5) <<  "application " << base_application << " is Java script" ;
 
           std::string class_path;
           std::map<std::string, std::string>::const_iterator x = environment.find(s_classpath_str);
           if (x != environment.end())
             {
               class_path = x->second;
-              ERS_DEBUG(5, "CLASSPATH defined via environment: " << class_path);
+              TLOG_DEBUG(5) <<  "CLASSPATH defined via environment: " << class_path ;
             }
 
           const std::string &user_dir(partition.get_RepositoryRoot());
@@ -878,7 +872,7 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
                 }
             }
 
-          ERS_DEBUG(5, "set final CLASSPATH: " << class_path);
+          TLOG_DEBUG(5) <<  "set final CLASSPATH: " << class_path ;
           environment[s_classpath_str] = class_path;
         }
   }
@@ -942,11 +936,11 @@ static void get_parameters(
 )
 // throw ( BadProgramInfo BadTag)
 {
-  ERS_DEBUG(4, " CALL get_parameters()"
+  TLOG_DEBUG(4) << " CALL get_parameters()"
             << "\n  program   = " << this_cp
             << "\n  tag       = " << &tag
             << "\n  host      = " << &host
-            << "\n  partition = " << &partition );
+            << "\n  partition = " << &partition ;
 
   const daq::core::SW_Repository * belongs_to = nullptr;
   const bool is_script = (this_cp->class_name() == daq::core::Script::s_class_name);
@@ -997,7 +991,7 @@ static void get_parameters(
     {
       // Script
       program_name = this_cp->get_BinaryName();
-      ERS_DEBUG(6, "the Program name is \"" << program_name << "\" (name of script)");
+      TLOG_DEBUG(6) <<  "the Program name is \"" << program_name << "\" (name of script)" ;
       if (program_name.empty())
         throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (name of script)" );
       }
@@ -1012,7 +1006,7 @@ static void get_parameters(
           {
             // Binary with no exact implementation
             program_name = this_cp->get_BinaryName();
-            ERS_DEBUG(6, "the program name is \"" << program_name << "\" (name of binary without exact implementations)");
+            TLOG_DEBUG(6) <<  "the program name is \"" << program_name << "\" (name of binary without exact implementations)" ;
             if (program_name.empty())
               throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (no exact implementation)" );
           }
@@ -1025,7 +1019,7 @@ static void get_parameters(
                 if (j->get_Tag() == &tag)
                   {
                     program_name = j->get_BinaryName();
-                    ERS_DEBUG(6, "the program name is \"" << program_name << "\" name of exact implementation binary file " << j );
+                    TLOG_DEBUG(6) <<  "the program name is \"" << program_name << "\" name of exact implementation binary file " << j  ;
                     break;
                   }
               }
@@ -1114,11 +1108,11 @@ void daq::core::ComputerProgram::get_info(
   const daq::core::Computer& host
 ) const
 {
-  ERS_DEBUG(4, " CALL daq::core::ComputerProgram::get_info()" 
+  TLOG_DEBUG(4) << " CALL daq::core::ComputerProgram::get_info()" 
 	    << "  \n this      = " << this  
 	    << "  \n tag       = " << &tag 
 	    << "  \n host      = " << &host
-	    << "  \n partition = " << &partition );
+	    << "  \n partition = " << &partition ;
 
 
     // Get the program names and the search paths
@@ -1249,7 +1243,7 @@ daq::core::Segment::get_timeouts(int& actionTimeout, int& shortActionTimeout) co
   actionTimeout += get_IsControlledBy()->get_ActionTimeout();
   shortActionTimeout += get_IsControlledBy()->cast<daq::core::BaseApplication>()->get_ExitTimeout();
 
-  ERS_DEBUG(4, "Segment: " << UID() << ": Action Timeout --> " << actionTimeout << "; Exit Timeout --> " << shortActionTimeout);
+  TLOG_DEBUG(4) <<  "Segment: " << UID() << ": Action Timeout --> " << actionTimeout << "; Exit Timeout --> " << shortActionTimeout ;
 
   return;
 }
@@ -1810,12 +1804,11 @@ daq::core::AlgorithmUtils::add_segments(
 bool
 daq::core::AlgorithmUtils::check_app(const daq::core::BaseApplication * app, std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const daq::core::Computer *> * use_hosts)
 {
-  ERS_DEBUG( 5,
+  TLOG_DEBUG( 5) <<
     "check_app(app=" << app->UID() << ", seg=" << app->get_segment() << ", host=" << app->get_host() << "):"
     " app_types=" << (app_types && app_types->find(app->class_name()) == app_types->end()) <<
     " use_segments=" << (use_segments && use_segments->find(app->get_segment()->UID()) == use_segments->end()) <<
-    " use_hosts=" << (use_hosts && use_hosts->find(app->get_host()) == use_hosts->end())
-  );
+    " use_hosts=" << (use_hosts && use_hosts->find(app->get_host()) == use_hosts->end());
 
   return (
     (
@@ -1834,7 +1827,7 @@ daq::core::AlgorithmUtils::get_applications(std::vector<const daq::core::BaseApp
   // return, if segment is disabled
   if (seg_config->is_disabled() == true)
     {
-      ERS_DEBUG( 3, "segment " << seg.UID() << " is disabled" );
+      TLOG_DEBUG( 3) <<  "segment " << seg.UID() << " is disabled"  ;
       return;
     }
 
@@ -2272,13 +2265,13 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
   const daq::core::BaseApplication * base_app = this_app->get_base_app();
   const daq::core::Segment * segment = this_app->get_segment();
 
-  ERS_DEBUG( 4, "  this           = " << this_app->UID() << "\n"
+  TLOG_DEBUG( 4) << "  this           = " << this_app->UID() << "\n"
                 "  partition      = " << &partition << "\n"
                 "  parent segment = " << segment << "\n"
-                "  host           = " << &host );
+                "  host           = " << &host ;
 
     {
-      ERS_DEBUG( 4, "Building partition-segment[s] path to the application" );
+      TLOG_DEBUG( 4) <<  "Building partition-segment[s] path to the application"  ;
 
       std::list<std::vector<const daq::core::Component *>> paths;
       segment->get_parents(partition, paths);
@@ -2306,7 +2299,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
 
       std::vector<const daq::core::Component *>& path = paths.front();
 
-      ERS_DEBUG( 5, "add " << root_segment << " as root segment for application " << this_app->UID());
+      TLOG_DEBUG( 5) <<  "add " << root_segment << " as root segment for application " << this_app->UID() ;
       s_list.push_back(root_segment);
 
       if (path.size() != 1 || path[0]->UID() != root_segment->UID())
@@ -2363,7 +2356,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
           text << " * segment " << (*i)->UID() << std::endl;
         }
       text << " * partition: " << &partition << std::endl;
-      ERS_DEBUG(4, "PATH to application " << this_app->UID() << " is:\n" << text.str());
+      TLOG_DEBUG(4) <<  "PATH to application " << this_app->UID() << " is:\n" << text.str() ;
     }
 
   // Check Application has a Program linked to it and that program is linked to a sw repository
@@ -2393,14 +2386,14 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     for (std::list<const daq::core::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i) {
       if(s_list.size() > 1 && *i == root_segment)
         {
-          ERS_DEBUG(4, "skip default tags of " << root_segment << " for application " << this_app->UID());
+          TLOG_DEBUG(4) <<  "skip default tags of " << root_segment << " for application " << this_app->UID() ;
           continue;
         }
 
       const auto& default_tags((*i)->get_DefaultTags());
       if (!default_tags.empty()) {
         tempTags.insert(tempTags.end(), default_tags.begin(), default_tags.end());
-        ERS_DEBUG(4, "use default tags of " << *i << " for application " << this_app->UID());
+        TLOG_DEBUG(4) <<  "use default tags of " << *i << " for application " << this_app->UID() ;
         break;
       }
     }
@@ -2409,7 +2402,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     const auto& default_tags(partition.get_DefaultTags());
     if (!default_tags.empty() && tempTags.empty()) {
       tempTags.insert(tempTags.end(), default_tags.begin(), default_tags.end());
-      ERS_DEBUG(4, "use default tags of " << &partition << " for application " << this_app->UID());
+      TLOG_DEBUG(4) <<  "use default tags of " << &partition << " for application " << this_app->UID() ;
     }
   }
 
@@ -2424,7 +2417,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
       if (daq::core::is_compatible(*i, host, partition))
         tags.push_back(i);
       else
-        ERS_DEBUG(6, "* remove tag " << i << " which is incompatible with the HW tag " << host.get_HW_Tag());
+        TLOG_DEBUG(6) <<  "* remove tag " << i << " which is incompatible with the HW tag " << host.get_HW_Tag() ;
 
     // No Tags found to support this hardware
     if (tags.empty())
@@ -2448,7 +2441,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
         text <<" application's tags for " << this_app->UID() << " are:\n";
         for (const auto& i : tags)
           text << " * tag " << i << "\n";
-        ERS_DEBUG(6,text.str());
+        TLOG_DEBUG(6) << text.str() ;
       }
   }
 
@@ -2575,21 +2568,21 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
   try
   {
     add_front_partition_environment(environment, partition); // throw
-    ERS_DEBUG( 5, "calculate " << this << " process environment:\n"
+    TLOG_DEBUG( 5) << "calculate " << this << " process environment:\n"
                   "add front " << &partition << " object environment\n"
-                  << mk_app_env_string(environment) );
+                  << mk_app_env_string(environment) ;
 
     // Application needs Environment
     add_env_vars(environment, get_ProcessEnvironment(), tag);
-    ERS_DEBUG( 5, "calculate " << this << " process environment:\n"
+    TLOG_DEBUG( 5) << "calculate " << this << " process environment:\n"
                   "add " << this << " object environment\n"
-                  << mk_app_env_string(environment) );
+                  << mk_app_env_string(environment) ;
 
     // Application's ComputerProgram needs Environment
     add_env_vars(environment, program->get_ProcessEnvironment(), tag);
-    ERS_DEBUG( 5, "calculate " << this << " process environment:\n"
+    TLOG_DEBUG( 5) << "calculate " << this << " process environment:\n"
                   "add " << program << " object environment\n"
-                  << mk_app_env_string(environment) );
+                  << mk_app_env_string(environment) ;
 
     // Segment list NeedsEnvironment
     std::map<std::string,std::string> parent_var_names;
@@ -2608,14 +2601,14 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
               get_host_and_backup_list(j)
             );
 
-            ERS_DEBUG(6, j->get_base_app() << " adds segment-wide process environment " << swv_name << " => " << value);
+            TLOG_DEBUG(6) <<  j->get_base_app() << " adds segment-wide process environment " << swv_name << " => " << value ;
             environment.emplace(swv_name, value);
 
               // check if one is looking for parent with this name; add and mark if found
             std::map<std::string,std::string>::iterator x = parent_var_names.find(swv_name);
             if(x != parent_var_names.end() && !x->second.empty()) {
               environment.emplace(x->second, value);
-              ERS_DEBUG(6, j->get_base_app() << " adds parent segment-wide process environment " << x->second << " => " << value);
+              TLOG_DEBUG(6) <<  j->get_base_app() << " adds parent segment-wide process environment " << x->second << " => " << value ;
               x->second = "";
             }
 
@@ -2623,7 +2616,7 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
             const std::string& swv_parent_name(ia->get_SegmentProcEnvVarParentName());
             if(!swv_parent_name.empty()) {
               if(parent_var_names.emplace(swv_name,swv_parent_name).second == true) {
-                ERS_DEBUG(6, j->get_base_app() << " requires to add parent segment-wide process environment " << swv_parent_name << " (set for " << swv_name << ')');
+                TLOG_DEBUG(6) <<  j->get_base_app() << " requires to add parent segment-wide process environment " << swv_parent_name << " (set for " << swv_name << ')' ;
               }
             }
           }
@@ -2633,23 +2626,23 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
         }
       }
 
-      ERS_DEBUG( 5, "calculate " << this << " process environment:\n"
+      TLOG_DEBUG( 5) << "calculate " << this << " process environment:\n"
                     "add " << *i << " object environment\n"
-                    << mk_app_env_string(environment) );
+                    << mk_app_env_string(environment) ;
     }
 
     add_end_partition_environment(environment, partition, base_app, program, tag);
-    ERS_DEBUG( 5, "calculate " << base_app << " process environment:\n"
+    TLOG_DEBUG( 5) << "calculate " << base_app << " process environment:\n"
                   "add end " << &partition << " object environment\n"
-                  << mk_app_env_string(environment) );
+                  << mk_app_env_string(environment) ;
 
     // Set Application ID and name variables
     add_env_var(environment, s_tdaq_application_object_id_str, base_app->UID());
     add_env_var(environment, s_tdaq_application_name_str, UID());
 
-    ERS_DEBUG( 5, "final " << base_app << " process environment:\n"
+    TLOG_DEBUG( 5) << "final " << base_app << " process environment:\n"
                   "add TDAQ_APPLICATION_OBJECT_ID and TDAQ_APPLICATION_NAME variables to environment\n"
-               << mk_app_env_string(environment)  );
+               << mk_app_env_string(environment)  ;
   }
   catch  ( daq::config::Generic & ex ) {
     throw daq::core::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
@@ -2699,13 +2692,13 @@ daq::core::BaseApplication::get_backup_hosts() const
 daq::core::ApplicationConfig::ApplicationConfig(::Configuration& db) :
     m_db(db), m_root_segment(nullptr)
 {
-  ERS_DEBUG(2, "construct the object " << (void *)this);
+  TLOG_DEBUG(2) <<  "construct the object " << (void *)this ;
   m_db.add_action(this);
 }
 
 daq::core::ApplicationConfig::~ApplicationConfig()
 {
-  ERS_DEBUG(2, "destroy the object " << (void *)this);
+  TLOG_DEBUG(2) <<  "destroy the object " << (void *)this ;
   m_db.remove_action(this);
 }
 
@@ -2716,7 +2709,7 @@ daq::core::ApplicationConfig::~ApplicationConfig()
 std::string
 daq::core::Partition::get_log_directory() const
 {
-  ERS_DEBUG(4, " CALL " << this << "::get_log_directory()");
+  TLOG_DEBUG(4) <<  " CALL " << this << "::get_log_directory()" ;
 
   std::string log_path = get_LogRoot();
 
@@ -2804,7 +2797,7 @@ daq::core::SubstituteVariables::reset(const Partition& p)
             {
               if(m_cvt_map.emplace(rn, i->get_InstallationPath()).second == true)
                 {
-                  ERS_DEBUG(4, "add substitute variables conversion map parameter " << rn << "=\'" << i->get_InstallationPath() << "\' defined by object " << *i);
+                  TLOG_DEBUG(4) <<  "add substitute variables conversion map parameter " << rn << "=\'" << i->get_InstallationPath() << "\' defined by object " << *i ;
                 }
               else
                 {
@@ -2856,7 +2849,7 @@ daq::core::SubstituteVariables::reset(const Partition& p)
           map_iter++;
         }
 
-      ERS_DEBUG(3, text.str());
+      TLOG_DEBUG(3) <<  text.str() ;
     }
 
   // unread all objects, which may appear in template cache
@@ -2867,14 +2860,14 @@ daq::core::SubstituteVariables::reset(const Partition& p)
 void
 daq::core::SubstituteVariables::convert(std::string& s, const Configuration&, const ConfigObject& o, const std::string& a)
 {
-  ERS_DEBUG(5, "convert attribute \'" << a << "\' value \'" << s << "\' of object " << &o);
+  TLOG_DEBUG(5) <<  "convert attribute \'" << a << "\' value \'" << s << "\' of object " << &o ;
 
   static const std::string beg_str("${");
   static const std::string end_str("}");
 
   s = substitute_variables(s, &m_cvt_map, beg_str, end_str);
 
-  ERS_DEBUG(5, "return value \'" << s << '\'');
+  TLOG_DEBUG(5) <<  "return value \'" << s << '\'' ;
 }
 
 std::string
@@ -2995,7 +2988,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
   if (const char * rl = get_env("DAL_GET_PARTITION_REF_LEVEL"))
     {
       rlevel = atoi(rl);
-      ERS_DEBUG(3, " set ref-level parameter = " << rlevel << " (was read from non-empty environment variable \"DAL_GET_PARTITION_REF_LEVEL\")");
+      TLOG_DEBUG(3) <<  " set ref-level parameter = " << rlevel << " (was read from non-empty environment variable \"DAL_GET_PARTITION_REF_LEVEL\")" ;
     }
 
   // reset reference parameter if the method was called for this partition
@@ -3009,7 +3002,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
   if (s_already_processed_partitions.find(cname) != s_already_processed_partitions.end())
     {
       rlevel = 0;
-      ERS_DEBUG(3, " set ref-level parameter = 0 (the method get_partition() has been called already for partition@configuration \'" << cname << "\')");
+      TLOG_DEBUG(3) <<  " set ref-level parameter = 0 (the method get_partition() has been called already for partition@configuration \'" << cname << "\')" ;
     }
   else
     {
@@ -3031,7 +3024,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
               dummu.push_back(token);
               names += token + '\n';
             }
-          ERS_DEBUG(3, " set ref-class-names parameter = " << names << " (was read from non-empty environment variable \"DAL_GET_PARTITION_REF_CLASS_NAMES\")");
+          TLOG_DEBUG(3) <<  " set ref-class-names parameter = " << names << " (was read from non-empty environment variable \"DAL_GET_PARTITION_REF_CLASS_NAMES\")" ;
         }
       else if (getenv("DAL_GET_PARTITION_AVOID_DEF_REF_CLASS_NAMES") == nullptr)
         {
@@ -3050,7 +3043,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
               daq::core::BinaryFile::s_class_name,       // sw object extensions
               daq::core::Parameter::s_class_name         // parameters for substitution
             };
-          ERS_DEBUG(3, " set default ref-class-names parameter (to get info about applications)");
+          TLOG_DEBUG(3) <<  " set default ref-class-names parameter (to get info about applications)" ;
         }
     }
 
@@ -3174,7 +3167,7 @@ daq::core::get_used_repositories(const daq::core::Partition& p)
 static void
 check_file_exists(const std::string& path, std::string & file)
 {
-  ERS_DEBUG(6, "try path \'" << path << '\'');
+  TLOG_DEBUG(6) <<  "try path \'" << path << '\'' ;
 
   struct stat buffer;
   if (stat(path.c_str(), &buffer) == 0)
@@ -3232,123 +3225,15 @@ static std::string cv_info_name("RunParams.ConfigVersion");
 std::string
 daq::core::get_config_version(const std::string& partition)
 {
-  IPCPartition p(partition);
-  ISInfoDictionary dict(p);
-
-  ConfigVersion cv;
-  cv.Version = "";
-
-  try
-    {
-      ERS_DEBUG(1, "try to read IS value " << cv_info_name);
-      dict.findValue(cv_info_name, cv);
-    }
-  catch (const daq::is::InfoNotFound & ex)
-    {
-      throw daq::config::NotFound(ERS_HERE, "is value", cv_info_name.c_str(), ex);
-    }
-  catch (const daq::is::RepositoryNotFound & ex)
-    {
-      throw daq::config::NotFound(ERS_HERE, "is repository", cv_info_name.c_str(), ex);
-    }
-  catch (const daq::is::Exception & ex)
-    {
-      std::ostringstream text;
-      text << "failed to read IS object \"" << cv_info_name << '\"';
-      throw daq::config::Generic(ERS_HERE, text.str().c_str(), ex);
-    }
-
-  if (!cv.Version.empty())
-    return cv.Version;
-
+  
   if(const char * env = getenv(s_tdaq_db_version_str.c_str()))
     return env;
 
-  return cv.Version; // empty string
-}
-
-void
-daq::core::set_config_version(const std::string& partition, const std::string& version, bool reload)
-{
-  IPCPartition p(partition);
-  ISInfoDictionary dict(p);
-
-  try
-    {
-      if(version.empty())
-        {
-          ERS_DEBUG(1, "remove " << cv_info_name);
-          dict.remove(cv_info_name);
-        }
-      else
-        {
-          ConfigVersion cv;
-          cv.Version = version;
-          ERS_DEBUG(1, "write " << version << " to " << cv_info_name);
-          dict.checkin(cv_info_name, cv);
-        }
-    }
-  catch (const daq::is::RepositoryNotFound & ex)
-    {
-      throw daq::config::NotFound(ERS_HERE, "is repository", cv_info_name.c_str(), ex);
-    }
-  catch (const daq::is::Exception & ex)
-    {
-      std::ostringstream text;
-      text << "failed to " << (version.empty() ? "remove" : "check-in") << " IS object \"" << cv_info_name << '\"';
-      throw daq::config::Generic(ERS_HERE, text.str().c_str(), ex);
-    }
-
-
-  if (reload)
-    {
-      const bool is_initial(partition == ::ipc::partition::default_name);
-      const char * rdb_server_name(is_initial ? "RDB_INITIAL" : "RDB");
-
-      try
-        {
-          ::rdb::RDBNameList files;
-          files.length(1);
-          files[0] = CORBA::string_dup(version.c_str());
-          ERS_DEBUG(1, "reload \"" << rdb_server_name << '@' << partition << "\" with value " << version);
-          p.lookup<::rdb::cursor>(rdb_server_name)->reload_database(files);
-
-          if (!is_initial)
-            {
-              rdb_server_name = "RDB_RW";
-              ERS_DEBUG(1, "reload \"" << rdb_server_name << '@' << partition << "\" with value " << version);
-              p.lookup<::rdb::writer>(rdb_server_name)->reload_database(files);
-            }
-        }
-      catch (CORBA::SystemException & ex)
-        {
-          std::ostringstream text;
-          text << "failed to reload rdb server \"" << rdb_server_name << '@' << partition << '\"';
-          throw daq::config::Generic(ERS_HERE, text.str().c_str(), daq::ipc::CorbaSystemException(ERS_HERE, &ex));
-        }
-      catch (::rdb::CannotProceed & ex )
-        {
-          std::ostringstream text;
-          text << "failed to reload rdb server \"" << rdb_server_name << '@' << partition << "\": " << ex.text;
-          throw daq::config::Generic(ERS_HERE, text.str().c_str());
-        }
-      catch ( const daq::ipc::Exception & ex)
-        {
-          std::ostringstream text;
-          text << "lookup failed for rdb server \"" << rdb_server_name << '@' << partition << '\"';
-          throw daq::config::Generic(ERS_HERE, text.str().c_str(), ex);
-        }
-    }
+  throw daq::config::Generic(ERS_HERE, ("The environment variable \"" + s_tdaq_db_version_str + "\" needs to be defined").c_str());
 }
 
 std::string
 daq::core::Partition::get_config_version()
 {
   return ::daq::core::get_config_version(UID());
-}
-
-void
-daq::core::Partition::set_config_version(const std::string& version, bool reload)
-{
-  ::daq::core::set_config_version(UID(), version, reload);
 }
