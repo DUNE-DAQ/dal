@@ -2,8 +2,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 #include "config/Configuration.hpp"
 
 #include "dal/util.hpp"
@@ -70,14 +68,6 @@ struct TableRow
 int
 main(int argc, char *argv[])
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue & ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
 
   std::string data;
   std::string partition_name;

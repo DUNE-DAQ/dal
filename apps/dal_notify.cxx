@@ -19,8 +19,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 
   // include headers describing abstract configuration interface
 
@@ -198,14 +196,6 @@ extern "C" void signal_handler(int sig)
 
 int main(int argc, char *argv[])
 {
-    // initialise IPC which "probably" will be used
-
-  try {
-    IPCCore::init(argc, argv);
-  }
-  catch(ers::Issue & ex) {
-    ers::warning(ers::Message(ERS_HERE, ex));
-  }
 
 
     // parse command line

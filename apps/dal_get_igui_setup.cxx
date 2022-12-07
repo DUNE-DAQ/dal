@@ -14,8 +14,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 #include "config/Configuration.hpp"
 
 #include "dal/util.hpp"
@@ -70,14 +68,6 @@ ERS_DECLARE_ISSUE(
 int
 main(int argc, char * argv[])
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue & ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
 
   ConfdbAddHostReturnValues return_status = __NoErrors__;
 

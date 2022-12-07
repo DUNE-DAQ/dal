@@ -157,10 +157,10 @@ get_configuration(Configuration& db, const std::string& partition_name, const st
     }
 
     f.close();
-    ERS_LOG("finish with file " << fname.str());
+    TLOG() << "finish with file " << fname.str();
   }
   catch (ers::Issue & ex) {
-    ERS_LOG("ERROR [thread " << count << "]: caught " << ex);
+    TLOG() << "ERROR [thread " << count << "]: caught " << ex;
   }
 }
 

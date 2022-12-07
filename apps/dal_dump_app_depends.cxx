@@ -1,8 +1,6 @@
 #include <sstream>
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 #include "config/Configuration.hpp"
 
 #include "dal/Partition.hpp"
@@ -17,14 +15,6 @@
 int
 main(int argc, char *argv[])
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue & ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
 
   boost::program_options::options_description desc("This program prints out results of algorithms calculating dependencies of application initialisation and shutdown");
 

@@ -18,8 +18,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 #include "config/Change.hpp"
 #include "config/Configuration.hpp"
 
@@ -324,15 +322,6 @@ subscribe_object(const daq::core::Partition& partition, const std::string& id)
 int
 main(int argc, char **argv)
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue & ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
-
 
     // database and partition names passed via command line
 

@@ -1,6 +1,5 @@
 #include <chrono>
 
-#include <ipc/core.h>
 
 #include <boost/program_options.hpp>
 
@@ -23,14 +22,6 @@ stop_and_report(T &tp, const std::string& name)
 int
 main(int argc, char *argv[])
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue &ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
 
   boost::program_options::options_description desc(
       "This program prints out results of disabled() algorithm applied to all objects of classes derived from Component class and to the objects of application configuration");

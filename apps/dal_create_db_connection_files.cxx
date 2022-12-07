@@ -16,8 +16,6 @@
 
 #include "ers/ers.hpp"
 
-#include "ipc/core.h"
-
 #include "config/Configuration.hpp"
 
 #include "dal/Partition.hpp"
@@ -69,14 +67,6 @@ namespace daq
 
 int main(int ac, char *av[])
 {
-
-   try {
-      IPCCore::init(ac, av);
-   }
-   catch(ers::Issue & e) {
-      ers::fatal(e);
-      abort();
-   }
 
   // take defaults from environment
   std::string tdaq_partition(""), tdaq_db(""), lookup("");
@@ -177,7 +167,7 @@ int main(int ac, char *av[])
     if ( tdbc ) {
       if(type.find(tdbc->get_Type()) == type.end()) {
         daq::core::BadDBType e(ERS_HERE,tdbc->get_Type(), tdbc->UID() );
-        ERS_LOG(e);
+        TLOG() << e;
       }
       else {
         if(tdbc->get_Alias().empty()) {

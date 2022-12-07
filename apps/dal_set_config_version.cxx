@@ -1,21 +1,11 @@
 #include <boost/program_options.hpp>
 
-#include <ipc/core.h>
-
 #include "dal/util.hpp"
-#include "exit_status.h"
+#include "exit_status.hpp"
 
 int
 main(int argc, char **argv)
 {
-  try
-    {
-      IPCCore::init(argc, argv);
-    }
-  catch (ers::Issue & ex)
-    {
-      ers::warning(ers::Message(ERS_HERE, ex));
-    }
 
   std::string partition;
   std::string version;
