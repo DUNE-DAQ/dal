@@ -206,8 +206,8 @@ namespace core {
      * \param partition the name of the partition
      * \return the configuration version
      *
-     *  @throw daq::config::NotFound is thrown if case if partition or information repository does not exist
-     *  @throw daq::config::Exception is thrown if case of problems
+     *  @throw dunedaq::config::NotFound is thrown if case if partition or information repository does not exist
+     *  @throw dunedaq::config::Exception is thrown if case of problems
      */
 
   std::string
@@ -224,8 +224,8 @@ namespace core {
      * \param version the configuration version
      * \param reload if true, send reload command to RDB and RDB_RW servers
      *
-     *  @throw daq::config::NotFound is thrown if case if partition or information repository does not exist
-     *  @throw daq::config::Exception is thrown if case of problems
+     *  @throw dunedaq::config::NotFound is thrown if case if partition or information repository does not exist
+     *  @throw dunedaq::config::Exception is thrown if case of problems
      */
 
   void

@@ -13,7 +13,7 @@
 ERS_DECLARE_ISSUE(
   dal_test_rw,
   ConfigException,
-  "caught daq::config::Exception exception",
+  "caught dunedaq::config::Exception exception",
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +235,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i->second << " is OK\n";
               ++i;
             }
-          catch (daq::config::DeletedObject& ex)
+          catch (dunedaq::config::DeletedObject& ex)
             {
               std::cout << " - node \'" << i->first << "\' was deleted\n";
               nodes_info.erase(i++);
@@ -272,7 +272,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i.second << " is OK\n";
               a_good_computer = const_cast<daq::core::Computer *>(i.second);
             }
-          catch (daq::config::DeletedObject& ex)
+          catch (dunedaq::config::DeletedObject& ex)
             {
               std::cout << " - node \'" << i.first << "\' was deleted\n";
             }
@@ -333,14 +333,14 @@ main(int argc, char *argv[])
           daq::core::Module * bad_module = const_cast<daq::core::Module *>(db.create<daq::core::Module>(*a_good_computer, a_good_computer->UID()));
           std::cout << " => the object " << bad_module << " was created: (FAILED)\n";
         }
-      catch (daq::config::Exception & ex)
+      catch (dunedaq::config::Exception & ex)
         {
           std::cout << " => the object was not created, caught exception \"" << ex.what() << "\": (OK)\n";
         }
 
       return EXIT_SUCCESS;
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       ers::fatal(dal_test_rw::ConfigException(ERS_HERE, ex));
     }

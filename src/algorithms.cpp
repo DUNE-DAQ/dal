@@ -755,11 +755,11 @@ add_front_partition_environment(std::map<std::string, std::string>& environment,
       if (!DBName.empty())
         add_env_var(environment, s_tdaq_db_data_str, DBName);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to read object " << &partition;
-      throw daq::config::Generic(ERS_HERE, text.str().c_str(), ex);
+      throw dunedaq::config::Generic(ERS_HERE, text.str().c_str(), ex);
     }
 }
 
@@ -951,7 +951,7 @@ static void get_parameters(
     {
       belongs_to = this_cp->get_BelongsTo();
     }
-  catch (daq::config::Exception& ex)
+  catch (dunedaq::config::Exception& ex)
     {
       throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to read SW_Package object", ex);
     }
@@ -1138,7 +1138,7 @@ void daq::core::ComputerProgram::get_info(
 
     add_end_partition_environment(environment, partition, nullptr, this, &tag);
   }
-  catch ( daq::config::Generic & ex ) {
+  catch ( dunedaq::config::Generic & ex ) {
      throw daq::core::BadProgramInfo( ERS_HERE, UID(), "failed to build Program environment", ex ) ;
   }
 
@@ -2364,7 +2364,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     {
       base_app->get_Program()->get_BelongsTo(); // throw an exception if "Program" or "BelongsTo" is not set
     }
-  catch (daq::config::Exception& ex)
+  catch (dunedaq::config::Exception& ex)
     {
       throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), "failed to read application's Program object", ex );
     }
@@ -2504,7 +2504,7 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
     catch(daq::core::BadProgramInfo &ex) {
       throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
     }
-    catch(daq::config::Exception& ex) {
+    catch(dunedaq::config::Exception& ex) {
       throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "Failed to read application's parameters to get possible Tags." , ex);
     }
 
@@ -2644,7 +2644,7 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
                   "add TDAQ_APPLICATION_OBJECT_ID and TDAQ_APPLICATION_NAME variables to environment\n"
                << mk_app_env_string(environment)  ;
   }
-  catch  ( daq::config::Generic & ex ) {
+  catch  ( dunedaq::config::Generic & ex ) {
     throw daq::core::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
   }
 
@@ -2810,7 +2810,7 @@ daq::core::SubstituteVariables::reset(const Partition& p)
     }
   catch(ers::Issue& ex)
     {
-      throw daq::config::Generic(ERS_HERE, "Failed to substitute parameters from the database", ex);
+      throw dunedaq::config::Generic(ERS_HERE, "Failed to substitute parameters from the database", ex);
     }
 
   // Recursive substitution of the variables before they are used
@@ -2824,11 +2824,11 @@ daq::core::SubstituteVariables::reset(const Partition& p)
         {
           subst_s = substitute_variables(map_iter->second, &m_cvt_map, beg_str, end_str);
         }
-      catch (daq::config::Exception& ex)
+      catch (dunedaq::config::Exception& ex)
         {
           std::ostringstream text;
           text << "Failed to calculate variable \'" << map_iter->first << '\'';
-          throw daq::config::Generic(ERS_HERE, text.str().c_str(), ex);
+          throw dunedaq::config::Generic(ERS_HERE, text.str().c_str(), ex);
         }
 
       if (subst_s != map_iter->second)
@@ -2893,7 +2893,7 @@ daq::core::substitute_variables(const std::string& str_from, const std::map<std:
       text << "Value \'" << str_from << "\' has exceeded the maximum number of substitutions allowed (" << max_subst << "). "
               "It might have a circular dependency with substitution variables. "
               "After " << max_subst << " substitutions it is \'" << s << '\'';
-      throw daq::config::Generic(ERS_HERE, text.str().c_str());
+      throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
     }
 
     if(cvs_map) {
@@ -2909,7 +2909,7 @@ daq::core::substitute_variables(const std::string& str_from, const std::map<std:
       else {
         std::ostringstream text;
         text << "substitution failed for parameter \'" << std::string(s, p_start, p_end - p_start + end.size()) << '\'';
-        throw daq::config::Generic(ERS_HERE, text.str().c_str());
+        throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
       }
     }
 
@@ -3229,7 +3229,7 @@ daq::core::get_config_version(const std::string& partition)
   if(const char * env = getenv(s_tdaq_db_version_str.c_str()))
     return env;
 
-  throw daq::config::Generic(ERS_HERE, ("The environment variable \"" + s_tdaq_db_version_str + "\" needs to be defined").c_str());
+  throw dunedaq::config::Generic(ERS_HERE, ("The environment variable \"" + s_tdaq_db_version_str + "\" needs to be defined").c_str());
 }
 
 std::string

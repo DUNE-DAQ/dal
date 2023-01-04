@@ -41,13 +41,13 @@ main(int argc, char **argv)
       std::string version = ::daq::core::get_config_version(partition);
       std::cout << version << std::endl;
     }
-  catch (const daq::config::NotFound & ex)
+  catch (const dunedaq::config::NotFound & ex)
     {
       std::cerr << ex << std::endl;
       auto params = ex.parameters();
       return (params["type"] == "is value" ? __InfoNotFoundExitStatus__ : __RepositoryNotFoundExitStatus__);
     }
-  catch (const daq::config::Exception & ex)
+  catch (const dunedaq::config::Exception & ex)
     {
       std::cerr << "ERROR: " << ex << std::endl;
       return __FailureExitStatus__;

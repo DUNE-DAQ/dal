@@ -101,7 +101,7 @@ namespace daq {
        *  For template applications with "RunsOn" attribute set to "FirstHostWithBackup" the backup hosts are
        *  randomly chosen from list of segment hosts; there are no backup hosts for other types of template "RunsOn".
        *
-       *  \throw Throw daq::config::Exception in case of problems
+       *  \throw Throw dunedaq::config::Exception in case of problems
        */
 
       std::vector<const Computer *>

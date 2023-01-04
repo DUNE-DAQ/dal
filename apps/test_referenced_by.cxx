@@ -111,7 +111,7 @@ main(int argc, char **argv)
         {
           crate2.set_objs("Modules", modules2_2);
         }
-      catch (daq::config::Exception & ex)
+      catch (dunedaq::config::Exception & ex)
         {
           std::cerr << "Expected error: " << ex << std::endl;
         }
@@ -137,7 +137,7 @@ main(int argc, char **argv)
         }
 
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       std::cerr << "ERROR: caught " << ex << std::endl;
       return EXIT_FAILURE;

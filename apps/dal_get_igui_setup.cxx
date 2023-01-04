@@ -210,7 +210,7 @@ main(int argc, char * argv[])
             << "setenv __IGUI_CLASSPATH__ \"" << class_path << "\"\n";
         }
     }
-  catch (const daq::config::Exception & ex)
+  catch (const dunedaq::config::Exception & ex)
     {
       ers::error(dal_get_igui_setup::CaughtConfigException(ERS_HERE,ex));
       return __Error__Config_Exception__;

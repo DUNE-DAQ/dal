@@ -206,7 +206,7 @@ main(int argc, char * argv[])
         std::cout << j << std::endl;
       }
   }
-  catch ( daq::config::Exception & ex ) {
+  catch ( dunedaq::config::Exception & ex ) {
     ers::error(dal_load_is_info_files::ConfigException(ERS_HERE,ex));
     return __Error__Config_Exception__;
   }

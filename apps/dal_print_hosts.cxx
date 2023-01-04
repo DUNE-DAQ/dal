@@ -235,7 +235,7 @@ main(int argc, char **argv)
             }
         }
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);

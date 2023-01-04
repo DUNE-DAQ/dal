@@ -46,12 +46,12 @@ main(int argc, char **argv)
     {
       ::daq::core::set_config_version(partition, version, reload);
     }
-  catch (const daq::config::NotFound & ex)
+  catch (const dunedaq::config::NotFound & ex)
     {
       std::cerr << ex << std::endl;
       return __RepositoryNotFoundExitStatus__;
     }
-  catch (const daq::config::Exception & ex)
+  catch (const dunedaq::config::Exception & ex)
     {
       std::cerr << "ERROR: " << ex << std::endl;
       return __FailureExitStatus__;

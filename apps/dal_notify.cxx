@@ -177,7 +177,7 @@ cb2(const std::vector<ConfigurationChange *> & changes, void * parameter)
 
       std::cout.flush();
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       std::cerr << "ERROR: " << ex << std::endl;
     }
@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
 
       conf.unsubscribe(); // unsubscribe cb2
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);

@@ -720,7 +720,7 @@ plug-in.
       ::Configuration db("oksconfig:daq/partitions/be_test.data.xml");
       ... // user's code accessing configuration data
     }
-    catch(daq::config::Exception & ex) {
+    catch(dunedaq::config::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>
@@ -839,7 +839,7 @@ e.g. as it is shown below.
 *partition));
       }
     }
-    catch(daq::config::Exception & ex) {
+    catch(dunedaq::config::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>

@@ -472,7 +472,7 @@ main(int argc, char **argv)
       while (true)
         sleep(1);
     }
-  catch (daq::config::Exception & ex)
+  catch (dunedaq::config::Exception & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);
