@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="ASCII"?>
+
+<!-- oks-schema version 2.2 -->
+
+
+<!DOCTYPE oks-schema [
+  <!ELEMENT oks-schema (info, (include)?, (comments)?, (class)+)>
+  <!ELEMENT info EMPTY>
+  <!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "schema"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+  <!ELEMENT include (file)+>
+  <!ELEMENT file EMPTY>
+  <!ATTLIST file
+      path CDATA #REQUIRED
+  >
+  <!ELEMENT comments (comment)+>
+  <!ELEMENT comment EMPTY>
+  <!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+  <!ELEMENT class (superclass | attribute | relationship | method)*>
+  <!ATTLIST class
+      name CDATA #REQUIRED
+      description CDATA ""
+      is-abstract (yes|no) "no"
+  >
+  <!ELEMENT superclass EMPTY>
+  <!ATTLIST superclass name CDATA #REQUIRED>
+  <!ELEMENT attribute EMPTY>
+  <!ATTLIST attribute
+      name CDATA #REQUIRED
+      description CDATA ""
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class) #REQUIRED
+      range CDATA ""
+      format (dec|hex|oct) "dec"
+      is-multi-value (yes|no) "no"
+      init-value CDATA ""
+      is-not-null (yes|no) "no"
+      ordered (yes|no) "no"
+  >
+  <!ELEMENT relationship EMPTY>
+  <!ATTLIST relationship
+      name CDATA #REQUIRED
+      description CDATA ""
+      class-type CDATA #REQUIRED
+      low-cc (zero|one) #REQUIRED
+      high-cc (one|many) #REQUIRED
+      is-composite (yes|no) #REQUIRED
+      is-exclusive (yes|no) #REQUIRED
+      is-dependent (yes|no) #REQUIRED
+      ordered (yes|no) "no"
+  >
+  <!ELEMENT method (method-implementation*)>
+  <!ATTLIST method
+      name CDATA #REQUIRED
+      description CDATA ""
+  >
+  <!ELEMENT method-implementation EMPTY>
+  <!ATTLIST method-implementation
+      language CDATA #REQUIRED
+      prototype CDATA #REQUIRED
+      body CDATA ""
+  >
+]>
+
+<oks-schema>
+
+<info name="" type="" num-of-items="83" oks-format="schema" oks-version="oks-08-03-03 built &quot;Apr 30 2021&quot;" created-by="isolov" created-on="lxplus015" creation-time="20030411T150215" last-modified-by="isolov" last-modified-on="pc-tbed-pub-21.cern.ch" last-modification-time="20210430T142105"/>
+
+ <class name="Application" description="This abstract class is used to describe base properties of a simple process.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_3_Application_Classes" is-abstract="yes">
+  <superclass name="BaseApplication"/>
+  <relationship name="RunsOn" description="Defines computer device where to start the process." class-type="Computer" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="BackupHosts" class-type="ComputerBase" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="BaseApplication" description="This class is used to describe processes which can be started at certain moment and order. To describe a new process it is necessary to create an instance of a concrete class derived from this one and put references to the software object (i.e. ComputerProgram class) to describe what to start and the ComputerBase to describe where to start. The &apos;Initialization&apos; and &apos;Shutdown&apos; dependencies are used in case if we want to start a process synchronously and we know which one we must start or kill first. For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_3_Application_Classes" is-abstract="yes">
+  <superclass name="TestableObject"/>
+  <attribute name="Parameters" description="Command line parameters." type="string"/>
+  <attribute name="RestartParameters" description="Command line parameters to restart application in case of application failure." type="string"/>
+  <attribute name="Logging" description="Indicates whether the stdout of this application shall be piped to /dev/null or stored in a log file.." type="bool" init-value="true" is-not-null="yes"/>
+  <attribute name="InputDevice" description="If defined, it will be used as standard input." type="string"/>
+  <attribute name="InitTimeout" description="Initialization timeout, i.e. maximum time for a process to go to state&#xA;&quot;ready-to-communicate&quot; with others, e.g. a server start up time." type="u32" init-value="0"/>
+  <attribute name="ExitTimeout" description="Time to wait for the application to exit cleanly before sending it a SIGKILL." type="u32" range="1..60" init-value="5" is-not-null="yes"/>
+  <attribute name="StartIn" description="Directory where to start the process." type="string"/>
+  <attribute name="RestartableDuringRun" description="This flag indicates whether an application can or cannot be restarted while a Run is ongoing." type="bool" init-value="false"/>
+  <attribute name="IfExitsUnexpectedly" description="Describes an action if the application exits at unexpected moment.&#xA;" type="enum" range="Error,Ignore,Restart,Handle" init-value="Error"/>
+  <attribute name="IfFailsToStart" description="Describes action if the application cannot be started." type="enum" range="Error,Ignore,Restart,Handle" init-value="Error"/>
+  <relationship name="InitializationDependsFrom" description="Defines processes to be started before this one." class-type="BaseApplication" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ShutdownDependsFrom" description="Defines shutdown order." class-type="BaseApplication" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Program" description="Defines computer program to be used for this process." class-type="ComputerProgram" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ExplicitTag" description="If defined it points to the exact tag of computer program." class-type="Tag" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Uses" description="Define sw packages which are used by given application in addition to ones defined by the program.&#xA;" class-type="SW_Package" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ProcessEnvironment" description="Define application specific process environment." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <method name="get_host" description="">
+   <method-implementation language="c++" prototype="const daq::core::Computer * get_host() const" body="ADD_ALGO_1"/>
+   <method-implementation language="java" prototype="dal.Computer get_host() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_host();"/>
+  </method>
+  <method name="get_segment" description="Get generated segment object this application belongs to.">
+   <method-implementation language="c++" prototype="const daq::core::Segment * get_segment() const" body="ADD_ALGO_1"/>
+   <method-implementation language="java" prototype="dal.Segment get_segment() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_segment();"/>
+  </method>
+  <method name="get_backup_hosts" description="Get backup hosts for this application.&#xA;&#xA;The method returns vector of computers where the application can be restarted in case of problems.&#xA;&#xA;For normal applications the backup hosts are defined via &quot;BackupHosts&quot; relationship.&#xA;For template applications with &quot;RunsOn&quot; attribute set to &quot;FirstHostWithBackup&quot; the backup hosts are randomly chosen from list of segment hosts; there are no backup hosts for other types of template &quot;RunsOn&quot;.&#xA;&#xA;\throw daq::config::Exception in case of problems">
+   <method-implementation language="c++" prototype="std::vector&lt;const daq::core::Computer *&gt; get_backup_hosts() const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.Computer[] get_backup_hosts() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_backup_hosts();"/>
+  </method>
+  <method name="get_base_app" description="Return original base application object, i.e. not created by DAL algorithms">
+   <method-implementation language="c++" prototype="const daq::core::BaseApplication * get_base_app() const" body=""/>
+   <method-implementation language="java" prototype="dal.BaseApplication get_base_app() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_base_app();"/>
+  </method>
+  <method name="get_initialization_depends_from" description="Get applications initialization depends from.&#xA;&#xA;If this application is normal (i.e. non-templated), the algorithm returns all dependent normal applications and templated applications which belong to the segment of the application.&#xA;If this application is templated, then the algorithm returns all dependent applications belonging to the same segment and running on the same host.&#xA;&#xA;By performance efficiency reasons the algorithm needs to know all applications running in this segment.&#xA;The all_apps input parameter should contain result returned by get_all_applications() algorithm running for the segment of this application (preferable) or it&apos;s partition.&#xA;&#xA;\param all_apps  all applications in this segment or whole partition&#xA;\return result containing initialization dependent applications&#xA;\throw Throw daq::core::NotInitedObject if the object was not initialized and cannot be used">
+   <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_initialization_depends_from(const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; all_apps) const" body=""/>
+  </method>
+  <method name="get_shutdown_depends_from" description="Get applications shutdown depends from.&#xA;&#xA;The behavior is similar to the get_initialization_depends_from() method.&#xA; &#xA;\param all_apps  all applications in this segment or whole partition&#xA;\return result containing shutdown dependent applications&#xA;\throw daq::core::NotInitedObject if the object was not initialized and cannot be used">
+   <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_shutdown_depends_from(const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; all_apps) const" body=""/>
+  </method>
+  <method name="get_info" description="Get full information about application.&#xA;&#xA;The method returns vector of allowed tags, process environment, possible program names and command line arguments.&#xA;The root_segment has to be a reference on online segment returned by the partition&apos;s get_segment() invoked on the online segment.&#xA;\param environment   output map of process environment name:value pairs&#xA;\param program_names output vector of possible program names&#xA;\param partition     reference on partition&#xA;\param root_segment  reference on online segment (as returned by daq::core::Partition::get_segment() invoked on the online segment)&#xA;\param host          reference on host where to run application (may override host set in AppConfig)&#xA;\param startArgs     output string with command line arguments to start application&#xA;\param restartArgs   output string with command line arguments to re-start application&#xA;\return tag for this application&#xA;\throw  daq::core::AlgorithmError in case of problems">
+   <method-implementation language="c++" prototype="const daq::core::Tag * get_info(std::map&lt;std::string, std::string&gt;&amp; environment, std::vector&lt;std::string&gt;&amp; program_names, std::string &amp; startArgs, std::string &amp; restartArgs) const" body=""/>
+   <method-implementation language="java" prototype="dal.Tag get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, StringBuilder startArgs, StringBuilder restartArgs) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.AppConfig.get_info(this, environment,program_names, startArgs, restartArgs);"/>
+  </method>
+  <method name="is_templated" description="Return true if application is templated">
+   <method-implementation language="c++" prototype="bool is_templated() const" body=""/>
+   <method-implementation language="java" prototype="boolean get_is_templated() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_is_templated();"/>
+  </method>
+  <method name="get_app_config" description="">
+   <method-implementation language="c++" prototype="const AppConfig * get_app_config(bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/app-config.hpp&gt;&#xA;namespace daq { namespace core { class AlgorithmUtils; } }&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;AppConfig&gt; p_app_config;&#xA;mutable std::atomic&lt;const BaseApplication *&gt; p_gen_obj;&#xA;friend class daq::core::AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
+   <method-implementation language="java" prototype="dal.AppConfig get_app_config(boolean no_except) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.AppConfig p_app_config;&#xA;dal.BaseApplication p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_app_config(this, no_except);&#xA;"/>
+  </method>
+ </class>
+
+ <class name="Binary" description="This class is used to describe binary program. By default binaries should exist for each tag defined for the software repository this binary belongs to (see ExactImplementations relationship for more details).">
+  <superclass name="ComputerProgram"/>
+  <relationship name="ExactImplementations" description="Is used to describe implementations different from default, e.g. having different binary name, command line parameters, environment, etc.&#xA;If a program object is defined, there are no default implementations." class-type="BinaryFile" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="yes"/>
+ </class>
+
+ <class name="BinaryFile">
+  <attribute name="BinaryName" type="string" is-not-null="yes"/>
+  <relationship name="Tag" class-type="Tag" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Cable" description="Describe generic directional connector between two connectable objects (source and destination).">
+  <superclass name="HW_Object"/>
+  <superclass name="Resource"/>
+  <relationship name="Destination" description="Points on destination object connected by this cable." class-type="HW_ConnectableObject" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Source" description="Points on source object connected by this cable." class-type="HW_ConnectableObject" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Component" description="Abstract base class for Segment and Resource classes. It is only used to allow objects of derived classes to be put into list of disabled items. For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_4_Resource_Classes" is-abstract="yes">
+  <method name="get_parents" description="The algorithm calculates a vector of segments which are parents of given segment.&#xA;If the segment has parents referenced by the partition object, then:&#xA;- in case of C++ it fills parents parameter&#xA;- in case of Java it returns parents; otherwise it throws {@link NotFoundException} exception">
+   <method-implementation language="c++" prototype="void get_parents(const daq::core::Partition&amp; partition, std::list&lt; std::vector&lt;const daq::core::Component *&gt; &gt;&amp; parents) const" body=""/>
+   <method-implementation language="java" prototype="Component[][] get_parents(Partition partition) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.Algorithms.get_parents(this, partition);"/>
+  </method>
+  <method name="disabled" description="The algorithm checks if the segment / resource is disabled in the partition that uses it.&#xA;@param partition      partition object containing this resource or segment&#xA;">
+   <method-implementation language="c++" prototype="bool disabled(const daq::core::Partition&amp; partition, bool skip_check = false) const" body=""/>
+   <method-implementation language="java" prototype="boolean disabled(Partition partition) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return partition.resources().get_disabled(this, partition, false);"/>
+  </method>
+  <method name="why_disabled" description="">
+   <method-implementation language="java" prototype="String why_disabled(Partition partition, String prefix, boolean full_report) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return partition.resources().why_disabled(this, prefix, full_report);"/>
+  </method>
+ </class>
+
+ <class name="Computer" description="Describes a computer.">
+  <superclass name="ComputerBase"/>
+  <superclass name="Platform"/>
+  <superclass name="HW_Object"/>
+  <attribute name="Memory" description="Memory in MB" type="u32" init-value="16384" is-not-null="yes"/>
+  <attribute name="CPU" description="Computer performance. Now in MHz frequency. To be discussed." type="u16" init-value="2048" is-not-null="yes"/>
+  <attribute name="NumberOfCores" description="Number of cores." type="u16" init-value="8"/>
+  <attribute name="RLogin" description="Defines command used for computer remote login. Examples: rsh, ash, ssh." type="string" init-value="ssh" is-not-null="yes"/>
+  <relationship name="Interfaces" description="A computer can have several interfaces (e.g. NIC) connecting it with other hw." class-type="Interface" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="yes"/>
+ </class>
+
+ <class name="ComputerBase" description="Describes an abstract computer power. Can be a computer or set of computers." is-abstract="yes">
+ </class>
+
+ <class name="ComputerProgram" description="Describes programs which can be running of generic computer." is-abstract="yes">
+  <superclass name="SW_Object"/>
+  <attribute name="DefaultParameters" description="Define default command line parameters." type="string"/>
+  <relationship name="ProcessEnvironment" class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <method name="get_info" description="Calculates computer program parameters:&#xA;- list of possible program files&#xA;- process environment&#xA; &#xA;Requires:&#xA;- partition reference&#xA;- tag reference&#xA;- computer reference&#xA;- optional partition pointer&#xA;">
+   <method-implementation language="c++" prototype="void get_info(std::map&lt;std::string, std::string&gt;&amp; environment, std::vector&lt;std::string&gt;&amp; program_names, const daq::core::Partition&amp; partition, const daq::core::Tag&amp; tag, const daq::core::Computer&amp; host) const" body=""/>
+   <method-implementation language="java" prototype="void get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, dal.Partition partition, dal.Tag tag, dal.Computer host) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="dal.Algorithms.get_info(this, environment, program_names, partition, tag, host);"/>
+  </method>
+ </class>
+
+ <class name="ComputerSet" description="Describes set of computers.">
+  <superclass name="ComputerBase"/>
+  <relationship name="Contains" description="Link to computers composing this set object." class-type="ComputerBase" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="ConnectorCable" description="Extension of the cable class to provide more properties required for bundle cable description.">
+  <superclass name="Cable"/>
+  <attribute name="SrcConnectionType" description="Type of source connector port." type="string"/>
+  <attribute name="DstConnectionType" description="Type of destination connector port." type="string"/>
+  <attribute name="SrcConnectionNumber" description="Number of source connector port." type="u16"/>
+  <attribute name="DstConnectionNumber" description="Number of destination connector port." type="u16"/>
+ </class>
+
+ <class name="Crate" description="A crate is a physical container of modules.">
+  <superclass name="HW_Object"/>
+  <attribute name="NumberOfSlots" description="Number of slots for modules." type="u16"/>
+  <attribute name="Position" description="Position of crate inside rack." type="u16" init-value="0"/>
+  <attribute name="LogicalId" description="Logical ID of crate." type="u32" init-value="0"/>
+  <relationship name="Modules" description="Modules inserted into crate." class-type="Module" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ControlHost" description="Points to a Computer where programs, communicating with crate modules (e.g. via VME) should/can be launched. Typically this is a zero Module in the Crate, but can also be a PC, connecting to a Crate by other interface." class-type="Computer" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="CustomLifetimeApplication">
+  <superclass name="CustomLifetimeApplicationBase"/>
+  <superclass name="Application"/>
+ </class>
+
+ <class name="CustomLifetimeApplicationBase">
+  <attribute name="Lifetime" description="Defines the transitions at which the application shall be started/stopped." type="enum" range="Boot_Shutdown,Configure_Unconfigure,SOR_EOR,EOR_SOR,UserDefined_Shutdown" init-value="Boot_Shutdown"/>
+  <attribute name="AllowSpontaneousExit" description="Allow the application to exit when it has finished its task.&#xA;The exit code will be checked and if it is !=0 then the system will behave as specified by the IfExitsUnexpectedly attribute." type="bool" init-value="false"/>
+ </class>
+
+ <class name="CustomLifetimeTemplateApplication">
+  <superclass name="CustomLifetimeApplicationBase"/>
+  <superclass name="TemplateApplication"/>
+ </class>
+
+ <class name="DBConnection" description="Describes the database connection to be used to obtain configuration parameters">
+  <attribute name="Server" description="Database server name" type="string"/>
+  <attribute name="Port" description="Port to be used to contact DB server." type="string"/>
+  <attribute name="Name" description="Schema name for oracle, database name for MySQL" type="string"/>
+  <attribute name="Alias" description="Logical name of the DB which is normally stored in dblookup files." type="string"/>
+  <attribute name="User" description="User name for database connection" type="string"/>
+  <attribute name="Password" description="Password for database connection" type="string"/>
+  <attribute name="Type" description="Technology used by the DB accessor, value ignored if db lookup mechanism is used." type="enum" range="MySQL,Oracle,SQLite,Coral" is-not-null="yes"/>
+ </class>
+
+ <class name="DataFlowParameters" description="Abstract class to be extended by the dataflow." is-abstract="yes">
+  <attribute name="Name" description="Name of the parameters set." type="string"/>
+ </class>
+
+ <class name="Detector" description="There are two types of usage:&#xA; * detector is a generic container for hw systems and objects;&#xA; * sub-detector as defined by event format and referenced by ROS or RCD">
+  <superclass name="HW_System"/>
+  <attribute name="LogicalId" description="Event format sub-detector source identifier." type="u8" init-value="0"/>
+ </class>
+
+ <class name="FpgaProgram">
+  <superclass name="SW_Object"/>
+  <attribute name="VersionID" description="Version number reported by this FPGA program when loaded." type="u32" format="hex" init-value="0x0" is-not-null="yes"/>
+  <attribute name="CadProject" description="Name of the CAD project used to create the FPGA program (can be checked in the binary file)." type="string" is-not-null="yes"/>
+  <attribute name="CheckString" description="Some other string which can (optionally) be checked in the binary file." type="string"/>
+  <attribute name="Checksum" description="Expected checksum of the binary file." type="u32" init-value="0x0" is-not-null="yes"/>
+  <attribute name="ChipType" description="Type of FPGA chip into which this program may be loaded." type="string" is-not-null="yes"/>
+  <attribute name="FlashRamBlock" description="Block within flash RAM to download this FPGA program." type="u32" format="hex" init-value="0x0" is-not-null="yes"/>
+  <attribute name="SourceURL" description="URL for downloading new versions of the binary file." type="string"/>
+  <attribute name="ProgramType" description="Function of this FPGA program." type="string" range="Invalid" init-value="Invalid" is-not-null="yes"/>
+  <attribute name="DeviceName" description="Name of FPGA device on the module for which this FPGA program is intended." type="string" range="Invalid" init-value="Invalid" is-not-null="yes"/>
+ </class>
+
+ <class name="HLTImplementation" description="The HLT implementation object contains a pointer to the specific implementation of the application that will run on the HLT trigger processor" is-abstract="yes">
+  <attribute name="libraries" description="Libraries that implement the functionality to be loaded inside the trigger processor" type="string" is-multi-value="yes"/>
+ </class>
+
+ <class name="HW_ConnectableObject">
+  <superclass name="HW_Object"/>
+ </class>
+
+ <class name="HW_Object" description="Generic hardware object.">
+  <superclass name="TestableObject"/>
+  <attribute name="Type" description="Hardware manufacture type." type="string"/>
+  <attribute name="Location" description="Physical location of hw object." type="string"/>
+  <attribute name="Description" type="string" is-not-null="yes"/>
+  <attribute name="HelpLink" description="URL containing description." type="string"/>
+  <attribute name="InstallationRef" description="Reference to object from installation DB." type="string"/>
+  <attribute name="State" description="If the state is &apos;true&apos;, the hw device is On." type="bool" init-value="true"/>
+ </class>
+
+ <class name="HW_System">
+  <attribute name="Description" type="string"/>
+  <attribute name="HelpLink" type="string"/>
+  <attribute name="State" type="bool"/>
+  <relationship name="HW_Systems" class-type="HW_System" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="yes" is-dependent="yes"/>
+  <relationship name="HW_Objects" class-type="HW_Object" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="IPCServiceApplication" description="Describes infrastructure application having CORBA test">
+  <superclass name="IPCServiceApplicationBase"/>
+  <superclass name="InfrastructureApplication"/>
+ </class>
+
+ <class name="IPCServiceApplicationBase" description="Describes base properties of applications having IPC test interface" is-abstract="yes">
+  <attribute name="InterfaceName" description="Name of CORBA IDL interface" type="string" range=".+" init-value="ipc/servant" is-not-null="yes"/>
+  <attribute name="IPCName" description="Name of this application (CORBA service) as published in IPC. It may differ from dal AppId for the application, so the synchronisation of command line parameters is needed." type="string"/>
+ </class>
+
+ <class name="IPCServiceTemplateApplication" description="Describes template infrastructure application having CORBA test">
+  <superclass name="IPCServiceApplicationBase"/>
+  <superclass name="InfrastructureTemplateApplication"/>
+ </class>
+
+ <class name="IS_EventsAndRates" description="A class which describes IS variables to use as event counters and rate indicators.">
+  <attribute name="EventCounter" description="Indicates from which IS variable to read the event counter from." type="string"/>
+  <attribute name="Rate" description="Indicates from which IS variable to read the rate from." type="string"/>
+  <attribute name="Description" description="Describes the type of IS information." type="string"/>
+ </class>
+
+ <class name="IS_InformationSources">
+  <relationship name="LVL1" description="Where to pick the IS information for L1 accepts." class-type="IS_EventsAndRates" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="HLT" description="Where to pick the IS information for events processed by the HLT." class-type="IS_EventsAndRates" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Recording" description="Where to pick the IS information for recorded events." class-type="IS_EventsAndRates" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Others" description="Indicates other IS information to take. Place holder for reduced DF panel." class-type="IS_EventsAndRates" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="InfrastructureApplication">
+  <superclass name="Application"/>
+  <superclass name="InfrastructureBase"/>
+ </class>
+
+ <class name="InfrastructureBase" description="Infrastructure applications are essential for data taking, so they have a set of backup hosts where these applications can be restarted if their default host is going down or become unavailable. This class represents the common features of all infrastructure apps." is-abstract="yes">
+  <attribute name="SegmentProcEnvVarName" description="When value is non-empty, the infrastructure application defines process environment for each application of given and nested segments. The name of the environment is equal to the value of this attribute. The value of the variable is calculated in accordance with value of the SegmentProcEnvVarValue attribute." type="string"/>
+  <attribute name="SegmentProcEnvVarParentName" description="Propagate parent&apos;s segment value of environment variable generated from the SegmentProcEnvVarName attribute." type="string"/>
+  <attribute name="SegmentProcEnvVarValue" description="appId           - set value to the application ID&#xA;runsOn          - set value to the host name, where application runs on&#xA;runsOnAndBackup - set value to the comma separated list of host and backup hosts names, where application can be runs on" type="enum" range="appId,runsOn,runsOnAndBackup"/>
+ </class>
+
+ <class name="InfrastructureTemplateApplication">
+  <superclass name="TemplateApplication"/>
+  <superclass name="InfrastructureBase"/>
+ </class>
+
+ <class name="Interface">
+  <superclass name="HW_Object"/>
+  <attribute name="Label" type="string"/>
+ </class>
+
+ <class name="JarFile">
+  <superclass name="SW_Object"/>
+ </class>
+
+ <class name="L1TriggerConfiguration" description="Trigger-configuration parameters specific for LVL1">
+  <attribute name="CtpPartitionNumber" description="Describes which partition of the CTP is used. 0=full ATLAS partition, 1/2/3=multi-partition running where only partition 1 has full readout and partition 2/3 are obliged to use TTC2LAN." type="u32" range="0..3" init-value="0" is-not-null="yes"/>
+  <attribute name="Lvl1PrescaleKey" description="Configuration key for LVL1 prescales" type="u32" init-value="0" is-not-null="yes"/>
+  <attribute name="Lvl1BunchGroupKey" description="Configuration key for LVL1 bunch groups" type="u32" init-value="0" is-not-null="yes"/>
+  <attribute name="ConfigureLvl1MenuFrom" description="Configuration source for LVL1" type="enum" range="DB,XML,OKS" init-value="DB" is-not-null="yes"/>
+ </class>
+
+ <class name="LinkInterface">
+  <superclass name="Interface"/>
+  <attribute name="Type" type="enum" range="source,destination" init-value="source"/>
+ </class>
+
+ <class name="MasterTrigger" description="Container for application controlling the master trigger and the master trigger module.">
+  <relationship name="Controller" description="Relation to Application controlling the master trigger.&#xA;The Root Controller will send luminosity block updates to it." class-type="RunControlApplicationBase" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TriggerModule" description="Relation to the Module acting as master trigger in the partition." class-type="ResourceBase" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Module" description="Class Module describes a generic module.&#xA;It has a lot of subclasses.">
+  <superclass name="HW_ConnectableObject"/>
+  <attribute name="PhysAddress" type="u32" format="hex" init-value="0"/>
+  <attribute name="CommAddress" type="u32" format="hex"/>
+  <attribute name="Position" type="u16" range="0..31" init-value="0"/>
+  <attribute name="Width" type="u16" init-value="1"/>
+  <attribute name="LogicalId" type="u32" init-value="0"/>
+  <relationship name="CPUs" class-type="Computer" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="yes" is-dependent="no"/>
+ </class>
+
+ <class name="MonApplication" description="This class should be used by any monitoring application that is not state aware.&#xA;It allows to define at what transition the application should start/stop and whether it should be restarted at warm start/stop.">
+  <superclass name="CustomLifetimeApplication"/>
+  <superclass name="WarmStartStopReactor"/>
+ </class>
+
+ <class name="MonTemplateApplication" description="This class should be used by any monitoring application that is not state aware.&#xA;It allows to define at what transition the application should start/stop and whether it should be restarted at warm start/stop.">
+  <superclass name="CustomLifetimeTemplateApplication"/>
+  <superclass name="WarmStartStopReactor"/>
+ </class>
+
+ <class name="MonitoringApplication" description="DEPRECATED!">
+  <superclass name="Application"/>
+ </class>
+
+ <class name="Network">
+  <attribute name="Name" type="string"/>
+  <attribute name="IPMask" type="string" init-value="225.225.0.0"/>
+  <relationship name="EndPoints" class-type="NetworkInterface" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="NetworkInterface">
+  <superclass name="Interface"/>
+  <attribute name="IPAddress" description="The hostname or dotted IP address for this interface." type="string"/>
+  <attribute name="Label" description="TDAQ network label. CTRL, DC* and EF to be used on Point-1. The DATA to be used on external testbeds." type="enum" range="NONE,CTRL,DC1,DC2,EF,DATA"/>
+  <attribute name="InterfaceName" description="Value returned by /sbin/config for this NIC." type="string" is-not-null="yes"/>
+ </class>
+
+ <class name="OnlineSegment">
+  <superclass name="Segment"/>
+  <attribute name="T0_ProjectTag" description="Set T0 project tag for production partition" type="string" is-multi-value="yes" init-value="obsolete" is-not-null="yes"/>
+  <relationship name="CompatibilityInfo" description="Reference on platform compatibilities" class-type="PlatformCompatibility" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="PmgAgent" description="Points to the software object describing process-manager-agent program." class-type="SW_Object" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="InitialPartition" description="Links the Online segment of a Partition to the initial Partition which provides the basic infrastructure." class-type="Partition" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TestHosts" description="set of hosts randomly used by Test Manager to launch tests on (in case no explicit host is given to TM)" class-type="ComputerSet" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Parameter" description="This abstract class is used to describe a single variable (name:value pair) or s set of variables." is-abstract="yes">
+  <attribute name="Description" description="Describes the purpose of the parameter." type="string"/>
+ </class>
+
+ <class name="Partition" description="The class describes TDAQ configuration including top-level segments, disabled components, various TDAQ base and user specific parameters. For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_1_Partition_Class">
+  <attribute name="RepositoryRoot" description="Specifies temporary sw installation area having highest priority over any other installation areas, e.g. to take shared libraries, binaries, etc. Usually it is used for testing patches." type="string"/>
+  <attribute name="IPCRef" description="Defines IPC init reference. By default, it is copied from the variable TDAQ_IPC_INIT_REF defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_IPC_INIT_REF)"/>
+  <attribute name="DBPath" description="Defines locations of database repositories (i.e. OKS_DB_ROOT). By default, it is copied from the variable TDAQ_DB_PATH defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_PATH)"/>
+  <attribute name="DBName" description="Defines database name, e.g. name of the OKS data file. By default, it is copied from the variable TDAQ_DB_DATA defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_DATA)"/>
+  <attribute name="DBVersion" description="Defines database version (SHA key) if GIT repository is used . By default, it is copied from the variable TDAQ_DB_VERSION defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_VERSION)"/>
+  <attribute name="DBTechnology" description="Defines config database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconfig,oksconfig" init-value="rdbconfig"/>
+  <attribute name="LogRoot" description="Defines root directory for log files." type="string" init-value="/tmp"/>
+  <attribute name="WorkingDirectory" description="Defines directory, where a new process run by pmg will be started." type="string" init-value="/tmp"/>
+  <attribute name="RunTypes" type="string" is-multi-value="yes"/>
+  <relationship name="Segments" description="References on top-level segments composing given partition. If a segment needs to be temporary disactivated in the partition, do not remove it from this list, but add it to the Disabled list." class-type="Segment" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+  <relationship name="OnlineInfrastructure" description="Defines online infrastructure segment." class-type="OnlineSegment" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Disabled" description="Lists segments and resources, which are temporary disabled." class-type="Component" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no" ordered="yes"/>
+  <relationship name="DefaultHost" description="The default host defines a host to run all applications with empty value of &apos;RunsOn&apos; relationship." class-type="Computer" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DefaultTags" description="If an application has no explicit tag, first suitable tag from this list will be used to select binary for that application." class-type="Tag" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ProcessEnvironment" description="Define process environment for any application ran in given partition." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Parameters" description="Define list of parameters used for database string substitution. Another source of parameters are segments linked with partition." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DataFlowParameters" description="A partition may have one data-flow parameters set." class-type="DataFlowParameters" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="IS_InformationSource" description="Links the Partition to a set of IS variables used to display global performance monitoring." class-type="IS_InformationSources" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="RunTagList" description="Links the partition to a set of user defined run tags" class-type="RunTagList" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="MasterTrigger" description="Link to the master trigger of the partition." class-type="MasterTrigger" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TestRepositories" description="Links the partition object with the Tests that are performed on it." class-type="TestRepository" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TriggerConfiguration" description="Points to object describing Level-1 and HLT trigger configuration." class-type="TriggerConfiguration" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ResourcesInfoConfiguration" description="Defines configuration for ResourcesInfo service.&#xA;The service is only active, if this configuration is correctly defined.&#xA;Do not activate the service for test partitions!&#xA;Do not disable the service without a reason for combined partition!" class-type="ResourcesInfoConfig" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="OnlineInfrastructureApplications" description="Extension of OnlineSegment applications" class-type="Application" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <method name="get_all_applications" description="Returns all templated and non-templated applications defined in the partition with their parameters to be used by the data collection and message passing configurations.">
+   <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_all_applications(std::set&lt;std::string&gt; * app_types = nullptr, std::set&lt;std::string&gt; * use_segments = nullptr, std::set&lt;const Computer *&gt; * use_hosts = nullptr) const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return get_segment(get_OnlineInfrastructure().UID()).get_all_applications(app_types, use_segments, use_hosts);"/>
+  </method>
+  <method name="set_disabled" description="In addition to persistently disabled components, dynamically disable these components. It will be taken into account by disabled() algorithm of Component class. This information is not committed to the database and will be overwritten by next set_disabled() call or erased by any config action (DB load, unload, reload).">
+   <method-implementation language="c++" prototype="void set_disabled(const std::set&lt;const daq::core::Component *&gt;&amp; objs) const" body="BEGIN_PRIVATE_SECTION&#xA;friend class DisabledComponents;&#xA;friend class Component;&#xA;mutable daq::core::DisabledComponents m_disabled_components; &#xA;END_PRIVATE_SECTION&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;m_disabled_components(p_db)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;BEGIN_HEADER_PROLOGUE&#xA;#include &quot;dal/disabled-components.hpp&quot;&#xA;END_HEADER_PROLOGUE"/>
+   <method-implementation language="java" prototype="void set_disabled(Component objs[]) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PUBLIC_SECTION&#xA;Resources resources() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException;&#xA;END_PUBLIC_SECTION&#xA;BEGIN_PRIVATE_SECTION&#xA;private Resources p_resources;&#xA;&#xA;public Resources resources() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException {&#xA;  if(p_was_read == false) {init();}&#xA;  return p_resources;&#xA;}&#xA;END_PRIVATE_SECTION&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_resources == null) p_resources = new Resources(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;resources().set_disabled(objs);"/>
+  </method>
+  <method name="set_enabled" description="Dynamically enable these persistently disabled components. It will be taken into account by disabled() algorithm of the Component class. This information is not committed to the database and will be overwritten by next set_enabled() call or erased by any config action (DB load, unload, reload).">
+   <method-implementation language="c++" prototype="void set_enabled(const std::set&lt;const daq::core::Component *&gt;&amp; objs) const" body=""/>
+   <method-implementation language="java" prototype="void set_enabled(Component objs[]) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="resources().set_enabled(objs);"/>
+  </method>
+  <method name="get_segment" description="The DAL algorithm to access segment by name. It generates templated segments and applications objects dynamically">
+   <method-implementation language="c++" prototype="const daq::core::Segment * get_segment(const std::string&amp; name) const" body="BEGIN_PRIVATE_SECTION&#xA;mutable daq::core::ApplicationConfig m_app_config; &#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;m_app_config(p_db)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;&#xA;BEGIN_HEADER_PROLOGUE&#xA;#include &quot;dal/application-config.hpp&quot;&#xA;END_HEADER_PROLOGUE"/>
+   <method-implementation language="java" prototype="dal.Segment get_segment(String id) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return p_application_config.get_segment(this, id);&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;private ApplicationConfig p_application_config;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_application_config == null) p_application_config = new ApplicationConfig(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
+  </method>
+  <method name="get_log_directory" description="returns the directory in which to write log files. ">
+   <method-implementation language="c++" prototype="std::string get_log_directory() const" body=""/>
+  </method>
+  <method name="set_config_version" description="Set configuration version, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="void set_config_version(const std::string&amp; name, bool reload)" body=""/>
+   <method-implementation language="java" prototype="void set_config_version(final String version, boolean reload) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="dal.Algorithms.set_config_version(UID(), version, reload);"/>
+  </method>
+  <method name="get_config_version" description="Return configuration version used by given partition, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="std::string get_config_version()" body=""/>
+   <method-implementation language="java" prototype="String get_config_version() throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return dal.Algorithms.get_config_version(UID());"/>
+  </method>
+ </class>
+
+ <class name="Platform" description="This abstract class is used to define base hw tags used in TDAQ." is-abstract="yes">
+  <attribute name="HW_Tag" description="Set of all available hardware tags in the format: &quot;hardware platform&quot;-&quot;operating system&quot;" type="enum" range="i686-slc6,x86_64-slc6,x86_64-mac108,x86_64-cc7,x86_64-centos7,x86_64-centos8,x86_64-centos9,aarch64-centos7,aarch64-centos8,aarch64-centos9,armv7-centos7,armv7-centos8" init-value="x86_64-centos7" is-not-null="yes"/>
+ </class>
+
+ <class name="PlatformCompatibility" description="The class describes compatibility of HW platforms">
+  <superclass name="Platform"/>
+  <relationship name="CompatibleWith" description="List of platforms compatible with given one" class-type="PlatformCompatibility" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="RM_HW_Resource">
+  <superclass name="RM_Resource"/>
+  <attribute name="HardwareClass" type="string"/>
+ </class>
+
+ <class name="RM_Resource" description="The Resource class is used to describe shared and exclusive resources used by the processes: the name of the resource, the maximum numbers of copies per partition and per system (i.e. total), and documentation (help URL and comments). The dynamic part of a resource includes the list of processes that allocated this resource.&#xA;An example of a resource could be a run-time license (for example we can start limited number of processes with GUI that use some commercial widget). A resource can describe some hardware resources (for example we can not have two concurrent processes that write on the same type recorder device). The use of resources can be connected with the architecture of the process (for example, we do not want to allow start simultaneously several GUI editors for the same data, if there is no concurrent update of graphical view or the creator of software objects knows that it must be started only once per system or per partition, etc.)." is-abstract="yes">
+  <attribute name="Description" type="string"/>
+  <attribute name="MaxCopyPerPartition" type="s32" init-value="1"/>
+  <attribute name="MaxCopyTotal" type="s32" init-value="1"/>
+  <attribute name="HelpLink" type="string" init-value="http://"/>
+ </class>
+
+ <class name="RM_SW_Resource">
+  <superclass name="RM_Resource"/>
+ </class>
+
+ <class name="Rack">
+  <superclass name="HW_Object"/>
+  <superclass name="Component"/>
+  <relationship name="Nodes" class-type="ComputerBase" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="yes"/>
+  <relationship name="Crates" class-type="Crate" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="yes" is-dependent="no"/>
+  <relationship name="LFS" description="Local File Servers of the rack (can be more than one)." class-type="Computer" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Resource">
+  <superclass name="ResourceBase"/>
+ </class>
+
+ <class name="ResourceApplication" description="The class describes an application, that can be enabled or disabled in the scope of partition.">
+  <superclass name="CustomLifetimeApplication"/>
+  <superclass name="Resource"/>
+ </class>
+
+ <class name="ResourceBase">
+  <superclass name="Component"/>
+  <method name="get_resources" description="Returns list of resources including defined by the nested sets. If partition parameter is provided (i.e. it is not &lt;b&gt;null&lt;/b&gt;), only enabled resources are added.">
+   <method-implementation language="c++" prototype="void get_resources(::Configuration&amp; db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const" body=""/>
+  </method>
+ </class>
+
+ <class name="ResourceSet">
+  <superclass name="ResourceBase"/>
+  <relationship name="Contains" description="A resource set is a container of resources to easily implement group operations (add/remove, enable/disable)." class-type="ResourceBase" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="ResourceSetAND" description="This resource set is considered disabled when ALL nested resources are disabled.">
+  <superclass name="ResourceSet"/>
+ </class>
+
+ <class name="ResourceSetOR" description="This resource set is considered disabled when ANY nested resource is disabled.">
+  <superclass name="ResourceSet"/>
+ </class>
+
+ <class name="ResourcesInfoConfig" description="Describes full configuration of ResourceInfo service. An instance of that class to be linked with Partition object to enable the service.">
+  <attribute name="ArchiveInCOOL" description="If true, the resources info is stored on COOL. Otherwise the resources info is only published in IS." type="bool" init-value="false"/>
+  <relationship name="DetectorFolders" description="Defines detectors folders." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="GlobalFolder" description="Mandatory relationship on folder collecting resources shared by several detectors. The mix and max ID values are ignored, but sub-folders config is used." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DefaultDetectorSubFolders" description="Defines sub-folders for all detectors" class-type="ResourcesInfoDetectorFolderConfig" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="ResourcesInfoDetectorConfig">
+  <attribute name="FolderName" description="Defines name of detector folder." type="string" is-not-null="yes"/>
+  <attribute name="SubDetectorIDs" description="Defines sub-detector identifiers for given detector group (see ranges in eformat/SourceIdentifier.hpp of tdaq-common release)." type="u8" format="hex" is-multi-value="yes"/>
+  <relationship name="SubFolders" description="Defines structure of detector sub-folders.&#xA;The order of sub-folders in this list defines selection priority:&#xA;if resource&apos;s class matches to a name of OKS base class,&#xA;the resource goes into given sub-folder." class-type="ResourcesInfoDetectorFolderConfig" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="ResourcesInfoDetectorFolderConfig" description="Describes configuration of detector sub-folder used by the ResourceInfo service.">
+  <attribute name="FolderName" description="Defines name of detector sub-folder." type="string" is-not-null="yes"/>
+  <attribute name="BaseClasses" description="Defines names of detector resource base classes. If resource class is derived from any such class, it is archived in given detector sub-folder." type="string" is-multi-value="yes" is-not-null="yes"/>
+ </class>
+
+ <class name="RunControlApplication">
+  <superclass name="RunControlApplicationBase"/>
+  <superclass name="Application"/>
+ </class>
+
+ <class name="RunControlApplicationBase" is-abstract="yes">
+  <superclass name="IPCServiceApplicationBase"/>
+  <attribute name="ActionTimeout" description="Maximum time (unit is seconds!) allowed to change a state, before a timeout warning shall be raised.." type="s32" init-value="10" is-not-null="yes"/>
+  <attribute name="ProbeInterval" description="Defines at what interval (in seconds) a controller shall probe its children." type="s32" init-value="25" is-not-null="yes"/>
+  <attribute name="FullStatisticsInterval" description="Defines at what time interval (in seconds) the controller shall request complete operational statistics to its children." type="s32" init-value="63" is-not-null="yes"/>
+  <attribute name="IfError" description="This attribute is used by the parent controller to know how to react in case that this controlled application goes in Error state or sends a FATAL error." type="enum" range="Error,Ignore,Restart,Handle"/>
+  <attribute name="ControlsTTCPartitions" description="Flag that indicates whether on this controller the dynamic restart during a run can by applied." type="bool" init-value="false"/>
+ </class>
+
+ <class name="RunControlTemplateApplication">
+  <superclass name="RunControlApplicationBase"/>
+  <superclass name="TemplateApplication"/>
+ </class>
+
+ <class name="RunTagList">
+  <attribute name="RunTags" description="Array of user defined tags which will be added to the run description.&#xA;Format is: tag_name={predefined_value_1, predefined_value_2...}} or tag_name if there are no predefined values." type="string" is-multi-value="yes"/>
+ </class>
+
+ <class name="SW_ExternalPackage">
+  <superclass name="SW_Package"/>
+  <relationship name="Binaries" description="Maps package specific dir with binaries to CMT one" class-type="TagMapping" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="SharedLibraries" description="Maps package specific dir with shared libraries to CMT one" class-type="TagMapping" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="SW_Object" description="This class is used to describe platform independent part of DAQ software component from logical point of view.&#xA;The platform dependent part is described by &apos;Program&apos; class.&#xA;To start DAQ software component it is necessary to create an instance of &apos;SW_Module&apos; class." is-abstract="yes">
+  <superclass name="TestableObject"/>
+  <attribute name="BinaryName" description="Name of executable file." type="string" is-not-null="yes"/>
+  <attribute name="Description" description="Description of executable file. Often it is a result of --help command line option." type="string"/>
+  <attribute name="Authors" description="Lists developers of given binary." type="string" is-multi-value="yes"/>
+  <attribute name="HelpURL" description="URL to provide more information about binary." type="string" init-value="http://"/>
+  <relationship name="Needs" description="Point to RM resources required by given binary. If defined, such resources are allocated by PMG before starting this binary." class-type="RM_Resource" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="BelongsTo" description="A software object has to belong to some repository, that defines various paths and environment required to run such binary." class-type="SW_Repository" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Uses" description="A software object can use zero or many software repositories&#xA;(here &quot;uses&quot; means that at least it needs shared libraries from them)." class-type="SW_Package" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="SW_Package" description="Describe common properties of SW repository and ExternalPackage classes" is-abstract="yes">
+  <attribute name="Name" description="The string defines name of the software repository." type="string" init-value="Unknown SW" is-not-null="yes"/>
+  <attribute name="InstallationPath" description="The string defines the software repository installation path." type="string" init-value="/usr/local" is-not-null="yes"/>
+  <attribute name="PatchArea" description="If patch area is non-empty, it is added to:&#xA;* the PATH and the LD_LIBRARY_PATH process environment variables of sw objects using it;&#xA;* the possible binary file names (i.e. if exists, binary will be taken from the patch area)." type="string"/>
+  <relationship name="Uses" description="Define others sw repositories which are used by given one.&#xA;This adds paths to bin and lib directories of the repository&apos; programs." class-type="SW_Package" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ProcessEnvironment" description="A software package defines environment variables to be set for any application using such sw package." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="AddProcessEnvironment" class-type="SW_PackageVariable" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="SW_PackageVariable" description="This class is used to extend process environment defined by a sw package. The value of suffix is added to the sw package installation path and appended to the variable using colon separator.">
+  <attribute name="Description" type="string"/>
+  <attribute name="Name" description="Name of environment variable." type="string" is-not-null="yes"/>
+  <attribute name="Suffix" description="The suffix is appended to the SW_Package installation path and the resulted value is appended to the variable value separated by colon sign." type="string"/>
+ </class>
+
+ <class name="SW_Repository" description="The sw repository describes an installation area of sw release built on top of CMT.">
+  <superclass name="SW_Package"/>
+  <attribute name="ISInfoDescriptionFiles" description="List of files describing IS information produced by the computer programs of given repository." type="string" is-multi-value="yes"/>
+  <attribute name="IGUIProperties" description="List of properties to be passed to IGUI, when this sw repository is used by partition." type="string" is-multi-value="yes"/>
+  <attribute name="InstallationPathVariableName" description="The value defines variable to be created by DAL algorithm, if an application belongs or uses this sw repository. It is ignored, if empty." type="string"/>
+  <relationship name="Tags" description="List tags available in given sw repository. Any binary belonging to the repository should have implementations for each tag." class-type="Tag" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="SW_Objects" description="A software repository contains at least one software object.  A referenced software object shall point to the same software repository (i.e. a software object can&apos;t be shared by several repositories)." class-type="SW_Object" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="Script" description="This class is used to describe a script program. The scripts are usually installed on share/bin directory.">
+  <superclass name="ComputerProgram"/>
+  <attribute name="Shell" description="Specify shell script interpreter." type="string"/>
+ </class>
+
+ <class name="Segment" description="A segment is self-sufficient part of the system which can be configured and controlled independently from the rest of the TDAQ system. A segment represents a detector, a system or their part. A segment can include other segments. A segment is controlled by associated RC controller application.&#xA;To be used by the partition it has to be added to the partition&apos;s Segments relationship. To be temporary ignored a segment can be disabled, i.e. added to the partition&apos;s Disabled relationship. When a segment is disabled, all nested segments are also disabled.&#xA;A segment can include applications and resources.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_2_Segment_Classes">
+  <superclass name="Component"/>
+  <relationship name="Segments" description="Nested segments of given segment." class-type="Segment" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+  <relationship name="UsesObjects" description="A segment state depends on state of hw objects it uses." class-type="HW_Object" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="UsesSystems" description="A segment state depends on state of hw systems it uses." class-type="HW_System" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Resources" class-type="ResourceBase" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Infrastructure" description="Infrastructure applications are started before any other applications from given and all included segments." class-type="InfrastructureBase" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Applications" description="Normal applications of segment." class-type="BaseApplication" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
+  <relationship name="ProcessEnvironment" description="Process environment defined for all applications of given and nested segments." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="IsControlledBy" description="RunControl application controlling the segment." class-type="RunControlApplicationBase" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DefaultTags" description="If an application has no explicit tag, first suitable tag from this list will be used to select binary for that application for given and nested segments (if not overwritten by them)." class-type="Tag" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="JarFiles" class-type="JarFile" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Parameters" description="Parameters which are used by database objects belonging to this segment." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="Hosts" description="Defines host where to run segment&apos;s applications without explicitly defined host.&#xA;The first host is state &quot;On&quot; is used to run normal applications and template applications with &quot;RunsOn&quot; = &quot;FirstHost&quot;.&#xA;The other hosts are used for template applications with &quot;RunsOn&quot; = &quot;All*Hosts&quot;." class-type="ComputerBase" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TestRepositories" description="Links the Segment with the specific Tests which can be performed on it." class-type="TestRepository" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="SubTransitions" description="The list of sub-transitions this segment&apos;s controller will dispatch to its children" class-type="SubTransition" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <method name="get_timeouts" description="calculates the timeouts for long and short execution of run control commands: shortTimeout and actionTimeout.&#xA;throws daq::core::BadSegment&#xA;Requires:&#xA;- reference to Configuration&#xA;- reference to Partition">
+   <method-implementation language="c++" prototype="void get_timeouts(int &amp; actionTimeout, int &amp; shortActionTimeout) const" body=""/>
+  </method>
+  <method name="find_is_server_by_mask" description="The method searches nearest IS server between this segment and partition with name including given mask.">
+   <method-implementation language="c++" prototype="std::string find_is_server_by_mask(const std::string&amp; mask, const daq::core::Partition&amp; partition) const" body=""/>
+  </method>
+  <method name="get_all_applications" description="Get all application of this and nested segments.&#xA;In the parameters one can precise types of applications, names of segments and hosts the applications run on. The method is used to implement partition&apos;s get_all_applications() algorithm returning description of all applications running in the partition; in this case it is run on partition&apos;s online segment.">
+   <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_all_applications(std::set&lt;std::string&gt; * app_types = nullptr, std::set&lt;std::string&gt; * use_segments = nullptr, std::set&lt;const Computer *&gt; * use_hosts = nullptr) const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.SegConfig.get_all_applications(this, app_types, use_segments, use_hosts);"/>
+  </method>
+  <method name="get_controller" description="">
+   <method-implementation language="c++" prototype="const daq::core::BaseApplication * get_controller() const" body="ADD_ALGO_1"/>
+   <method-implementation language="java" prototype="dal.BaseApplication get_controller() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_controller();"/>
+  </method>
+  <method name="get_infrastructure" description="">
+   <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; get_infrastructure() const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_infrastructure() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_infrastructure();"/>
+  </method>
+  <method name="get_applications" description="">
+   <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; get_applications() const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_applications() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_applications();"/>
+  </method>
+  <method name="get_nested_segments" description="The algorithm calculates a vector of nested segments including templated ones.&#xA;">
+   <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::Segment*&gt;&amp; get_nested_segments() const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="dal.Segment[] get_nested_segments() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_nested_segments();"/>
+  </method>
+  <method name="get_hosts" description="">
+   <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::Computer*&gt;&amp; get_hosts() const" body="ADD_ALGO_N"/>
+   <method-implementation language="java" prototype="Computer[] get_hosts() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_hosts();"/>
+  </method>
+  <method name="get_base_segment" description="">
+   <method-implementation language="c++" prototype="const Segment * get_base_segment() const" body="ADD_ALGO_1"/>
+   <method-implementation language="java" prototype="dal.Segment get_base_segment() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_base_segment();"/>
+  </method>
+  <method name="is_disabled" description="">
+   <method-implementation language="c++" prototype="bool is_disabled() const" body=""/>
+   <method-implementation language="java" prototype="boolean is_disabled() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).is_disabled();"/>
+  </method>
+  <method name="is_templated" description="">
+   <method-implementation language="c++" prototype="bool is_templated() const" body=""/>
+   <method-implementation language="java" prototype="boolean is_templated() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).is_templated();"/>
+  </method>
+  <method name="get_seg_config" description="">
+   <method-implementation language="c++" prototype="SegConfig * get_seg_config(bool check_disabled, bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/seg-config.hpp&gt;&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;SegConfig&gt; p_seg_config;&#xA;mutable std::atomic&lt;const Segment *&gt; p_gen_obj;&#xA;friend class Partition;&#xA;friend class AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST"/>
+   <method-implementation language="java" prototype="dal.SegConfig get_seg_config(boolean check_disabled, boolean no_except) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.SegConfig p_seg_config;&#xA;dal.Segment p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_seg_config(this, check_disabled, no_except);"/>
+  </method>
+ </class>
+
+ <class name="SubTransition">
+  <attribute name="MainTransition" description="The main transition the sub-transition refers to" type="enum" range="CONFIGURE,CONNECT,START,STOPROIB,STOPDC,STOPHLT,STOPRECORDING,STOPGATHERING,STOPARCHIVING,DISCONNECT,UNCONFIGURE" init-value="CONFIGURE" is-not-null="yes"/>
+  <attribute name="Substeps" description="Sub-steps for one of the main transitions" type="string" is-multi-value="yes" is-not-null="yes"/>
+ </class>
+
+ <class name="Tag" description="Defines available CMT tags.">
+  <superclass name="Platform"/>
+  <attribute name="SW_Tag" description="Available compilers and their instrumentations." type="enum" range="gcc49-opt,gcc49-dbg,gcc62-opt,gcc62-dbg,gcc7-opt,gcc7-dbg,gcc8-opt,gcc8-dbg,gcc9-opt,gcc9-dbg,clang80-opt,clang80-dbg,clang39-opt,clang39-dbg,clang8-opt,clang8-dbg,clang9-opt,clang9-dbg,clang12-opt,clang12-dbg,clang13-opt,clang13-dbg,clang14-opt,clang14-dbg,gcc10-opt,gcc10-dbg,gcc11-opt,gcc11-dbg,gcc12-opt,gcc12-dbg" init-value="gcc8-opt" is-not-null="yes"/>
+ </class>
+
+ <class name="TagMapping" description="Is used to map CMT tag installation on model used by external package, e.g.: i686-slc4-gcc34-opt/bin is mapped on slc4_ia32_gcc34/bin">
+  <superclass name="Tag"/>
+  <attribute name="Value" description="Defines mapping of value depending from tag." type="string"/>
+ </class>
+
+ <class name="TemplateApplication" description="This class is used to describe many process to be started.&#xA;A template application is referenced by segment objects, which keep lists of template application hosts.&#xA;For more information about template applications read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_3_Application_Classes" is-abstract="yes">
+  <superclass name="BaseApplication"/>
+  <attribute name="Instances" description="Defines number of instances per template host. If number is set to 0, then the number of instances on a host is equal to the number of it&apos;s CPU cores." type="u16" init-value="1"/>
+  <attribute name="RunsOn" description="Describe where to run template application.&#xA;For a segment the list of hosts is defined by &quot;Hosts&quot; relationship.&#xA;For template segment the list of hosts is defined by rack&apos;s hosts.&#xA;The &quot;FirstHost&quot; is first host in the list in state &quot;On&quot; without a possibility to restart application on a backup host.&#xA;The &quot;FirstHostWithBackup&quot; is similar to above and allows to restart application on one of enabled hosts.&#xA;Error is raised if:&#xA;1) &quot;FirstHost&quot; or &quot;AllHosts&quot; is set, but there are no segment hosts in state &quot;On&quot;&#xA;2) &quot;AllButFirstHost&quot; is set, but there is only one segment host in state &quot;On&quot;" type="enum" range="FirstHost,FirstHostWithBackup,AllButFirstHost,AllHosts" init-value="AllButFirstHost" is-not-null="yes"/>
+ </class>
+
+ <class name="TemplateSegment" description="The HLTSegment has to be used to describe a segment with template applications.">
+  <superclass name="Segment"/>
+  <relationship name="Racks" class-type="Rack" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="TestRepository" description="Abstract class to allow set of tests to be linked to the Partition or Segment objects (implementation of it in testdal)." is-abstract="yes">
+ </class>
+
+ <class name="TestableObject" description="An object that may have test (test4Object) associated and therefore be testable with test manager.&#xA;This is an abstract class, real testable classes must be inherited (e.g. Computer, Module)." is-abstract="yes">
+ </class>
+
+ <class name="TriggerConfiguration" description="Object for the trigger-configuration settings for LVL1 and HLT">
+  <attribute name="LatencyValue" description="LVL1 trigger latency offset value (e.g., 0 refers to the standard Physics configuration)" type="s32" init-value="0"/>
+  <attribute name="TriggerCoolConnection" description="Database to write HLT prescale changes to.&#xA;This is used by the CTP or the HLTSV in pre-loaded mode." type="string"/>
+  <relationship name="l1" description="The L1 configuration parameters" class-type="L1TriggerConfiguration" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="hlt" description="The L2 implementation to be loaded in Level-2 processors" class-type="HLTImplementation" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="TriggerDBConnection" description="Object containing the database connection parameters for the TriggerDB." class-type="TriggerDBConnection" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DBConnections" description="Links the description of DB connections needed to configure the Trigger to the TriggerConfiguration object.&#xA;This relationship excludes the TriggerDB connection which is linked via the TriggerDBConnections relationship. " class-type="DBConnection" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="TriggerDBConnection" description="Describes the database connection to be used to obtain trigger-configuration parameters">
+  <superclass name="DBConnection"/>
+  <attribute name="SuperMasterKey" description="The super-master key for the configuration in the database" type="u32" init-value="0"/>
+ </class>
+
+ <class name="Variable" description="Variable allows to associate a value with string name. It is used for process environment and database strings substitution. In some cases the value of application process environment depends on context of variable usage (when TagValues relationship is set).">
+  <superclass name="Parameter"/>
+  <attribute name="Name" description="Name of the variable." type="string"/>
+  <attribute name="Value" description="Default value of the variable. If TagValues is not empty, the value can be re-defined by corresponding tag in the context of the application&apos;s process environment." type="string"/>
+  <relationship name="TagValues" description="Defines value of variable for given tag." class-type="TagMapping" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <method name="get_value" description="The method returns value of variable depending on the application context (if tag is provided).">
+   <method-implementation language="c++" prototype="const std::string&amp; get_value(const Tag * = 0) const" body=""/>
+   <method-implementation language="java" prototype="String get_value(Tag tag) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.Algorithms.get_value(this, tag);"/>
+  </method>
+ </class>
+
+ <class name="VariableSet" description="Set of variables or variable sets. Names and values of all nested variables are added to value of relationship using resource set.">
+  <superclass name="Parameter"/>
+  <relationship name="Contains" description="List of included variables or variable sets." class-type="Parameter" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+ </class>
+
+ <class name="WarmStartStopReactor" description="This class has two attributes to flag to the run control what should be done with an application at warm start/stop." is-abstract="yes">
+  <attribute name="RestartAtWarmStart" description="Set to true if you want your application to be restarted at warm start." type="bool" init-value="true"/>
+  <attribute name="RestartAtWarmStop" description="Set to true if you want your application to be restarted at warm stop" type="bool" init-value="false"/>
+ </class>
+
+</oks-schema>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ASCII"?>
+
+<!-- oks-data version 2.2 -->
+
+
+<!DOCTYPE oks-data [
+  <!ELEMENT oks-data (info, (include)?, (comments)?, (obj)+)>
+  <!ELEMENT info EMPTY>
+  <!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "data"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+  <!ELEMENT include (file)*>
+  <!ELEMENT file EMPTY>
+  <!ATTLIST file
+      path CDATA #REQUIRED
+  >
+  <!ELEMENT comments (comment)*>
+  <!ELEMENT comment EMPTY>
+  <!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+  <!ELEMENT obj (attr | rel)*>
+  <!ATTLIST obj
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+  <!ELEMENT attr (data)*>
+  <!ATTLIST attr
+      name CDATA #REQUIRED
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class|-) "-"
+      val CDATA ""
+  >
+  <!ELEMENT data EMPTY>
+  <!ATTLIST data
+      val CDATA #REQUIRED
+  >
+  <!ELEMENT rel (ref)*>
+  <!ATTLIST rel
+      name CDATA #REQUIRED
+      class CDATA ""
+      id CDATA ""
+  >
+  <!ELEMENT ref EMPTY>
+  <!ATTLIST ref
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+]>
+
+<oks-data>
+
+<info name="" type="" num-of-items="2" oks-format="data" oks-version="JCF, Oct-5-2022: please contact John Freeman at jcfree@fnal.gov or on Slack if you see this message" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20230105T194746" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20230105T194746"/>
+
+<include>
+ <file path="/home/jcfree/daqbuild_oks/core.schema.xml"/>
+</include>
+
+<obj class="Partition" id="JohnsPartition">
+<!--  <rel name="Segments">
+   <ref class="Segment" id="SIOMEmonConcentratorTest"/>
+  </rel>
+-->
+  <rel name="OnlineInfrastructure" class="OnlineSegment" id="setup"/>
+  <rel name="DefaultHost" class="Computer" id="mu2edaq13.fnal.gov"/>
+</obj>
+
+<obj class="RunControlApplication" id="JohnsRunControlApplication">
+ <attr name="InterfaceName" type="string" val="rc/commander"/>
+ <attr name="ActionTimeout" type="s32" val="10"/>
+ <attr name="ProbeInterval" type="s32" val="5"/>
+ <attr name="FullStatisticsInterval" type="s32" val="60"/>
+ <attr name="ControlsTTCPartitions" type="bool" val="0"/>
+ <attr name="Logging" type="bool" val="1"/>
+ <attr name="InitTimeout" type="u32" val="60"/>
+ <attr name="ExitTimeout" type="u32" val="5"/>
+ <attr name="RestartableDuringRun" type="bool" val="0"/>
+ <attr name="IfExitsUnexpectedly" type="enum" val="Error"/>
+ <attr name="IfFailsToStart" type="enum" val="Error"/>
+<!-- <rel name="Program" class="Binary" id="rc_controller"/> -->
+</obj>
+
+
+<obj class="CustomLifetimeApplication" id="SomeApp">
+ <attr name="Lifetime" type="enum" val="UserDefined_Shutdown"/>
+ <attr name="AllowSpontaneousExit" type="bool" val="0"/>
+</obj>
+
+
+
+<!--
+<obj class="Segment" id="SIOMEmonConcentratorTest">
+ <rel name="IsControlledBy" class="RunControlApplication" id="JohnsRunControlApplication"/> 
+ <rel name="Applications">
+   <ref class="CustomLifetimeApplication" id="SomeApp"/>
+ </rel>
+</obj>
+-->
+
+<obj class="OnlineSegment" id="setup">
+ <attr name="T0_ProjectTag" type="string" val="data_test"/> 
+ <rel name="IsControlledBy" class="RunControlApplication" id="JohnsRunControlApplication"/>
+ <rel name="InitialPartition" class="Partition" id="JohnsPartition">
+ <rel name="PmgAgent" class="Binary" id="JohnsPmgAgent">
+ <rel name="Applications">
+   <ref class="CustomLifetimeApplication" id="SomeApp"/>
+ </rel>
+</obj>
+
+<obj class="Binary" id="JohnsPmgAgent">
+ <attr name="DefaultParameters" type="string" val="foo bar"/>
+</obj>
+
+
+<obj class="Tag" id="SomeTag">
+ <attr name="HW_Tag" type="enum" val="x86_64-centos7"/>
+ <attr name="SW_Tag" type="enum" val="gcc49-opt"/>
+</obj>
+
+
+<!-- JCF, Jan-6-2023: these are NOT the actual specs of mu2edaq13.fnal.gov; this is a placeholder to test basic DAL applications -->
+
+<obj class="Computer" id="mu2edaq13.fnal.gov">
+ <attr name="HW_Tag" type="enum" val="x86_64-centos7"/>
+ <attr name="Type" type="string" val="Intel(R) Xeon(TM) CPU 3.40GHz"/>
+ <attr name="Location" type="string" val=""/>
+ <attr name="Description" type="string" val=""/>
+ <attr name="HelpLink" type="string" val=""/>
+ <attr name="InstallationRef" type="string" val=""/>
+ <attr name="State" type="bool" val="1"/>
+ <attr name="Memory" type="u16" val="514"/>
+ <attr name="CPU" type="u16" val="3400"/>
+ <attr name="NumberOfCores" type="s16" val="2"/>
+ <attr name="RLogin" type="string" val="ssh"/>
+<!-- <rel name="Interfaces" num="2">
+  "NetworkInterface" "pc-csc-ros-eca-00.cern.ch-dc1"
+  "NetworkInterface" "pc-csc-ros-eca-00.cern.ch-dc2"
+ </rel> -->
+</obj>
+
+
+</oks-data>
