@@ -66,7 +66,7 @@
 <info name="" type="" num-of-items="2" oks-format="data" oks-version="JCF, Oct-5-2022: please contact John Freeman at jcfree@fnal.gov or on Slack if you see this message" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20230105T194746" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20230105T194746"/>
 
 <include>
- <file path="/home/jcfree/daqbuild_oks/core.schema.xml"/>
+ <file path="core.schema.xml"/>
 </include>
 
 <obj class="Partition" id="JohnsPartition">
