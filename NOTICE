@@ -1,3 +1,13 @@
+
+This repo's code has been copied from the ATLAS TDAQ package of the
+same name (under the tdaq-9-05-00 release) and been refactored for the
+DUNE DAQ. Original ATLAS TDAQ licensing info (Apache License 2.0) can
+be found below this line. Note that while this license does not
+necessarily apply to the refactored parts of the code, it does apply
+to the unmodified parts.
+
+======================================================================
+
 Copyright (C) 2001-2020 CERN for the benefit of the ATLAS collaboration.
 Licensed under the Apache License, version 2.0.
 
@@ -11,3 +21,4 @@ Contributors
  Bahar Aydemir <bahar.aydemir@cern.ch>
  Andy Salnikov <salnikov@slac.stanford.edu>
  Andre Dos Anjos <andre.dos.anjos@gmail.com>
+
