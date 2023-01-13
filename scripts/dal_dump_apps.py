@@ -27,19 +27,17 @@ if __name__ == '__main__':
        the -d command line parameter, or by the TDAQ_DB environment variable in format \"impl:parameter\",\n
        e.g. \"oksconfig:/tmp/my-db.xml\". By default the algorithms are applied to all applications used by\n
        the partition are their results are printed out.\n\n
-       usage: dal_dump_apps [-d | --data database-name]\n
+       usage: dal_dump_apps.py [-d | --data database-name]\n
                          [-p | --partition-id partition-id]\n
                          [-a | --application-id app-id]\n
                          [-n | --application-name app-name]\n
                          [-g | --application-segment-id seg-id]\n
-                         [-s | --substitute-variables\n
         \n""", formatter_class=RawTextHelpFormatter)
     parser.add_argument("-d", "--data", help = "name of the database (ignore TDAQ_DB variable)" )
     parser.add_argument("-p", "--partition_id", help = "name of the partition object")
     parser.add_argument("-a", "--application_id", help = "identity of the application object (if not provided, dump all applications")
     parser.add_argument("-n", "--application_name", help = "name of the application object (if not provided, dump all applications)")
     parser.add_argument("-g", "--application_segment_id", help = "identity of the application's segment object (if defined,print apps of this segment")  
-    parser.add_argument("-s", "--substitute_variables", help = "")                       
  
     args = parser.parse_args()
 
@@ -58,21 +56,18 @@ if __name__ == '__main__':
         args.application_id = args.application_name
     # get Partition object
     partition = db.get_dal('Partition', args.partition_id)
-    app_config_list = partition.get_all_applications(db, set(), set({args.application_segment_id}), set())  
+    app_config_list = partition.get_all_applications(db, None, args.application_segment_id, None)  
 
     count = 0
 
-    #root_seg = partition.get_segment(db, partition.OnlineInfrastructure.id)
-
     for i in app_config_list :
-
-        if app and (i.base_app is not app):
+        if app and type(app) != int and (i.get_base_app().id != app.id): # recall app is initialized to the integer 0
             continue           
-        if  i.is_templated :
+        if  i.is_templated() :
             if ((args.application_id is not None) ) and ( not (   args.application_name == i.app_id) ): #watch out for these 
                 continue
         else :
-            if (args.application_id is not None)  and ( not (   app.id == i.app_id) ):
+            if (args.application_id is not None)  and ( not (   app.id == i.get_app_id()) ):
                 continue
 
         count += 1
@@ -88,10 +83,10 @@ if __name__ == '__main__':
         print_info(info['programNames'], info['environment'])
 
     if count == 0 :
-        if app is not None:
+        if app is not None and type(app) != int:  # recall app is initialized to the integer 0
            print("the application " + app.id + " is not running in the partition; it is disabled or not included into partition")
-        elif application_name is not None:
-           print("the application with name \'" + application_name + "\' is not running in the partition; it is disabled or not included into partition")
-        elif application_segment_id is not None :
-           print("the applications of segment " + application_segment_id + " are not running in the partition; the segment or it\'s applications are disabled or the segment is not included into partition")
+        elif args.application_name is not None:
+           print("the application with name \'" + args.application_name + "\' is not running in the partition; it is disabled or not included into partition")
+        elif args.application_segment_id is not None :
+           print("the applications of segment " + args.application_segment_id + " are not running in the partition; the segment or it\'s applications are disabled or the segment is not included into partition")
 

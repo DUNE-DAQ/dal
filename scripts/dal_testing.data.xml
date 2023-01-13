@@ -69,6 +69,12 @@
  <file path="core.schema.xml"/>
 </include>
 
+<obj class="SW_Repository" id="FakeRepository">
+  <rel name="Tags">
+   <ref class="Tag" id="SomeTag"/>
+  </rel>
+</obj>
+
 <obj class="Partition" id="JohnsPartition">
 <!--  <rel name="Segments">
    <ref class="Segment" id="SIOMEmonConcentratorTest"/>
@@ -77,6 +83,23 @@
   <rel name="OnlineInfrastructure" class="OnlineSegment" id="setup"/>
   <rel name="DefaultHost" class="Computer" id="mu2edaq13.fnal.gov"/>
 </obj>
+
+<obj class="Binary" id="rc_controller">
+ <attr name="BinaryName" type="string" val="rc_controller"/>
+ <attr name="Description" type="string" val="A Controller implementing all the default actions"/>
+ <attr name="HelpURL" type="string" val=""/>
+ <attr name="DefaultParameters" type="string" val="foo bar"/>
+ <rel name="BelongsTo" class="SW_Repository" id="FakeRepository"/> 
+</obj>
+
+<obj class="Binary" id="coolapp">
+ <attr name="BinaryName" type="string" val="coolapp"/>
+ <attr name="Description" type="string" val="Just a straight-up amazing application"/>
+ <attr name="HelpURL" type="string" val=""/>
+ <attr name="DefaultParameters" type="string" val="arg1 arg2 arg3"/>
+ <rel name="BelongsTo" class="SW_Repository" id="FakeRepository"/> 
+</obj>
+
 
 <obj class="RunControlApplication" id="JohnsRunControlApplication">
  <attr name="InterfaceName" type="string" val="rc/commander"/>
@@ -90,25 +113,18 @@
  <attr name="RestartableDuringRun" type="bool" val="0"/>
  <attr name="IfExitsUnexpectedly" type="enum" val="Error"/>
  <attr name="IfFailsToStart" type="enum" val="Error"/>
-<!-- <rel name="Program" class="Binary" id="rc_controller"/> -->
+ <rel name="Program" class="Binary" id="rc_controller"/> 
+ <rel name="ExplicitTag" class="Tag" id="SomeTag"/>
 </obj>
 
 
 <obj class="CustomLifetimeApplication" id="SomeApp">
  <attr name="Lifetime" type="enum" val="UserDefined_Shutdown"/>
  <attr name="AllowSpontaneousExit" type="bool" val="0"/>
+ <rel name="Program" class="Binary" id="coolapp"/> 
+ <rel name="ExplicitTag" class="Tag" id="SomeTag"/>
 </obj>
 
-
-
-<!--
-<obj class="Segment" id="SIOMEmonConcentratorTest">
- <rel name="IsControlledBy" class="RunControlApplication" id="JohnsRunControlApplication"/> 
- <rel name="Applications">
-   <ref class="CustomLifetimeApplication" id="SomeApp"/>
- </rel>
-</obj>
--->
 
 <obj class="OnlineSegment" id="setup">
  <attr name="T0_ProjectTag" type="string" val="data_test"/> 
@@ -120,6 +136,7 @@
  </rel>
 </obj>
 
+<!-- Is there enough info here? -->
 <obj class="Binary" id="JohnsPmgAgent">
  <attr name="DefaultParameters" type="string" val="foo bar"/>
 </obj>
@@ -135,6 +152,7 @@
 
 <obj class="Computer" id="mu2edaq13.fnal.gov">
  <attr name="HW_Tag" type="enum" val="x86_64-centos7"/>
+ <attr name="SW_Tag" type="enum" val="gcc49-opt"/>
  <attr name="Type" type="string" val="Intel(R) Xeon(TM) CPU 3.40GHz"/>
  <attr name="Location" type="string" val=""/>
  <attr name="Description" type="string" val=""/>

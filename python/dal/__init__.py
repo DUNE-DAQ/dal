@@ -12,7 +12,15 @@ dal_classes = config.dal.module('dal_classes', f'{scriptsdir}/../../../bin/core.
 
 Partition = dal_classes.Partition
 
-def partition_get_all_applications_tweak(self, db, partition_name):
-    return partition_get_all_applications(db._obj, partition_name)
+def setify(arg):
+    if arg is None:
+        return set()
+    elif type(arg) is str:
+        return set( {arg} )
+    else:
+        return set(arg)
 
-Partition.get_all_applications = partition_get_all_applications_tweak
+def partition_get_all_applications_wrapper(self, db, app_types, use_segments, use_hosts):
+    return partition_get_all_applications(db._obj, self.id, setify(app_types), setify(use_segments), setify(use_hosts))
+
+Partition.get_all_applications = partition_get_all_applications_wrapper
