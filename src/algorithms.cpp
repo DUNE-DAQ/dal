@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "ers/ers.hpp"
-#include "system/Host.hpp"
+#include "okssystem/Host.hpp"
 #include "logging/Logging.hpp"
 
 #include <boost/spirit/include/karma.hpp>
@@ -1606,7 +1606,7 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
   // check local-host, if there are no hosts
   if(seg_config->m_hosts.empty())
     {
-      static std::string local_hostname = System::LocalHost::full_local_name();
+      static std::string local_hostname = OksSystem::LocalHost::full_local_name();
 
       if (const daq::core::Computer * host = seg.configuration().get<daq::core::Computer>(local_hostname))
         {

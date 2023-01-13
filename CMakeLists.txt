@@ -5,7 +5,7 @@ find_package(daq-cmake REQUIRED)
 
 daq_setup_environment()
 
-find_package(system REQUIRED)
+find_package(okssystem REQUIRED)
 find_package(ers REQUIRED)
 find_package(logging REQUIRED)
 find_package(config REQUIRED)
@@ -20,9 +20,9 @@ daq_generate_dal(data/schema/core.schema.xml
   CPP_OUTPUT  dal_cpp_srcs
   DUMP_OUTPUT cpp_dump_src)
 
-daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES config::config system::system logging::logging)
+daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES config::config okssystem::okssystem logging::logging)
 
-daq_add_python_bindings(*.cpp LINK_LIBRARIES dal)
+#daq_add_python_bindings(*.cpp LINK_LIBRARIES dal)
 
 daq_add_application(dal_dump ${cpp_dump_src}                                              LINK_LIBRARIES dal config::config)
 daq_add_application(dal_print_hosts dal_print_hosts.cxx                               LINK_LIBRARIES dal config::config Boost::program_options)
