@@ -84,6 +84,7 @@
   <rel name="DefaultHost" class="Computer" id="mu2edaq13.fnal.gov"/>
 </obj>
 
+
 <obj class="Binary" id="rc_controller">
  <attr name="BinaryName" type="string" val="rc_controller"/>
  <attr name="Description" type="string" val="A Controller implementing all the default actions"/>
@@ -134,6 +135,13 @@
  <rel name="Applications">
    <ref class="CustomLifetimeApplication" id="SomeApp"/>
  </rel>
+  <rel name="Segments">
+    <ref class="Segment" id="RelatedSegment"/>
+  </rel>
+</obj>
+
+<obj class="Segment" id="RelatedSegment"/>
+ <rel name="IsControlledBy" class="RunControlApplication" id="JohnsRunControlApplication"/>
 </obj>
 
 <!-- Is there enough info here? -->

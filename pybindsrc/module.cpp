@@ -16,6 +16,8 @@ namespace dunedaq::dal::python {
 extern void
 register_dal_classes(py::module&);
 
+extern void
+register_algorithm_test_bindings(py::module&);
 
 PYBIND11_MODULE(_daq_dal_py, m)
 {
@@ -23,7 +25,7 @@ PYBIND11_MODULE(_daq_dal_py, m)
   m.doc() = "Python interface to the dal package"; 
 
   register_dal_classes(m);
-  
+  register_algorithm_test_bindings(m);
 }
 
 } // namespace dunedaq::dal::python

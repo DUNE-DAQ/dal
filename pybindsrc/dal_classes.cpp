@@ -6,6 +6,8 @@
  * received with this code.
  */
 
+#include "dal_pybind_utils.hpp"
+
 #include "dal/BaseApplication.hpp"
 #include "dal/Partition.hpp"
 #include "dal/ComputerProgram.hpp"
@@ -27,6 +29,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <variant>
@@ -34,23 +37,9 @@
 
 namespace py = pybind11;
 
-namespace dunedaq {
-
-  ERS_DECLARE_ISSUE(dal, NullPointerReturned, "A null pointer was returned",)
-
-} // namespace dunedaq
-
 namespace dunedaq::dal::python {
 
   using AppInfo_t = std::variant<std::string, std::vector<std::string>, std::map<std::string, std::string>>;
-
-  void check_ptrs(std::vector<const void*> ptrs) {
-    for (const auto& ptr : ptrs) {
-      if (!ptr) {
-	throw NullPointerReturned(ERS_HERE);
-      }
-    }
-  }
 
   struct ObjectLocator {
     
@@ -139,6 +128,109 @@ namespace dunedaq::dal::python {
     const daq::core::BaseApplication* m_app;
   };
 
+  class SegConfigHelper {
+
+  public:
+    SegConfigHelper(const daq::core::Segment* seg) :
+      m_segment(seg) {
+    }
+
+    std::string get_seg_id() const { 
+      check_ptrs({m_segment});
+      return m_segment->UID();
+    }
+
+    std::vector<AppConfigHelper> get_all_applications(std::set<std::string>* app_types = nullptr, 
+						      std::set<std::string>* use_segments = nullptr, 
+						      std::set<const daq::core::Computer *>* use_hosts = nullptr) const {
+      check_ptrs({m_segment});
+      return app_translator(m_segment->get_all_applications(app_types, use_segments, use_hosts));
+    }
+
+    AppConfigHelper* get_controller() const {
+      check_ptrs({m_segment});
+      return new AppConfigHelper(m_segment->get_controller());
+    }
+
+    std::vector<AppConfigHelper> get_infrastructure() const {
+      check_ptrs({m_segment});
+      return app_translator(m_segment->get_infrastructure());
+    }
+
+    std::vector<AppConfigHelper> get_applications() const {
+      check_ptrs({m_segment});
+      return app_translator(m_segment->get_applications());
+    }
+
+    std::vector<SegConfigHelper> get_nested_segments() const {
+      std::vector<SegConfigHelper> nested_segments;
+
+      check_ptrs({m_segment});
+      for (const auto& seg : m_segment->get_nested_segments()) {
+	nested_segments.emplace_back(SegConfigHelper(seg));
+      }
+      
+      return nested_segments;
+    }
+
+    std::vector<ObjectLocator> get_hosts() const {
+      std::vector<ObjectLocator> hosts;
+
+      check_ptrs({m_segment});
+      for (const auto& host : m_segment->get_hosts()) {
+	check_ptrs({host});
+	hosts.emplace_back(ObjectLocator(host->UID(), host->class_name()));
+      }
+
+      return hosts;
+    }
+
+    ObjectLocator* get_base_seg() const {
+      check_ptrs({m_segment});
+      check_ptrs({m_segment->get_base_segment()});
+
+      return new ObjectLocator(m_segment->get_base_segment()->UID(), m_segment->get_base_segment()->class_name());
+    }
+
+    bool is_disabled() const {
+      check_ptrs({m_segment});
+      return m_segment->is_disabled();
+    }
+
+    bool is_templated() const {
+      check_ptrs({m_segment});
+      return m_segment->is_templated();
+    }
+
+    std::unordered_map<std::string, int> get_timeouts() const {
+      int action_timeout = -999;
+      int shortaction_timeout = -999;
+      
+      check_ptrs({m_segment});
+      m_segment->get_timeouts(action_timeout, shortaction_timeout);
+
+      std::unordered_map<std::string, int> timeouts;
+      timeouts["actionTimeout"] = action_timeout;
+      timeouts["shortActionTimeout"] = shortaction_timeout;
+
+      return timeouts;
+    }
+
+  private:
+
+    static std::vector<AppConfigHelper> app_translator(const std::vector<const daq::core::BaseApplication *>& apps_in) {
+      std::vector<AppConfigHelper> apps_out;
+
+      for (const auto& app : apps_in) {
+	apps_out.emplace_back(AppConfigHelper(app));
+      }
+
+      return apps_out;
+    }
+    
+    const daq::core::Segment* m_segment;
+  };
+
     std::vector<AppConfigHelper> 
     partition_get_all_applications(const Configuration& db, 
 				   const std::string& partition_name,
@@ -164,7 +256,45 @@ namespace dunedaq::dal::python {
       return apps;
     }
 
-  
+  std::vector<std::vector<ObjectLocator>> component_get_parents(const Configuration& db, const std::string& partition_id, const std::string& component_id) {
+    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
+    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    
+    check_ptrs( {component_ptr, partition_ptr});
+
+    std::list<std::vector<const daq::core::Component*>> parents;
+    std::vector<std::vector<ObjectLocator>> parent_ids;
+
+    component_ptr->get_parents(*partition_ptr, parents);
+
+    for (const auto& parent : parents) { 
+      std::vector<ObjectLocator> parents_components;
+      
+      for (const auto& ancestor_component_ptr : parent) { 
+	check_ptrs( {ancestor_component_ptr} );
+	parents_components.emplace_back( ObjectLocator(ancestor_component_ptr->UID(), 
+						       ancestor_component_ptr->class_name()) );
+      }
+      parent_ids.emplace_back(parents_components);
+    }
+    
+    return parent_ids;
+  }
+
+  std::string partition_get_log_directory(const Configuration& db, const std::string& partition_id) {
+    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    check_ptrs( {partition_ptr} );
+    return partition_ptr->get_log_directory();
+  }
+
+  SegConfigHelper* partition_get_segment(const Configuration& db, const std::string& partition_id, const std::string& seg_name) {
+    auto partition_ptr = daq::core::get_partition(const_cast<Configuration&>(db), partition_id);
+    check_ptrs( {partition_ptr} );
+    auto segptr = partition_ptr->get_segment(seg_name);
+    check_ptrs( {segptr} );
+    return new SegConfigHelper(segptr);
+  }
+
 void
 register_dal_classes(py::module& m)
 {
@@ -186,9 +316,26 @@ register_dal_classes(py::module& m)
     .def("get_info", &AppConfigHelper::get_info, "Get information required to run the application")
     ;
 
-  m.def("partition_get_all_applications", &partition_get_all_applications, "Get list of applications in the requested partition");
+  py::class_<SegConfigHelper>(m, "SegConfigHelper")
+    .def(py::init<const daq::core::Segment*>())
+    .def("get_seg_id", &SegConfigHelper::get_seg_id, "get segment id")
+    .def("get_all_applications", &SegConfigHelper::get_all_applications, "Get all applications in the segment")
+    .def("get_controller", &SegConfigHelper::get_controller, "Get segment controller")
+    .def("get_infrastructure", &SegConfigHelper::get_infrastructure, "Get segment infrastructure applications")
+    .def("get_applications", &SegConfigHelper::get_applications, "Get segment applications")
+    .def("get_nested_segments", &SegConfigHelper::get_nested_segments, "Get nested segments")
+    .def("get_hosts", &SegConfigHelper::get_hosts, "Get hosts for given segment")
+    .def("get_base_seg", &SegConfigHelper::get_base_seg, "Get base segment object (i.e. used to create template segment)")
+    .def("is_templated", &SegConfigHelper::is_templated, "Return true if this segment is a template segment")
+    .def("is_disabled", &SegConfigHelper::is_disabled, "Return true if this segment is disabled")
+    .def("get_timeouts", &SegConfigHelper::get_timeouts, "Return run control action timeouts")
+    ;
 
+  m.def("partition_get_all_applications", &partition_get_all_applications, "Get list of applications in the requested partition");
+  m.def("component_get_parents", &component_get_parents, "Get the Component-derived class instances of the parent(s) of the Component-derived object in question");
+  m.def("partition_get_log_directory", partition_get_log_directory);
+  m.def("partition_get_segment", partition_get_segment);
 }
 
 
-} // namespace dunedaq::config::python
+} // namespace dunedaq::dal::python
