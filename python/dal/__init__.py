@@ -11,6 +11,7 @@ dal_classes = config.dal.module('dal_classes', f'{scriptsdir}/../../../bin/core.
 
 Partition = dal_classes.Partition
 Component = dal_classes.Component
+Variable = dal_classes.Variable
 
 def setify(arg):
     if arg is None:
@@ -44,8 +45,17 @@ def _component_get_parents_wrapper(self, db, partition):
         parent_list.append(component_list)
     return parent_list
 
+def _component_disabled_wrapper(self, db, partition):
+    return component_disabled(db._obj, partition, self.id)
+
+def _variable_get_value_wrapper(self, db, tag):
+    return variable_get_value(db._obj, self.id, tag.id)
+
 Partition.get_all_applications = _partition_get_all_applications_wrapper
 Partition.get_log_directory = _partition_get_log_directory_wrapper
 Partition.get_segment = _partition_get_segment_wrapper
 
 Component.get_parents = _component_get_parents_wrapper
+Component.disabled = _component_disabled_wrapper
+
+Variable.get_value = _variable_get_value_wrapper

@@ -281,6 +281,16 @@ namespace dunedaq::dal::python {
     return parent_ids;
   }
 
+  bool component_disabled(const Configuration& db, const std::string& partition_id, const std::string& component_id) {
+    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
+    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+
+    check_ptrs({component_ptr});
+    check_ptrs({partition_ptr});
+
+    return component_ptr->disabled(*partition_ptr);
+  }
+
   std::string partition_get_log_directory(const Configuration& db, const std::string& partition_id) {
     const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
     check_ptrs( {partition_ptr} );
@@ -293,6 +303,14 @@ namespace dunedaq::dal::python {
     auto segptr = partition_ptr->get_segment(seg_name);
     check_ptrs( {segptr} );
     return new SegConfigHelper(segptr);
+  }
+
+  std::string variable_get_value(const Configuration& db, const std::string& variable_id, const std::string& tag_id) {
+    const daq::core::Variable* variable_ptr = const_cast<Configuration&>(db).get<daq::core::Variable>(variable_id);
+    check_ptrs( {variable_ptr} );
+    const daq::core::Tag* tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
+    check_ptrs( {tag_ptr} );
+    return variable_ptr->get_value(tag_ptr);
   }
 
 void
@@ -332,9 +350,13 @@ register_dal_classes(py::module& m)
     ;
 
   m.def("partition_get_all_applications", &partition_get_all_applications, "Get list of applications in the requested partition");
-  m.def("component_get_parents", &component_get_parents, "Get the Component-derived class instances of the parent(s) of the Component-derived object in question");
   m.def("partition_get_log_directory", partition_get_log_directory);
   m.def("partition_get_segment", partition_get_segment);
+
+  m.def("component_get_parents", &component_get_parents, "Get the Component-derived class instances of the parent(s) of the Component-derived object in question");
+  m.def("component_disabled", &component_disabled, "Determine if a Component-derived object (e.g. a Segment) has been disabled");
+
+  m.def("variable_get_value", &variable_get_value, "Get the value stored in an object of class Variable");
 }
 
 

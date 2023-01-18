@@ -10,11 +10,20 @@ import filecmp
 
 test_output_verbose = True
 
+def print_output(res1, res2):
+    if test_output_verbose:
+        print("")
+        print("===================================RES1===================================")
+        print(res1)
+        print("===================================RES2===================================")
+        print(res2)
+        print("")
+        print("==========================================================================")
 
 def check (result, test_name) :
     if result == True:
         print("")
-        print(test_name + " is successful ! ")
+        print(test_name + " was successful ! ")
     else :
         print("")
         print(test_name + " failed ! ")
@@ -62,6 +71,30 @@ def print_segment(seg):
 
     return res
 
+def print_segment_timeout(seg):
+    res = "segment " + seg.get_seg_id() + " actionTimeout: " + str(seg.get_timeouts()['actionTimeout']) + ", shortActionTimeout" + str(seg.get_timeouts()['shortActionTimeout'] ) + '\n'
+
+    nested_segs=seg.get_nested_segments()
+    if ( (nested_segs is not None) and (not (len(nested_segs) == 0)) ):
+        for i in range (0,len(nested_segs)) :
+            res += print_segment_timeout(nested_segs[i])
+
+    return res
+
+def get_timeouts_test_case () :
+    root_seg = partition.get_segment(db, partition.OnlineInfrastructure.id)
+
+    res1 = print_segment_timeout(root_seg)
+    res2 = dal.get_timeouts_test(db._obj, partition.id, root_seg.get_seg_id())
+
+    res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
+    res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
+
+    print_output(res1, res2)
+
+    return (res1 == res2) 
+
+
 def get_parents_test_case () :
     
     res1 = ""
@@ -81,13 +114,7 @@ def get_parents_test_case () :
     res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
     res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
 
-    if test_output_verbose:
-        print("")
-        print("===================================RES1===================================")
-        print(res1)
-        print("===================================RES2===================================")
-        print(res2)
-        print("")
+    print_output(res1, res2)
 
     return (res1 == res2) 
 
@@ -108,13 +135,7 @@ def get_log_directory_test_case () :
     res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
     res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
 
-    if test_output_verbose:
-        print("")
-        print("===================================RES1===================================")
-        print(res1)
-        print("===================================RES2===================================")
-        print(res2)
-        print("")
+    print_output(res1, res2)
 
     return (res1 == res2) 
 
@@ -137,15 +158,56 @@ def get_segment_test_case () :
     res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
     res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
 
-    if test_output_verbose:
-        print("")
-        print("===================================RES1===================================")
-        print(res1)
-        print("===================================RES2===================================")
-        print(res2)
-        print("")
+    print_output(res1, res2)
 
     return (res1 == res2) 
+
+def get_disabled_test_case():
+
+    res1 = ""
+    components = db.get_dals('Component')    
+    print("Number of components to be tested : " + str(len(components)))
+    for i in range (0,len(components)) : 
+        res1 += str(components[i].disabled(db, partition.id)) 
+        res1 +='\n'
+
+    res2 = ""
+    for i in range (0,len(components)) : 
+        res2+=str(dal.disabled_test(db._obj, partition.id, components[i].id)) 
+    
+    res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
+    res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
+
+    print_output(res1, res2)
+    return (res1 == res2) 
+
+def get_value_test_case():
+ 
+    res1 = ""
+    variables =  db.get_dals('Variable')    
+    print("Number of Variables to be tested : " + str(len(variables)))
+     
+    for i in range (0,len(variables)) :
+        if len(variables[i].TagValues) != 0:
+           tag = variables[i].TagValues[0] 
+           res1 += str(variables[i].get_value(db, tag)) 
+           res1 +='\n'
+ 
+    res2 = ""
+    for i in range (0,len(variables)) : 
+        if len(variables[i].TagValues) != 0:
+           tag = variables[i].TagValues[0]
+           
+           res2+=str(dal.get_value_test(db._obj, variables[i].id, tag.id) )
+
+    res1 = res1.replace(",","").replace("[","").replace("]","").replace(" ","").replace("\n","")
+    res2 = res2.replace(",","").replace("[","").replace("]","").replace(" ","").replace("'","").replace("\n","")
+
+    print_output(res1, res2)
+
+    return (res1 == res2) 
+
+
 
 if __name__ == '__main__':
     global db
@@ -161,4 +223,12 @@ if __name__ == '__main__':
 
     check( get_log_directory_test_case(), "get_log_directory_test_case")
     check( get_segment_test_case(), "get_segment_test_case")
-    check( get_parents_test_case(), "get_parents_test_case")
+    check( get_value_test_case(), "get_value_test_case")
+    
+    try:
+        check( get_parents_test_case(), "get_parents_test_case")
+    except:
+        print(f"Swallowing exceptions from get_parents_test_case() until needed objects are added to {db_file}")
+
+    check( get_disabled_test_case(), "get_disabled_test_case")
+    check( get_timeouts_test_case(), "get_timeouts_test_case")

@@ -76,14 +76,17 @@
 </obj>
 
 <obj class="Partition" id="JohnsPartition">
-<!--  <rel name="Segments">
-   <ref class="Segment" id="SIOMEmonConcentratorTest"/>
-  </rel>
--->
+
   <rel name="OnlineInfrastructure" class="OnlineSegment" id="setup"/>
   <rel name="DefaultHost" class="Computer" id="mu2edaq13.fnal.gov"/>
+  
+  <rel name="Disabled">
+    <ref class="ResourceBase" id="AProblematicResource">
+  </rel>
 </obj>
 
+<obj class="ResourceBase" id="AProblematicResource">
+</obj>
 
 <obj class="Binary" id="rc_controller">
  <attr name="BinaryName" type="string" val="rc_controller"/>
@@ -155,6 +158,12 @@
  <attr name="SW_Tag" type="enum" val="gcc49-opt"/>
 </obj>
 
+<obj class="TagMapping" id="SomeTagMapping">
+ <attr name="HW_Tag" type="enum" val="x86_64-centos7"/>
+ <attr name="SW_Tag" type="enum" val="gcc49-opt"/>
+ <attr name="Value" type="string" val="12345"/>
+</obj>
+
 
 <!-- JCF, Jan-6-2023: these are NOT the actual specs of mu2edaq13.fnal.gov; this is a placeholder to test basic DAL applications -->
 
@@ -175,6 +184,16 @@
   "NetworkInterface" "pc-csc-ros-eca-00.cern.ch-dc1"
   "NetworkInterface" "pc-csc-ros-eca-00.cern.ch-dc2"
  </rel> -->
+</obj>
+
+<!-- JCF, Jan-17-2023: this snippet is derived from /cvmfs/atlas.cern.ch/repo/sw/tdaq/tdaq/tdaq-09-05-00/TM/data/part_hlt.data.xml as an example of a Variable -->
+<obj class="Variable" id="PYTHONPATH">
+ <attr name="Description" type="string" val=""/>
+ <attr name="Name" type="string" val="PYTHONPATH"/>
+ <attr name="Value" type="string" val="${LCG_INST_PATH}/LCG_95/Python/2.7.15"/>
+ <rel name="TagValues">                                                                  
+  <ref class="TagMapping" id="SomeTagMapping"/>
+ </rel>
 </obj>
 
 

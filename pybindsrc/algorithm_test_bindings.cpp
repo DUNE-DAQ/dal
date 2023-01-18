@@ -89,6 +89,21 @@ namespace {
     return out;
   }
   
+  std::string print_segment_timeout(const daq::core::Segment* seg) {
+    check_ptrs({seg});
+
+    int action_timeout, shortaction_timeout;
+
+    seg->get_timeouts(action_timeout, shortaction_timeout);
+
+    std::string out = std::string("segment ") + seg->UID() + " actionTimeout: " + std::to_string(action_timeout) + ", shortActionTimeout" + std::to_string(shortaction_timeout) + '\n';
+
+    for(const auto& x : seg->get_nested_segments()) {
+        out += print_segment_timeout(x);
+    }
+
+    return out;
+  }
 
 } // namespace ""
 
@@ -127,6 +142,37 @@ namespace dunedaq::dal::python {
     
     return print_segment(partition_ptr->get_segment(seg_name));
   }
+
+  std::string get_value_test(const Configuration& db, const std::string& variable_id, const std::string& tag_id) {
+
+    const daq::core::Variable *variable_ptr = const_cast<Configuration&>(db).get<daq::core::Variable>(variable_id);
+    const daq::core::Tag * tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
+
+    check_ptrs({variable_ptr, tag_ptr});
+
+    return variable_ptr->get_value(tag_ptr);
+  }
+
+  bool disabled_test(const Configuration& db, const::std::string partition_id, const std::string& component_id) {
+    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
+    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+
+    check_ptrs({component_ptr});
+    check_ptrs({partition_ptr});
+
+    return component_ptr->disabled(*partition_ptr);
+  }
+
+  std::string get_timeouts_test(const Configuration& db, const::std::string partition_id, const std::string& segment_id) {
+    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    check_ptrs({partition_ptr});
+
+    const daq::core::Segment* segment_ptr = partition_ptr->get_segment(segment_id);
+    check_ptrs({segment_ptr});
+
+    return print_segment_timeout(segment_ptr);
+  }
+  
   
   void
   register_algorithm_test_bindings(py::module& m)
@@ -134,6 +180,9 @@ namespace dunedaq::dal::python {
     m.def("get_parents_test", &get_parents_test, "To test against the component_get_parents binding");
     m.def("get_log_directory_test", &get_log_directory_test, "To test against the partition_get_log_directory binding");
     m.def("get_segment_test", &get_segment_test, "To test against the partition_get_segment binding");
+    m.def("get_value_test", &get_value_test, "To test against the variable_get_value binding");
+    m.def("disabled_test", &disabled_test, "To test against the component_disabled binding");
+    m.def("get_timeouts_test", &get_timeouts_test, "To test the SegConfigHelper get_timeouts binding");
   }
 
 } // namespace dunedaq::dal::python
