@@ -33,10 +33,7 @@ def _partition_get_segment_wrapper(self, db, segname):
 def _component_get_parents_wrapper(self, db, partition):
 
     parents = []
-    try:
-        parents = component_get_parents(db._obj, self.id, partition.id)
-    except RuntimeError:
-        print('Swallowing the "A null pointer was returned" exception')
+    parents = component_get_parents(db._obj, partition.id, self.id)
     parent_list = []
     for p in parents:
         component_list = []

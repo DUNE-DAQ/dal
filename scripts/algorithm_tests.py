@@ -224,11 +224,6 @@ if __name__ == '__main__':
     check( get_log_directory_test_case(), "get_log_directory_test_case")
     check( get_segment_test_case(), "get_segment_test_case")
     check( get_value_test_case(), "get_value_test_case")
-    
-    try:
-        check( get_parents_test_case(), "get_parents_test_case")
-    except:
-        print(f"Swallowing exceptions from get_parents_test_case() until needed objects are added to {db_file}")
-
+    check( get_parents_test_case(), "get_parents_test_case")
     check( get_disabled_test_case(), "get_disabled_test_case")
     check( get_timeouts_test_case(), "get_timeouts_test_case")

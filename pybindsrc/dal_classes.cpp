@@ -40,6 +40,7 @@ namespace py = pybind11;
 namespace dunedaq::dal::python {
 
   using AppInfo_t = std::variant<std::string, std::vector<std::string>, std::map<std::string, std::string>>;
+  using ComputerProgramInfo_t = std::variant<std::vector<std::string>, std::map<std::string, std::string>>;
 
   struct ObjectLocator {
     
@@ -259,7 +260,6 @@ namespace dunedaq::dal::python {
   std::vector<std::vector<ObjectLocator>> component_get_parents(const Configuration& db, const std::string& partition_id, const std::string& component_id) {
     const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
     const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
-    
     check_ptrs( {component_ptr, partition_ptr});
 
     std::list<std::vector<const daq::core::Component*>> parents;
@@ -313,6 +313,28 @@ namespace dunedaq::dal::python {
     return variable_ptr->get_value(tag_ptr);
   }
 
+  std::vector<ComputerProgramInfo_t> computer_program_get_info(const Configuration& db, const std::string& partition_id, const std::string& prog_id, const std::string& tag_id, const std::string& host_id) {
+
+    std::vector<ComputerProgramInfo_t> proginfo_collection;
+
+    std::map<std::string, std::string> environment;
+    std::vector<std::string> program_names;
+
+    auto partition_ptr = daq::core::get_partition(const_cast<Configuration&>(db), partition_id);
+    auto prog_ptr = const_cast<Configuration&>(db).get<daq::core::ComputerProgram>(prog_id);
+    auto tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
+    auto host_ptr = const_cast<Configuration&>(db).get<daq::core::Computer>(host_id);
+    check_ptrs( {partition_ptr, prog_ptr, tag_ptr, host_ptr } );
+
+    prog_ptr->get_info(environment, program_names, *partition_ptr, *tag_ptr, *host_ptr);
+		       
+    proginfo_collection.emplace_back(environment);
+    proginfo_collection.emplace_back(program_names);
+    
+    return proginfo_collection;
+  }
+
+
 void
 register_dal_classes(py::module& m)
 {
@@ -357,6 +379,8 @@ register_dal_classes(py::module& m)
   m.def("component_disabled", &component_disabled, "Determine if a Component-derived object (e.g. a Segment) has been disabled");
 
   m.def("variable_get_value", &variable_get_value, "Get the value stored in an object of class Variable");
+
+  m.def("computer_program_get_info", &computer_program_get_info, "Get details about a computer program");
 }
 
 
