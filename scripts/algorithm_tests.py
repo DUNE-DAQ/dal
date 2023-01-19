@@ -13,20 +13,23 @@ test_output_verbose = True
 def print_output(res1, res2):
     if test_output_verbose:
         print("")
-        print("===================================RES1===================================")
+        print("=====================Output When Python Bindings to C++ Used======================")
+        print("")
         print(res1)
-        print("===================================RES2===================================")
+        print("")
+        print("===========================Output When Original C++ Used==========================")
+        print("")
         print(res2)
         print("")
-        print("==========================================================================")
+        print("==================================================================================")
 
 def check (result, test_name) :
     if result == True:
         print("")
-        print(test_name + " was successful ! ")
+        print(test_name + ": PASS")
     else :
         print("")
-        print(test_name + " failed ! ")
+        print(test_name + ": FAIL")
         raise RuntimeError("")  
 
 def print_app(app):
@@ -219,11 +222,28 @@ if __name__ == '__main__':
     assert os.path.exists(db_file)
     db = config.Configuration(f"oksconfig:{db_file}")
 
-    partition=db.get_dal("Partition", "JohnsPartition")
+    partition=db.get_dal("Partition", "ToyPartition")
 
+    print(f"\n\nRUNNING TEST \"get_log_directory_test_case\"")
     check( get_log_directory_test_case(), "get_log_directory_test_case")
+
+    print(f"\n\nRUNNING TEST \"get_segment_test_case\"")
     check( get_segment_test_case(), "get_segment_test_case")
+
+    print(f"\n\nRUNNING TEST \"get_value_test_case\"")
     check( get_value_test_case(), "get_value_test_case")
+
+    print(f"\n\nRUNNING TEST \"get_parents_test_case\"")
     check( get_parents_test_case(), "get_parents_test_case")
+
+    print(f"\n\nRUNNING TEST \"get_disabled_test_case\"")
     check( get_disabled_test_case(), "get_disabled_test_case")
+
+    print(f"\n\nRUNNING TEST \"get_timeouts_test_case\"")
     check( get_timeouts_test_case(), "get_timeouts_test_case")
+
+    print("""
+n.b. newlines have been removed from the test output above; the important 
+thing is that the output agrees between calls to the C++ function and their
+Python bindings
+""")
