@@ -6,7 +6,6 @@ find_package(daq-cmake REQUIRED)
 daq_setup_environment()
 
 find_package(okssystem REQUIRED)
-find_package(genconfig REQUIRED)
 find_package(ers REQUIRED)
 find_package(logging REQUIRED)
 find_package(config REQUIRED)
