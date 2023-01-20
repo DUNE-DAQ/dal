@@ -7,7 +7,7 @@ written](https://gitlab.cern.ch/atlas-tdaq-software/oks) for the ATLAS
 data acquisition effort. Its features include:
 * The ability to define object types in XML (known as OKS "classes"), off of which C++ and Python code can automatically be generated
 * Support for class Attributes, Relationships, and Methods. Attributes and Relationships are automatically generated; Methods allow developers to add behavior to classes
-* The ability to create instances of classes, modify them, read them into a database and retrieve them from a database
+* The ability to create instances of classes, modify them, read them into the XML file acting as a database and retrieve them from the database
 
 As of this writing (Jan-18-2023) the packages have been refactored
 only to the extent that they work within the DUNE DAQ framework
@@ -50,7 +50,7 @@ With the packages built, it's time to run some tests to make sure things are in 
 
 If anything goes wrong during the tests, it will be self-evident. Make a note of what happened and contact John Freeman, `jcfree@fnal.gov`. 
 
-## A Look at Databases
+## A Look at OKS Databases: XML-Represented classes and objects
 
 While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to run the following command:
 ```
@@ -59,6 +59,28 @@ oks_tutorial simple.schema.xml simple.data.xml
 Just looking at the screen output of this application, you can learn a lot, in particular that the files appear to describe a company made up of people and departments represented as objects. To look at how this is represented, if you open `simple.schema.xml` and scroll past a lot preliminary material you don't need to worry about, you'll see a class called "Department", which consists of an Attribute (the name of the Department) and a Relationship (its staff). The Relationship here refers to the department's Employees, which is a count of Employee instances that can range from "zero" ("one" would have made more sense) to "many" (i.e., as many as you want). Scrolling down a little further, you see the Employee class has a superclass called Person, meaning an Employee contains the Attributes, etc. a Person would have but additionally with an Attribute called Salary and a Relationship called Works At. If we look at `simple.data.xml` you see it describes a department called EP with an employee named Maria and a department called IT which contains Alexander and Michel. Then there are three unaffiliated people, Mick, Peter, and a baby. Given that the baby's Birthday Attribute is set to `20000525`, it's safe to say this data file was designed quite a while ago. 
 
 OKS also provides tools which parse the XML and provide summaries of the contents of the databases. `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:simple.data.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:simple.data.xml -o` will summarize the objects themselves. Play around with it. 
+
+Note that as a database, it's possible to read in, modify, and save objects. E.g., you can do this once you've created `simple.schema.xml` and `simple.data.xml` and have entered an interactive Python environment:
+```
+import config
+db = config.Configuration('oksconfig:simple.data.xml')
+mick = db.get_dal('Person', 'mick')
+```
+and you can see that Mick's family situation is that he's unmarried:
+```
+print(mick.Family_Situation)   # Will print "Single"
+```
+Let's get Mick a spouse:
+```
+mick.Family_Situation = "Married"
+db.update_dal(mick)
+db.commit()
+```
+...and now, if you open up simple.data.xml and look up Mick, you'll see that he is, in fact, now married. Note that since `Family_Situation` is an enumeration, you can't give it an illegal value. See what happens if you do this:
+```
+mick.Family_Situation = "This is not an option"
+```
+Spoiler alert: you'll get an error. 
 
 ## A Realistic Example
 
