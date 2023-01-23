@@ -1,3 +1,6 @@
+
+_JCF, Jan-23-2023: the following are the original ATLAS TDAQ release notes; they are not guaranteed to be applicable to the DUNE DAQ refactor of this repository_
+
 # dal
 
 ## tdaq-09-01-00
