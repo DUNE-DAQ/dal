@@ -33,12 +33,12 @@
 struct ControlCallbackInfo
 {
   bool state;
-  const daq::core::Segment * segment;
-  const daq::core::ResourceBase * resource;
-  std::list<std::vector<const daq::core::Component *>> parents;
-  const daq::core::Partition& p;
+  const dunedaq::dal::Segment * segment;
+  const dunedaq::dal::ResourceBase * resource;
+  std::list<std::vector<const dunedaq::dal::Component *>> parents;
+  const dunedaq::dal::Partition& p;
 
-  ControlCallbackInfo(const daq::core::Segment * s, const daq::core::ResourceBase * r, const daq::core::Partition& part) :
+  ControlCallbackInfo(const dunedaq::dal::Segment * s, const dunedaq::dal::ResourceBase * r, const dunedaq::dal::Partition& part) :
       segment(s), resource(r), p(part)
   {
     state = (segment ? segment->disabled(p) : resource->disabled(p));
@@ -78,7 +78,7 @@ bool2sign(bool value)
   // the function to print a resource
 
 void
-print_resource(const daq::core::ResourceBase& resource, const daq::core::Partition& p, bool parent_state, size_t margin)
+print_resource(const dunedaq::dal::ResourceBase& resource, const dunedaq::dal::Partition& p, bool parent_state, size_t margin)
 {
   std::string str(margin, ' ');
 
@@ -88,11 +88,11 @@ print_resource(const daq::core::ResourceBase& resource, const daq::core::Partiti
     }
   else
     {
-      if (const daq::core::Resource * r = conf->cast<daq::core::Resource>(&resource))
+      if (const dunedaq::dal::Resource * r = conf->cast<dunedaq::dal::Resource>(&resource))
         {
           std::cout << str << r << '(' << bool2sign(parent_state) << bool2sign(r->disabled(p)) << ")\n";
         }
-      else if (const daq::core::ResourceSet * s = conf->cast<daq::core::ResourceSet>(&resource))
+      else if (const dunedaq::dal::ResourceSet * s = conf->cast<dunedaq::dal::ResourceSet>(&resource))
         {
           std::cout << str << s << '(' << bool2sign(parent_state) << bool2sign(s->disabled(p)) << ")\n";
 
@@ -111,7 +111,7 @@ print_resource(const daq::core::ResourceBase& resource, const daq::core::Partiti
   // the function to print a segment
 
 void
-print_segment(const daq::core::Segment& segment, const daq::core::Partition& p, bool parent_state, size_t margin)
+print_segment(const dunedaq::dal::Segment& segment, const dunedaq::dal::Partition& p, bool parent_state, size_t margin)
 {
   const std::string str(margin, ' ');
 
@@ -140,7 +140,7 @@ print_segment(const daq::core::Segment& segment, const daq::core::Partition& p, 
   // the function to print a partition
 
 void
-print_partition(const daq::core::Partition& partition)
+print_partition(const dunedaq::dal::Partition& partition)
 {
   // print out online-infrastructure segment
   std::cout << "  ONLINE INFRASTRUCTURE SEGMENT:\n";
@@ -161,7 +161,7 @@ void
 cb_partition(const std::vector<ConfigurationChange *> & /*changes*/, void * parameter)
 {
   std::cout << "something was changed, print out new partition control view:\n";
-  print_partition(*reinterpret_cast<const daq::core::Partition *>(parameter));
+  print_partition(*reinterpret_cast<const dunedaq::dal::Partition *>(parameter));
 }
 
   // the callback to be invoked when a segment or resource changed
@@ -248,7 +248,7 @@ cb(const std::vector<ConfigurationChange *> & changes, void * parameter)
   // ********************************** SUBSCRIPTION UTILITY ********************************* //
 
 template<class T> const T *
-subscribe_object(const daq::core::Partition& partition, const std::string& id)
+subscribe_object(const dunedaq::dal::Partition& partition, const std::string& id)
 {
     // get segment or resource object
 
@@ -258,8 +258,8 @@ subscribe_object(const daq::core::Partition& partition, const std::string& id)
         // about present segment's state and the segment's pointer
 
       ControlCallbackInfo * cb_info = new ControlCallbackInfo(
-        reinterpret_cast<const daq::core::Segment *> ( (T::s_class_name == "Segment") ? obj : 0 ),
-        reinterpret_cast<const daq::core::ResourceBase *>( (T::s_class_name.find("Resource") != std::string::npos) ? obj : 0 ),
+        reinterpret_cast<const dunedaq::dal::Segment *> ( (T::s_class_name == "Segment") ? obj : 0 ),
+        reinterpret_cast<const dunedaq::dal::ResourceBase *>( (T::s_class_name.find("Resource") != std::string::npos) ? obj : 0 ),
         partition
       );
 
@@ -399,7 +399,7 @@ main(int argc, char **argv)
       ::Configuration db(db_name);
       conf = &db;
 
-      const daq::core::Partition * partition = daq::core::get_partition(*conf, partition_name);
+      const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(*conf, partition_name);
       if (!partition)
         return EXIT_FAILURE;
 
@@ -416,16 +416,16 @@ main(int argc, char **argv)
           conf->subscribe(criteria, cb_partition, const_cast<void *>(reinterpret_cast<const void *>(partition)));
         }
 
-      std::vector<const daq::core::Segment *> p2;
+      std::vector<const dunedaq::dal::Segment *> p2;
 
       // subscribe on changes of objects in the Segment class
       if (subscribe_all_segments)
         {
-          std::vector<const daq::core::Segment *> segments;
+          std::vector<const dunedaq::dal::Segment *> segments;
           conf->get(segments);
           for (const auto& i : segments)
             {
-              if (subscribe_object<daq::core::Segment>(*partition, i->UID()) == 0)
+              if (subscribe_object<dunedaq::dal::Segment>(*partition, i->UID()) == 0)
                 return EXIT_FAILURE;
             }
         }
@@ -433,7 +433,7 @@ main(int argc, char **argv)
         {
           for (const auto& i : segment_objects)
             {
-              if (subscribe_object<daq::core::Segment>(*partition, i) == 0)
+              if (subscribe_object<dunedaq::dal::Segment>(*partition, i) == 0)
                 return EXIT_FAILURE;
             }
         }
@@ -442,11 +442,11 @@ main(int argc, char **argv)
       // subscribe on changes of objects in the Resource class
       if (subscribe_all_resources)
         {
-          std::vector<const daq::core::ResourceBase *> resources;
+          std::vector<const dunedaq::dal::ResourceBase *> resources;
           conf->get(resources);
           for(const auto& i : resources)
             {
-              if (subscribe_object<daq::core::ResourceBase>(*partition, i->UID()) == 0)
+              if (subscribe_object<dunedaq::dal::ResourceBase>(*partition, i->UID()) == 0)
                 return EXIT_FAILURE;
             }
         }
@@ -454,7 +454,7 @@ main(int argc, char **argv)
         {
           for(const auto& i : resource_objects)
             {
-              if(subscribe_object<daq::core::ResourceBase>(*partition, i) == 0)
+              if(subscribe_object<dunedaq::dal::ResourceBase>(*partition, i) == 0)
                 return EXIT_FAILURE;
             }
         }

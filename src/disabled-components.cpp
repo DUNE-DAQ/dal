@@ -14,7 +14,7 @@
 #include "test_circular_dependency.hpp"
 
 
-daq::core::DisabledComponents::DisabledComponents(::Configuration& db) :
+dunedaq::dal::DisabledComponents::DisabledComponents(::Configuration& db) :
   m_db(db),
   m_num_of_slr_enabled_resources(0),
   m_num_of_slr_disabled_resources(0)
@@ -23,63 +23,63 @@ daq::core::DisabledComponents::DisabledComponents(::Configuration& db) :
   m_db.add_action(this);
 }
 
-daq::core::DisabledComponents::~DisabledComponents()
+dunedaq::dal::DisabledComponents::~DisabledComponents()
 {
   TLOG_DEBUG(2) <<  "destroy the object " << (void *)this ;
   m_db.remove_action(this);
 }
 
 void
-daq::core::DisabledComponents::notify(std::vector<ConfigurationChange *>& /*changes*/) noexcept
+dunedaq::dal::DisabledComponents::notify(std::vector<ConfigurationChange *>& /*changes*/) noexcept
 {
   TLOG_DEBUG(2) <<  "reset partition components because of notification callback on object " << (void *)this ;
   __clear();
 }
 
 void
-daq::core::DisabledComponents::load() noexcept
+dunedaq::dal::DisabledComponents::load() noexcept
 {
   TLOG_DEBUG(2) <<  "reset partition components because of configuration load on object " << (void *)this ;
   __clear();
 }
 
 void
-daq::core::DisabledComponents::unload() noexcept
+dunedaq::dal::DisabledComponents::unload() noexcept
 {
   TLOG_DEBUG(2) <<  "reset partition components because of configuration unload on object " << (void *)this ;
   __clear();
 }
 
 void
-daq::core::DisabledComponents::update(const ConfigObject& obj, const std::string& name) noexcept
+dunedaq::dal::DisabledComponents::update(const ConfigObject& obj, const std::string& name) noexcept
 {
   TLOG_DEBUG(2) <<  "reset partition components because of configuration update (obj = " << obj << ", name = \'" << name << "\') on object " << (void *)this ;
   __clear();
 }
 
 void
-daq::core::DisabledComponents::reset() noexcept
+dunedaq::dal::DisabledComponents::reset() noexcept
 {
   TLOG_DEBUG(2) <<  "reset disabled by explicit user call" ;
   m_disabled.clear(); // do not clear s_user_disabled && s_user_enabled !!!
 }
 
 bool
-daq::core::DisabledComponents::is_enabled(const daq::core::Component * c)
+dunedaq::dal::DisabledComponents::is_enabled(const dunedaq::dal::Component * c)
 {
-  if (const daq::core::Segment * seg = c->cast<daq::core::Segment>())
+  if (const dunedaq::dal::Segment * seg = c->cast<dunedaq::dal::Segment>())
     {
-      if (daq::core::SegConfig * conf = seg->get_seg_config(false, true))
+      if (dunedaq::dal::SegConfig * conf = seg->get_seg_config(false, true))
         {
           return !conf->is_disabled();
         }
     }
-  else if (const daq::core::BaseApplication * app = c->cast<daq::core::BaseApplication>())
+  else if (const dunedaq::dal::BaseApplication * app = c->cast<dunedaq::dal::BaseApplication>())
     {
-      if (const daq::core::AppConfig * conf = app->get_app_config(true))
+      if (const dunedaq::dal::AppConfig * conf = app->get_app_config(true))
         {
-          const daq::core::BaseApplication * base = conf->get_base_app();
-          if (base != app && is_enabled_short(base->cast<daq::core::Component>()) == false)
+          const dunedaq::dal::BaseApplication * base = conf->get_base_app();
+          if (base != app && is_enabled_short(base->cast<dunedaq::dal::Component>()) == false)
             return false;
         }
     }
@@ -89,7 +89,7 @@ daq::core::DisabledComponents::is_enabled(const daq::core::Component * c)
 
 
 void
-daq::core::Partition::set_disabled(const std::set<const daq::core::Component *>& objs) const
+dunedaq::dal::Partition::set_disabled(const std::set<const dunedaq::dal::Component *>& objs) const
 {
   m_disabled_components.m_user_disabled.clear();
 
@@ -104,7 +104,7 @@ daq::core::Partition::set_disabled(const std::set<const daq::core::Component *>&
 }
 
 void
-daq::core::Partition::set_enabled(const std::set<const daq::core::Component *>& objs) const
+dunedaq::dal::Partition::set_enabled(const std::set<const dunedaq::dal::Component *>& objs) const
 {
   m_disabled_components.m_user_enabled.clear();
 
@@ -119,13 +119,13 @@ daq::core::Partition::set_enabled(const std::set<const daq::core::Component *>& 
 }
 
 void
-daq::core::DisabledComponents::disable_children(const daq::core::ResourceSet& rs)
+dunedaq::dal::DisabledComponents::disable_children(const dunedaq::dal::ResourceSet& rs)
 {
   for (auto & i : rs.get_Contains())
     {
       // FIXME 2022-04-22: implement efficient castable() method working with pointers
-      //if (i->castable(&daq::core::TemplateApplication::s_class_name) == false)
-      if (i->cast<daq::core::TemplateApplication>() == nullptr)
+      //if (i->castable(&dunedaq::dal::TemplateApplication::s_class_name) == false)
+      if (i->cast<dunedaq::dal::TemplateApplication>() == nullptr)
         {
           TLOG_DEBUG(6) <<  "disable resource " << i << " because it's parent resource-set " << &rs << " is disabled" ;
           disable(*i);
@@ -135,7 +135,7 @@ daq::core::DisabledComponents::disable_children(const daq::core::ResourceSet& rs
           TLOG_DEBUG(6) <<  "do not disable template resource application " << i << " (it's parent resource-set " << &rs << " is disabled)" ;
         }
 
-      if (const daq::core::ResourceSet * rs2 = i->cast<daq::core::ResourceSet>())
+      if (const dunedaq::dal::ResourceSet * rs2 = i->cast<dunedaq::dal::ResourceSet>())
         {
           disable_children(*rs2);
         }
@@ -143,13 +143,13 @@ daq::core::DisabledComponents::disable_children(const daq::core::ResourceSet& rs
 }
 
 void
-daq::core::DisabledComponents::disable_children(const daq::core::Segment& s)
+dunedaq::dal::DisabledComponents::disable_children(const dunedaq::dal::Segment& s)
 {
   for (auto & i : s.get_Resources())
     {
       // FIXME 2022-04-22: implement efficient castable() method working with pointers
-      //if (i->castable(&daq::core::TemplateApplication::s_class_name) == false)
-      if (i->cast<daq::core::TemplateApplication>() == nullptr)
+      //if (i->castable(&dunedaq::dal::TemplateApplication::s_class_name) == false)
+      if (i->cast<dunedaq::dal::TemplateApplication>() == nullptr)
         {
           TLOG_DEBUG(6) <<  "disable resource " << i << " because it's parent segment " << &s << " is disabled" ;
           disable(*i);
@@ -159,7 +159,7 @@ daq::core::DisabledComponents::disable_children(const daq::core::Segment& s)
           TLOG_DEBUG(6) <<  "do not disable template resource application " << i << " (it's parent segment " << &s << " is disabled)" ;
         }
 
-      if (const daq::core::ResourceSet * rs = i->cast<daq::core::ResourceSet>())
+      if (const dunedaq::dal::ResourceSet * rs = i->cast<dunedaq::dal::ResourceSet>())
         {
           disable_children(*rs);
         }
@@ -175,9 +175,9 @@ daq::core::DisabledComponents::disable_children(const daq::core::Segment& s)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace daq {
+namespace dunedaq {
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     ReadMaxAllowedIterations,
     AlgorithmError,
     "Has exceeded the maximum of iterations allowed (" << limit << ") during calculation of disabled objects",
@@ -191,25 +191,25 @@ namespace daq {
   // fill data from resource sets
 
 static void fill(
-  const daq::core::ResourceSet& rs,
-  std::vector<const daq::core::ResourceSetOR *>& rs_or,
-  std::vector<const daq::core::ResourceSetAND *>& rs_and,
-  daq::core::TestCircularDependency& cd_fuse
+  const dunedaq::dal::ResourceSet& rs,
+  std::vector<const dunedaq::dal::ResourceSetOR *>& rs_or,
+  std::vector<const dunedaq::dal::ResourceSetAND *>& rs_and,
+  dunedaq::dal::TestCircularDependency& cd_fuse
 )
 {
-  if (const daq::core::ResourceSetAND * r1 = rs.cast<daq::core::ResourceSetAND>())
+  if (const dunedaq::dal::ResourceSetAND * r1 = rs.cast<dunedaq::dal::ResourceSetAND>())
     {
       rs_and.push_back(r1);
     }
-  else if (const daq::core::ResourceSetOR * r2 = rs.cast<daq::core::ResourceSetOR>())
+  else if (const dunedaq::dal::ResourceSetOR * r2 = rs.cast<dunedaq::dal::ResourceSetOR>())
     {
       rs_or.push_back(r2);
     }
 
   for (auto & i : rs.get_Contains())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
-      if (const daq::core::ResourceSet * rs2 = i->cast<daq::core::ResourceSet>())
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      if (const dunedaq::dal::ResourceSet * rs2 = i->cast<dunedaq::dal::ResourceSet>())
         {
           fill(*rs2, rs_or, rs_and, cd_fuse);
         }
@@ -220,16 +220,16 @@ static void fill(
   // fill data from segments
 
 static void fill(
-  const daq::core::Segment& s,
-  std::vector<const daq::core::ResourceSetOR *>& rs_or,
-  std::vector<const daq::core::ResourceSetAND *>& rs_and,
-  daq::core::TestCircularDependency& cd_fuse
+  const dunedaq::dal::Segment& s,
+  std::vector<const dunedaq::dal::ResourceSetOR *>& rs_or,
+  std::vector<const dunedaq::dal::ResourceSetAND *>& rs_and,
+  dunedaq::dal::TestCircularDependency& cd_fuse
 )
 {
   for (auto & i : s.get_Resources())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
-      if (const daq::core::ResourceSet * rs = i->cast<daq::core::ResourceSet>())
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      if (const dunedaq::dal::ResourceSet * rs = i->cast<dunedaq::dal::ResourceSet>())
         {
           fill(*rs, rs_or, rs_and, cd_fuse);
         }
@@ -237,7 +237,7 @@ static void fill(
 
   for (auto & j : s.get_Segments())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, j);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, j);
       fill(*j, rs_or, rs_and, cd_fuse);
     }
 }
@@ -246,21 +246,21 @@ static void fill(
   // fill data from partition
 
 static void fill(
-  const daq::core::Partition& p,
-  std::vector<const daq::core::ResourceSetOR *>& rs_or,
-  std::vector<const daq::core::ResourceSetAND *>& rs_and,
-  daq::core::TestCircularDependency& cd_fuse
+  const dunedaq::dal::Partition& p,
+  std::vector<const dunedaq::dal::ResourceSetOR *>& rs_or,
+  std::vector<const dunedaq::dal::ResourceSetAND *>& rs_and,
+  dunedaq::dal::TestCircularDependency& cd_fuse
 )
 {
-  if (const daq::core::OnlineSegment * onlseg = p.get_OnlineInfrastructure())
+  if (const dunedaq::dal::OnlineSegment * onlseg = p.get_OnlineInfrastructure())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, onlseg);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, onlseg);
       fill(*onlseg, rs_or, rs_and, cd_fuse);
 
       // NOTE: normally application may not be ResourceSet, but for some "exotic" cases put this code
       for (auto &a : p.get_OnlineInfrastructureApplications())
         {
-          if (const daq::core::ResourceSet * rs = a->cast<daq::core::ResourceSet>())
+          if (const dunedaq::dal::ResourceSet * rs = a->cast<dunedaq::dal::ResourceSet>())
             {
               fill(*rs, rs_or, rs_and, cd_fuse);
             }
@@ -269,7 +269,7 @@ static void fill(
 
   for (auto & i : p.get_Segments())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
       fill(*i, rs_or, rs_and, cd_fuse);
     }
 }
@@ -277,7 +277,7 @@ static void fill(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool
-daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_check) const
+dunedaq::dal::Component::disabled(const dunedaq::dal::Partition& partition, bool skip_check) const
 {
   // fill disabled (e.g. after partition changes)
 
@@ -291,14 +291,14 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
         {
           // get two lists of all partition's resource-set-or and resource-set-and
           // also test any circular dependencies between segments and resource sets
-          daq::core::TestCircularDependency cd_fuse("component \'is-disabled\' status", &partition);
-          std::vector<const daq::core::ResourceSetOR *> rs_or;
-          std::vector<const daq::core::ResourceSetAND *> rs_and;
+          dunedaq::dal::TestCircularDependency cd_fuse("component \'is-disabled\' status", &partition);
+          std::vector<const dunedaq::dal::ResourceSetOR *> rs_or;
+          std::vector<const dunedaq::dal::ResourceSetAND *> rs_and;
           fill(partition, rs_or, rs_and, cd_fuse);
 
           // calculate explicitly and implicitly (nested) disabled components
             {
-              std::vector<const daq::core::Component *> vector_of_disabled;
+              std::vector<const dunedaq::dal::Component *> vector_of_disabled;
               vector_of_disabled.reserve(partition.get_Disabled().size() + partition.m_disabled_components.m_user_disabled.size());
 
               // add user disabled components, if any
@@ -329,11 +329,11 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
                 {
                   partition.m_disabled_components.disable(*i);
 
-                  if (const daq::core::ResourceSet * rs = i->cast<daq::core::ResourceSet>())
+                  if (const dunedaq::dal::ResourceSet * rs = i->cast<dunedaq::dal::ResourceSet>())
                     {
                       partition.m_disabled_components.disable_children(*rs);
                     }
-                  else if (const daq::core::Segment * seg = i->cast<daq::core::Segment>())
+                  else if (const dunedaq::dal::Segment * seg = i->cast<dunedaq::dal::Segment>())
                     {
                       partition.m_disabled_components.disable_children(*seg);
                     }
@@ -368,7 +368,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
                 {
                   if (partition.m_disabled_components.is_enabled_short(j))
                     {
-                      const std::vector<const daq::core::ResourceBase*> &resources = j->get_Contains();
+                      const std::vector<const dunedaq::dal::ResourceBase*> &resources = j->get_Contains();
 
                       if (!resources.empty())
                         {
@@ -402,7 +402,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
 
               if (count > iLimit)
                 {
-                  ers::error(daq::core::ReadMaxAllowedIterations(ERS_HERE, iLimit));
+                  ers::error(dunedaq::dal::ReadMaxAllowedIterations(ERS_HERE, iLimit));
                   break;
                 }
             }
@@ -415,7 +415,7 @@ daq::core::Component::disabled(const daq::core::Partition& partition, bool skip_
 }
 
 unsigned long
-daq::core::DisabledComponents::get_num_of_slr_resources(const daq::core::Partition& p)
+dunedaq::dal::DisabledComponents::get_num_of_slr_resources(const dunedaq::dal::Partition& p)
 {
   return (p.m_disabled_components.m_num_of_slr_enabled_resources + p.m_disabled_components.m_num_of_slr_disabled_resources);
 }

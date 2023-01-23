@@ -26,7 +26,7 @@ do
   echo "processing $f ..."
 
   cat $f | sed '
-                s/\([^a-zA-Z0-9_]\)\(dal::\)\([a-zA-Z0-9_]*\)/\1daq::core::\3/g;
+                s/\([^a-zA-Z0-9_]\)\(dal::\)\([a-zA-Z0-9_]*\)/\1dunedaq::dal::\3/g;
                 s/online\/schema\/online.schema.xml/dal\/schema\/core.schema.xml/g;
                 s/online\/schema\/test-repository.schema.xml/daq\/schema\/test-repository.schema.xml/g;
                 s/online\/sw\/external.data.xml/DAQRelease\/sw\/external.data.xml/g;

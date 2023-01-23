@@ -114,8 +114,8 @@ dal_dump_java='dal_dump.oksconfig.java.out'
 
 echo ''
 echo 'TEST 3: test generated dal cpp dump using oksconfig'
-echo "(1/3) run: \"${1}/dal_dump -d oksconfig:${db_file} -c Partition | sed 's/daq::core /dal /g' > ${dal_dump_cpp}\""
-if ! ${1}/dal_dump -d "oksconfig:${db_file}" -c Partition | sed 's/daq::core /dal /g' > ${dal_dump_cpp}
+echo "(1/3) run: \"${1}/dal_dump -d oksconfig:${db_file} -c Partition | sed 's/dunedaq::dal /dal /g' > ${dal_dump_cpp}\""
+if ! ${1}/dal_dump -d "oksconfig:${db_file}" -c Partition | sed 's/dunedaq::dal /dal /g' > ${dal_dump_cpp}
 then
   echo 'command failed, check FAILED'
   exit 1
@@ -202,8 +202,8 @@ fi
 dal_dump_rdbconfig_cpp='dal_dump.rdbconfig.cpp.out'
 dal_dump_rdbconfig_java='dal_dump.rdbconfig.java.out'
 
-echo "(3/6) run: \"$1/dal_dump -d "rdbconfig:${db_name}" -c Partition\" | sed 's/daq::core /dal /g' > ${dal_dump_rdbconfig_cpp}\""
-if ! $1/dal_dump -d "rdbconfig:${db_name}" -c Partition | sed 's/daq::core /dal /g' > ${dal_dump_rdbconfig_cpp}
+echo "(3/6) run: \"$1/dal_dump -d "rdbconfig:${db_name}" -c Partition\" | sed 's/dunedaq::dal /dal /g' > ${dal_dump_rdbconfig_cpp}\""
+if ! $1/dal_dump -d "rdbconfig:${db_name}" -c Partition | sed 's/dunedaq::dal /dal /g' > ${dal_dump_rdbconfig_cpp}
 then
   echo 'command failed, check FAILED'
   Cleanup

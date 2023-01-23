@@ -19,17 +19,17 @@
      std::map <std::string, std::string> m_controller_map;
 
      Configuration* m_oks_db;
-     const daq::core::Partition* m_partition;
+     const dunedaq::dal::Partition* m_partition;
 
      std::string m_current_rcd;
      std::string m_current_controller;
-     std::map <const daq::core::Segment *, bool> m_is_linked;
+     std::map <const dunedaq::dal::Segment *, bool> m_is_linked;
 
-bool navigate_segments (const daq::core::Segment *segment,
-                        const daq::core::Segment *target)
+bool navigate_segments (const dunedaq::dal::Segment *segment,
+                        const dunedaq::dal::Segment *target)
 {
-  std::vector <const daq::core::Segment *> vseg;
-  std::vector <const daq::core::Segment *>::iterator iseg;
+  std::vector <const dunedaq::dal::Segment *> vseg;
+  std::vector <const dunedaq::dal::Segment *>::iterator iseg;
 
   vseg = segment->get_Segments ();
 
@@ -45,11 +45,11 @@ bool navigate_segments (const daq::core::Segment *segment,
   return false;
 }
 
-bool find_segment (const daq::core::Partition* partition,
-		   const daq::core::Segment *target)
+bool find_segment (const dunedaq::dal::Partition* partition,
+		   const dunedaq::dal::Segment *target)
 {
-  std::vector <const daq::core::Segment *> vseg;
-  std::vector <const daq::core::Segment *>::iterator iseg;
+  std::vector <const dunedaq::dal::Segment *> vseg;
+  std::vector <const dunedaq::dal::Segment *>::iterator iseg;
 
   vseg = partition->get_Segments ();
 
@@ -68,14 +68,14 @@ bool find_segment (const daq::core::Partition* partition,
 
 void navigate_relationships (Configuration *confDB,
 			     ConfigObject *o,
-			     const daq::core::Partition *partition,
+			     const dunedaq::dal::Partition *partition,
 			     bool debug)
 {
   std::string class_name = o->class_name ();
 
   // If the object is a resource, then check if it is enabled
 
-  const daq::core::ResourceBase *res_obj = confDB->get <daq::core::ResourceBase> (class_name);
+  const dunedaq::dal::ResourceBase *res_obj = confDB->get <dunedaq::dal::ResourceBase> (class_name);
 
   if (res_obj)
     if (res_obj->disabled (*partition))
@@ -117,7 +117,7 @@ void navigate_relationships (Configuration *confDB,
   {
     if (iobj->class_name () == "Segment")
     {
-      const daq::core::Segment *s = confDB->get <daq::core::Segment> (iobj->UID ());
+      const dunedaq::dal::Segment *s = confDB->get <dunedaq::dal::Segment> (iobj->UID ());
 
       // Is that segment disabled ?
 
@@ -126,8 +126,8 @@ void navigate_relationships (Configuration *confDB,
 
       // Is that segment part of the partition ?
 
-      std::pair <const daq::core::Segment *, bool> is_linked;
-      std::map <const daq::core::Segment *, bool>::iterator link_it;
+      std::pair <const dunedaq::dal::Segment *, bool> is_linked;
+      std::map <const dunedaq::dal::Segment *, bool>::iterator link_it;
 
       link_it = m_is_linked.find (s);
 
@@ -148,7 +148,7 @@ void navigate_relationships (Configuration *confDB,
 
       // Find the controller
 
-      const daq::core::RunControlApplicationBase *rc = s->get_IsControlledBy ();
+      const dunedaq::dal::RunControlApplicationBase *rc = s->get_IsControlledBy ();
 
       m_current_controller = rc->UID ();
       return;
@@ -163,7 +163,7 @@ void navigate_relationships (Configuration *confDB,
 
       if (iobj->class_name () == "RCD")
       {
-	const daq::core::ResourceBase *rapp = confDB->get <daq::core::ResourceBase> (iobj->UID ());
+	const dunedaq::dal::ResourceBase *rapp = confDB->get <dunedaq::dal::ResourceBase> (iobj->UID ());
 	if (! rapp->disabled (*partition))
 	{
 	  m_current_rcd = rapp->UID ();
@@ -175,7 +175,7 @@ void navigate_relationships (Configuration *confDB,
 }
 
 void setup (Configuration *confDB,
-	    const daq::core::Partition *partition,
+	    const dunedaq::dal::Partition *partition,
 	    std::string& rcd_uid,
 	    std::vector <std::string>& busychannel_uid_vector,
 	    std::vector <bool>& enabled_config,
@@ -201,7 +201,7 @@ void setup (Configuration *confDB,
     if (enabled_config[i])
     {
       const RODBusydal::BusyChannel *bc = confDB->get <RODBusydal::BusyChannel> ((*ichannel));
-      const daq::core::ResourceBase *rb = bc->get_BusySource ();
+      const dunedaq::dal::ResourceBase *rb = bc->get_BusySource ();
       std::string obj_name = rb->UID () + "@" + rb->class_name ();
       std::pair<std::string, std::string> busy_channel_pair;
 
@@ -319,12 +319,12 @@ int main(int argc, char *argv[])
       Configuration db(db_name);
 
       // find partition; exit, if there is no partition object
-      const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+      const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
       if (!partition)
         return EXIT_FAILURE;
 
       // register variables converter
-      db.register_converter(new daq::core::SubstituteVariables(*partition));
+      db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
 
       std::vector <std::string> busychannel_uid_vector(16);
       std::vector <bool> enabled_config(16);

@@ -80,9 +80,9 @@ main(int argc, char *argv[])
 
       auto tp = std::chrono::steady_clock::now();
 
-      const daq::core::Partition *partition = use_algorithm ? daq::core::get_partition(db, partition_name) : db.get<daq::core::Partition>(partition_name);
+      const dunedaq::dal::Partition *partition = use_algorithm ? dunedaq::dal::get_partition(db, partition_name) : db.get<dunedaq::dal::Partition>(partition_name);
 
-      stop_and_report(tp, use_algorithm ? "daq::core::get_partition()" : "get<daq::core::Partition>()");
+      stop_and_report(tp, use_algorithm ? "dunedaq::dal::get_partition()" : "get<dunedaq::dal::Partition>()");
 
       if (!partition)
         return EXIT_FAILURE;
@@ -90,13 +90,13 @@ main(int argc, char *argv[])
       if (substitute_vars)
         {
           auto tp2 = std::chrono::steady_clock::now();
-          db.register_converter(new daq::core::SubstituteVariables(*partition));
+          db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
           std::ostringstream text;
-          stop_and_report(tp2, "daq::core::SubstituteVariables()");
+          stop_and_report(tp2, "dunedaq::dal::SubstituteVariables()");
         }
 
       for (const auto &x : disabled)
-        if (const daq::core::Component *obj = db.get<daq::core::Component>(x))
+        if (const dunedaq::dal::Component *obj = db.get<dunedaq::dal::Component>(x))
           {
             auto tp2 = std::chrono::steady_clock::now();
             std::ostringstream text;

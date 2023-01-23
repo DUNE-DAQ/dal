@@ -8,10 +8,8 @@
 
 class Configuration;
 
-namespace daq
-{
-  namespace core
-  {
+namespace dunedaq::dal {
+
     class Segment;
     class Partition;
 
@@ -22,7 +20,7 @@ namespace daq
     private:
 
       ::Configuration& m_db;
-      mutable std::atomic<const daq::core::Segment*> m_root_segment;
+      mutable std::atomic<const dunedaq::dal::Segment*> m_root_segment;
       mutable std::mutex m_root_segment_mutex;
 
       void
@@ -64,7 +62,6 @@ namespace daq
       }
 
     };
-  }
-}
+} // namespace dunedaq::dal
 
 #endif

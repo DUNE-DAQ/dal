@@ -3,7 +3,7 @@
 #include "test_circular_dependency.hpp"
 
 void
-daq::core::TestCircularDependency::push(const DalObject * object)
+dunedaq::dal::TestCircularDependency::push(const DalObject * object)
 {
   if(p_index < p_limit) {
     p_objects[p_index++] = object;
@@ -15,6 +15,6 @@ daq::core::TestCircularDependency::push(const DalObject * object)
       s << p_objects[i];
     }
 
-    throw daq::core::FoundCircularDependency(ERS_HERE, p_limit, p_goal, s.str());
+    throw dunedaq::dal::FoundCircularDependency(ERS_HERE, p_limit, p_goal, s.str());
   }
 }

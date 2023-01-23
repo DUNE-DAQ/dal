@@ -14,7 +14,7 @@ set(cpp_srcs)
 set(cpp_dump_src)
 
 daq_generate_dal(data/schema/core.schema.xml 
-  NAMESPACE daq::core
+  NAMESPACE dunedaq::dal
   INCLUDE ${CMAKE_CODEGEN_BINARY_DIR}/include/${PROJECT_NAME}
   CPP ${CMAKE_CODEGEN_BINARY_DIR}/src
   CPP_OUTPUT  dal_cpp_srcs

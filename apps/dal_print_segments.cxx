@@ -12,11 +12,11 @@
 namespace po = boost::program_options;
 
 static void
-print_resource(const daq::core::ResourceBase * res, unsigned int recursion_level)
+print_resource(const dunedaq::dal::ResourceBase * res, unsigned int recursion_level)
 {
   std::cout << std::string(recursion_level * 2, ' ') << res->UID() << std::endl;
 
-  if (const daq::core::ResourceSet * rset = res->cast<daq::core::ResourceSet>())
+  if (const dunedaq::dal::ResourceSet * rset = res->cast<dunedaq::dal::ResourceSet>())
     {
       for (const auto & r : rset->get_Contains())
         print_resource(r, recursion_level + 1);
@@ -24,7 +24,7 @@ print_resource(const daq::core::ResourceBase * res, unsigned int recursion_level
 }
 
 static void
-print_segment(const daq::core::Segment * seg, unsigned int recursion_level)
+print_segment(const dunedaq::dal::Segment * seg, unsigned int recursion_level)
 {
   std::cout << std::string(recursion_level * 2, ' ') << seg->UID() << std::endl;
 
@@ -75,9 +75,9 @@ main(int argc, char *argv[])
     {
       Configuration db(data);
 
-      if (const daq::core::Partition * p = daq::core::get_partition(db, name))
+      if (const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(db, name))
         {
-          db.register_converter(new daq::core::SubstituteVariables(*p));
+          db.register_converter(new dunedaq::dal::SubstituteVariables(*p));
           print_segment(p->get_segment(p->get_OnlineInfrastructure()->UID()), 0);
         }
       else

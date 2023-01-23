@@ -141,18 +141,18 @@ main(int argc, char * argv[])
 
       // find partition
 
-    const daq::core::Partition * p = daq::core::get_partition(db, partition_name);
+    const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(db, partition_name);
     if(!p) return 1;
 
 
       // register variables converter
 
-    db.register_converter(new daq::core::SubstituteVariables(*p));
+    db.register_converter(new dunedaq::dal::SubstituteVariables(*p));
 
 
       // get set of software repositories files
 
-    std::set<const daq::core::SW_Repository *> repositories = daq::core::get_used_repositories(*p);
+    std::set<const dunedaq::dal::SW_Repository *> repositories = dunedaq::dal::get_used_repositories(*p);
 
 
       // build list of is-info files

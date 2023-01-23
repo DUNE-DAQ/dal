@@ -27,10 +27,10 @@
 
 typedef   std::map<std::string,std::string> TranslationMap;
 
-namespace daq
+namespace dunedaq
 {
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadDBType,
     AlgorithmError,
     "Failed to identify DB type \'" << type << "\' from the database object \'" << dbt << "\'",
@@ -39,19 +39,19 @@ namespace daq
     ((std::string) dbt)
   )
 
-  ERS_DECLARE_ISSUE( core,
+  ERS_DECLARE_ISSUE( dal,
     CantCreateDirectory,
     "Directory '" << directory << "' can not be created",
     ((std::string)directory )
     )
 
-  ERS_DECLARE_ISSUE( core,
+  ERS_DECLARE_ISSUE( dal,
     CannotChangePermissions,
     "File permissions on " << file << " can not be changed because: " << reason,
     ((std::string)file )
     ((std::string)reason )
     )
-}
+} // namespace dunedaq
 
  std::string lowcase(const std::string & mixed)
    {
@@ -131,19 +131,19 @@ int main(int ac, char *av[])
     // find partition and register variables converter
     // exit, if there is no partition object
 
-    const daq::core::Partition * partition = daq::core::get_partition(db, tdaq_partition);
+    const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, tdaq_partition);
     if(!partition) return 1;
-    db.register_converter(new daq::core::SubstituteVariables(*partition));
+    db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
     
     // Get Trigger Configuration 
-    const daq::core::TriggerConfiguration * tc = partition->get_TriggerConfiguration();
+    const dunedaq::dal::TriggerConfiguration * tc = partition->get_TriggerConfiguration();
     
 
     if (!tc) return 1;
 
     // Get DBConnections
-    const daq::core::TriggerDBConnection * tdbc = tc->get_TriggerDBConnection();
-    std::vector<const daq::core::DBConnection*> odbc = tc->get_DBConnections();
+    const dunedaq::dal::TriggerDBConnection * tdbc = tc->get_TriggerDBConnection();
+    std::vector<const dunedaq::dal::DBConnection*> odbc = tc->get_DBConnections();
     
     std::filesystem::path lookuppath(lookup);
     if (!exists(lookuppath)) {
@@ -154,7 +154,7 @@ int main(int ac, char *av[])
 	}
       catch (std::exception & ex)
 	{
-	  ers::fatal(daq::core::CantCreateDirectory(ERS_HERE, lookuppath.string(), ex ) );
+	  ers::fatal(dunedaq::dal::CantCreateDirectory(ERS_HERE, lookuppath.string(), ex ) );
 	  return 1;
 	}
     }
@@ -166,7 +166,7 @@ int main(int ac, char *av[])
 
     if ( tdbc ) {
       if(type.find(tdbc->get_Type()) == type.end()) {
-        daq::core::BadDBType e(ERS_HERE,tdbc->get_Type(), tdbc->UID() );
+        dunedaq::dal::BadDBType e(ERS_HERE,tdbc->get_Type(), tdbc->UID() );
         TLOG() << e;
       }
       else {
@@ -197,7 +197,7 @@ int main(int ac, char *av[])
     }
     for(unsigned int i=0; i< odbc.size(); i++) {
       if(type.find(odbc[i]->get_Type()) == type.end()) {
-	daq::core::BadDBType e(ERS_HERE,odbc[i]->get_Type(), odbc[i]->UID() );
+	dunedaq::dal::BadDBType e(ERS_HERE,odbc[i]->get_Type(), odbc[i]->UID() );
 	ers::error(e);
       }
       else {

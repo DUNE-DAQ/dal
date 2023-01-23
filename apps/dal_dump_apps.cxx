@@ -76,7 +76,7 @@ print_info(const std::vector<std::string>& file_names, const std::map<std::strin
 int
 main(int argc, char *argv[])
 {
-  boost::program_options::options_description desc("Example of daq::core::Application::get_info() algorithm usage. By default the algorithm is applied to all applications used by the partition.");
+  boost::program_options::options_description desc("Example of dunedaq::dal::Application::get_info() algorithm usage. By default the algorithm is applied to all applications used by the partition.");
 
   std::string db_name;
   std::string partition_name;
@@ -132,7 +132,7 @@ main(int argc, char *argv[])
 
       // find partition || exit, if there is no partition object
 
-      const daq::core::Partition * partition = daq::core::get_partition(conf, partition_name);
+      const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(conf, partition_name);
 
       if (!partition)
         return EXIT_FAILURE;
@@ -141,12 +141,12 @@ main(int argc, char *argv[])
 
       if (subst)
         {
-          conf.register_converter(new daq::core::SubstituteVariables(*partition));
+          conf.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
         }
 
       // get application object (a normal application or template application)
 
-      const daq::core::BaseApplication * b_app = (object_id.empty() ? nullptr : conf.get<daq::core::BaseApplication>(object_id));
+      const dunedaq::dal::BaseApplication * b_app = (object_id.empty() ? nullptr : conf.get<dunedaq::dal::BaseApplication>(object_id));
 
       if (!object_id.empty() && !b_app)
         {
@@ -163,21 +163,21 @@ main(int argc, char *argv[])
           segments.insert(segment_id);
         }
 
-      const daq::core::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
-      std::vector<const daq::core::BaseApplication *> objects = root_seg->get_all_applications(0, (!segments.empty() ? &segments : 0), 0);
+      const dunedaq::dal::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
+      std::vector<const dunedaq::dal::BaseApplication *> objects = root_seg->get_all_applications(0, (!segments.empty() ? &segments : 0), 0);
 
       unsigned int count = 0;
 
       for (const auto& i : objects)
         {
-          if (b_app && (i->get_base_app()->cast<daq::core::BaseApplication>() != b_app))
+          if (b_app && (i->get_base_app()->cast<dunedaq::dal::BaseApplication>() != b_app))
             continue;
           if (!app_name.empty() && app_name != i->UID())
             continue;
 
           count++;
 
-          if (i->get_base_app()->cast<daq::core::Application>())
+          if (i->get_base_app()->cast<dunedaq::dal::Application>())
             {
               std::cout << "### (" << count << ") application " << i->get_base_app() << " ###\n";
             }
@@ -200,7 +200,7 @@ main(int argc, char *argv[])
 
               print_info(file_names, environment);
             }
-          catch (daq::core::AlgorithmError & ex)
+          catch (dunedaq::dal::AlgorithmError & ex)
             {
               ers::error(ex);  // report a problem
             }

@@ -28,7 +28,7 @@ struct TableRow
     ;
   }
 
-  TableRow(const char fill, const char separator, unsigned short num, const daq::core::BaseApplication * app, const daq::core::Computer * host, const daq::core::Segment * seg, const std::string& seg_id, const std::string& app_id) :
+  TableRow(const char fill, const char separator, unsigned short num, const dunedaq::dal::BaseApplication * app, const dunedaq::dal::Computer * host, const dunedaq::dal::Segment * seg, const std::string& seg_id, const std::string& app_id) :
       m_fill(fill), m_separator(separator)
   {
     std::ostringstream num_s;
@@ -44,7 +44,7 @@ struct TableRow
     m_items[5] = app_id;
   }
 
-  TableRow(const char fill, const char separator, const daq::core::Computer& host) :
+  TableRow(const char fill, const char separator, const dunedaq::dal::Computer& host) :
       m_fill(fill), m_separator(separator)
   {
     m_items[0] = m_items[1] = m_items[3] = m_items[4] = m_items[5] = "";
@@ -73,7 +73,7 @@ main(int argc, char *argv[])
   std::string partition_name;
   std::set<std::string> app_types;
   std::vector<std::string> hosts_list;
-  std::set<const daq::core::Computer *> hosts;
+  std::set<const dunedaq::dal::Computer *> hosts;
   std::set<std::string> segments;
   bool backup = false;
 
@@ -125,18 +125,18 @@ main(int argc, char *argv[])
     {
       Configuration db(data);
 
-      const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+      const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
 
       if (!partition)
         return EXIT_FAILURE;
 
-      db.register_converter(new daq::core::SubstituteVariables(*partition));
+      db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
 
-      std::set<const daq::core::Computer *> hosts;
+      std::set<const dunedaq::dal::Computer *> hosts;
 
       for (const auto& x : hosts_list)
         {
-          if (const daq::core::Computer * host = db.get<daq::core::Computer>(x))
+          if (const dunedaq::dal::Computer * host = db.get<dunedaq::dal::Computer>(x))
             {
               hosts.insert(host);
             }
@@ -147,7 +147,7 @@ main(int argc, char *argv[])
             }
         }
 
-      std::vector<const daq::core::BaseApplication *> apps = partition->get_all_applications((app_types.empty() ? nullptr : &app_types), (segments.empty() ? nullptr : &segments), (hosts.empty() ? nullptr : &hosts));
+      std::vector<const dunedaq::dal::BaseApplication *> apps = partition->get_all_applications((app_types.empty() ? nullptr : &app_types), (segments.empty() ? nullptr : &segments), (hosts.empty() ? nullptr : &hosts));
 
       std::cout << "Got " << apps.size() << " applications:\n";
 

@@ -39,8 +39,8 @@
 
   // keep pointers to objects used to test substitution (with command line option -s)
 
-const daq::core::Partition * partition   = nullptr;
-daq::core::SubstituteVariables * sv_obj  = nullptr;
+const dunedaq::dal::Partition * partition   = nullptr;
+dunedaq::dal::SubstituteVariables * sv_obj  = nullptr;
 
 void
 pre_cb(void * parameter)
@@ -128,23 +128,23 @@ cb2(const std::vector<ConfigurationChange *> & changes, void * parameter)
             {
               if (class_name == "Application")
                 {
-                  if (const daq::core::Application * obj = configuration->get<daq::core::Application>(i))
+                  if (const dunedaq::dal::Application * obj = configuration->get<dunedaq::dal::Application>(i))
                     obj->print(4, true, std::cout);
                 }
               else if (class_name == "Variable")
                 {
-                  if (const daq::core::Variable * obj = configuration->get<daq::core::Variable>(i))
+                  if (const dunedaq::dal::Variable * obj = configuration->get<dunedaq::dal::Variable>(i))
                     obj->print(4, true, std::cout);
                 }
               else if (class_name == "Partition")
                 {
-                  if (const daq::core::Partition * obj = configuration->get<daq::core::Partition>(i))
+                  if (const dunedaq::dal::Partition * obj = configuration->get<dunedaq::dal::Partition>(i))
                     obj->print(4, true, std::cout);
 
                   // print all disabled to test work of auto disabling algorithm
                   if (partition)
                     {
-                      std::vector<const daq::core::Component*> objs;
+                      std::vector<const dunedaq::dal::Component*> objs;
                       configuration->get(objs);
 
                       std::cout << std::boolalpha << "Found " << objs.size() << " objects of classes derived from Component class.\n"
@@ -169,7 +169,7 @@ cb2(const std::vector<ConfigurationChange *> & changes, void * parameter)
 
               if (class_name == "RunControlApplication")
                 {
-                  if (const daq::core::RunControlApplication * obj = configuration->get<daq::core::RunControlApplication>(i))
+                  if (const dunedaq::dal::RunControlApplication * obj = configuration->get<dunedaq::dal::RunControlApplication>(i))
                     obj->print(4, true, std::cout);
                 }
             }
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
       // find partition and register conversion object, if update of a parameter to be tested
       if (!partition4substitution.empty())
         {
-          partition = daq::core::get_partition(conf, partition4substitution);
+          partition = dunedaq::dal::get_partition(conf, partition4substitution);
 
           if (!partition)
             {
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
               return (EXIT_FAILURE);
             }
 
-          sv_obj = new daq::core::SubstituteVariables(*partition);
+          sv_obj = new dunedaq::dal::SubstituteVariables(*partition);
           conf.register_converter(sv_obj);
 
           subscribe_var = true;
@@ -289,26 +289,26 @@ int main(int argc, char *argv[])
 
       if (subscribe_app)
         {
-          c1.add(daq::core::Application::s_class_name);
+          c1.add(dunedaq::dal::Application::s_class_name);
           std::cout << "subscribe on any changes in class Application\n";
         }
 
       if (subscribe_var)
         {
-          c1.add(daq::core::Variable::s_class_name);
+          c1.add(dunedaq::dal::Variable::s_class_name);
           std::cout << "subscribe on any changes in class Variable\n";
         }
 
       if (subscribe_prt)
         {
-          c1.add(daq::core::Partition::s_class_name);
+          c1.add(dunedaq::dal::Partition::s_class_name);
           std::cout << "subscribe on any changes in class Partition\n";
         }
 
       // subscribe on changes of objects in the Application class
       for (const auto& i : app_objects)
         {
-          if (const daq::core::Application * obj = conf.get<daq::core::Application>(i))
+          if (const dunedaq::dal::Application * obj = conf.get<dunedaq::dal::Application>(i))
             {
               c2.add(*obj);
               std::cout << "subscribe on modifications of object \"" << i << "\" from Application class\n";
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
       // subscribe on changes of objects in the Environment class
       for (const auto& i : var_objects)
         {
-          if (const daq::core::Variable * obj = conf.get<daq::core::Variable>(i))
+          if (const dunedaq::dal::Variable * obj = conf.get<dunedaq::dal::Variable>(i))
             {
               c2.add(*obj);
               std::cout << "subscribe on modifications of object \"" << i << "\" from Variable class\n";
@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
       // subscribe on changes of objects in the Partition class
       for (const auto& i : prt_objects)
         {
-          if (const daq::core::Partition * obj = conf.get<daq::core::Partition>(i))
+          if (const dunedaq::dal::Partition * obj = conf.get<dunedaq::dal::Partition>(i))
             {
               c2.add(*obj);
               std::cout << "subscribe on modifications of object \"" << i << "\" from Partition class\n";

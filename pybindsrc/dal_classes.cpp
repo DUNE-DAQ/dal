@@ -55,7 +55,7 @@ namespace dunedaq::dal::python {
   class AppConfigHelper {
 
   public:
-    AppConfigHelper(const daq::core::BaseApplication* app):
+    AppConfigHelper(const dunedaq::dal::BaseApplication* app):
       m_app(app)
     {
       check_ptrs( {m_app});
@@ -112,7 +112,7 @@ namespace dunedaq::dal::python {
       std::vector<std::string> program_names;
       std::string start_args, restart_args;
     
-      const daq::core::Tag * tag = m_app->get_info(environment, program_names, start_args, restart_args);
+      const dunedaq::dal::Tag * tag = m_app->get_info(environment, program_names, start_args, restart_args);
       check_ptrs({tag});
 
       app_info_collection["tag"] = tag->UID();
@@ -126,13 +126,13 @@ namespace dunedaq::dal::python {
 
   private:
 
-    const daq::core::BaseApplication* m_app;
+    const dunedaq::dal::BaseApplication* m_app;
   };
 
   class SegConfigHelper {
 
   public:
-    SegConfigHelper(const daq::core::Segment* seg) :
+    SegConfigHelper(const dunedaq::dal::Segment* seg) :
       m_segment(seg) {
     }
 
@@ -143,7 +143,7 @@ namespace dunedaq::dal::python {
 
     std::vector<AppConfigHelper> get_all_applications(std::set<std::string>* app_types = nullptr, 
 						      std::set<std::string>* use_segments = nullptr, 
-						      std::set<const daq::core::Computer *>* use_hosts = nullptr) const {
+						      std::set<const dunedaq::dal::Computer *>* use_hosts = nullptr) const {
       check_ptrs({m_segment});
       return app_translator(m_segment->get_all_applications(app_types, use_segments, use_hosts));
     }
@@ -219,7 +219,7 @@ namespace dunedaq::dal::python {
 
   private:
 
-    static std::vector<AppConfigHelper> app_translator(const std::vector<const daq::core::BaseApplication *>& apps_in) {
+    static std::vector<AppConfigHelper> app_translator(const std::vector<const dunedaq::dal::BaseApplication *>& apps_in) {
       std::vector<AppConfigHelper> apps_out;
 
       for (const auto& app : apps_in) {
@@ -229,7 +229,7 @@ namespace dunedaq::dal::python {
       return apps_out;
     }
     
-    const daq::core::Segment* m_segment;
+    const dunedaq::dal::Segment* m_segment;
   };
 
     std::vector<AppConfigHelper> 
@@ -238,13 +238,13 @@ namespace dunedaq::dal::python {
 				   std::set<std::string> app_types,
 				   std::set<std::string> use_segments,
 				   std::set<std::string> use_hosts) {
-      const daq::core::Partition* partition = daq::core::get_partition(const_cast<Configuration&>(db), partition_name);
+      const dunedaq::dal::Partition* partition = dunedaq::dal::get_partition(const_cast<Configuration&>(db), partition_name);
 
       check_ptrs({partition});
 
-      std::set<const daq::core::Computer *> use_hosts_concrete;
+      std::set<const dunedaq::dal::Computer *> use_hosts_concrete;
       for (const auto& hostname : use_hosts) {
-	auto computer_ptr = const_cast<Configuration&>(db).get<daq::core::Computer>(hostname);
+	auto computer_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Computer>(hostname);
 	check_ptrs({computer_ptr});
 	use_hosts_concrete.insert(computer_ptr);
       }
@@ -258,11 +258,11 @@ namespace dunedaq::dal::python {
     }
 
   std::vector<std::vector<ObjectLocator>> component_get_parents(const Configuration& db, const std::string& partition_id, const std::string& component_id) {
-    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    const dunedaq::dal::Component* component_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Component>(component_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
     check_ptrs( {component_ptr, partition_ptr});
 
-    std::list<std::vector<const daq::core::Component*>> parents;
+    std::list<std::vector<const dunedaq::dal::Component*>> parents;
     std::vector<std::vector<ObjectLocator>> parent_ids;
 
     component_ptr->get_parents(*partition_ptr, parents);
@@ -282,8 +282,8 @@ namespace dunedaq::dal::python {
   }
 
   bool component_disabled(const Configuration& db, const std::string& partition_id, const std::string& component_id) {
-    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    const dunedaq::dal::Component* component_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Component>(component_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
 
     check_ptrs({component_ptr});
     check_ptrs({partition_ptr});
@@ -292,13 +292,13 @@ namespace dunedaq::dal::python {
   }
 
   std::string partition_get_log_directory(const Configuration& db, const std::string& partition_id) {
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
     check_ptrs( {partition_ptr} );
     return partition_ptr->get_log_directory();
   }
 
   SegConfigHelper* partition_get_segment(const Configuration& db, const std::string& partition_id, const std::string& seg_name) {
-    auto partition_ptr = daq::core::get_partition(const_cast<Configuration&>(db), partition_id);
+    auto partition_ptr = dunedaq::dal::get_partition(const_cast<Configuration&>(db), partition_id);
     check_ptrs( {partition_ptr} );
     auto segptr = partition_ptr->get_segment(seg_name);
     check_ptrs( {segptr} );
@@ -306,9 +306,9 @@ namespace dunedaq::dal::python {
   }
 
   std::string variable_get_value(const Configuration& db, const std::string& variable_id, const std::string& tag_id) {
-    const daq::core::Variable* variable_ptr = const_cast<Configuration&>(db).get<daq::core::Variable>(variable_id);
+    const dunedaq::dal::Variable* variable_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Variable>(variable_id);
     check_ptrs( {variable_ptr} );
-    const daq::core::Tag* tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
+    const dunedaq::dal::Tag* tag_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Tag>(tag_id);
     check_ptrs( {tag_ptr} );
     return variable_ptr->get_value(tag_ptr);
   }
@@ -320,10 +320,10 @@ namespace dunedaq::dal::python {
     std::map<std::string, std::string> environment;
     std::vector<std::string> program_names;
 
-    auto partition_ptr = daq::core::get_partition(const_cast<Configuration&>(db), partition_id);
-    auto prog_ptr = const_cast<Configuration&>(db).get<daq::core::ComputerProgram>(prog_id);
-    auto tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
-    auto host_ptr = const_cast<Configuration&>(db).get<daq::core::Computer>(host_id);
+    auto partition_ptr = dunedaq::dal::get_partition(const_cast<Configuration&>(db), partition_id);
+    auto prog_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::ComputerProgram>(prog_id);
+    auto tag_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Tag>(tag_id);
+    auto host_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Computer>(host_id);
     check_ptrs( {partition_ptr, prog_ptr, tag_ptr, host_ptr } );
 
     prog_ptr->get_info(environment, program_names, *partition_ptr, *tag_ptr, *host_ptr);
@@ -345,7 +345,7 @@ register_dal_classes(py::module& m)
     ;
 
   py::class_<AppConfigHelper>(m, "AppConfigHelper")
-    .def(py::init<const daq::core::BaseApplication*>())
+    .def(py::init<const dunedaq::dal::BaseApplication*>())
     .def("get_app_id", &AppConfigHelper::get_app_id, "Wrapper for BaseApplication::UID()")
     .def("get_base_app", &AppConfigHelper::get_base_app, "Return identifying info on the BaseApplication")
     .def("get_host", &AppConfigHelper::get_host, "Return identifying info on the host")
@@ -357,7 +357,7 @@ register_dal_classes(py::module& m)
     ;
 
   py::class_<SegConfigHelper>(m, "SegConfigHelper")
-    .def(py::init<const daq::core::Segment*>())
+    .def(py::init<const dunedaq::dal::Segment*>())
     .def("get_seg_id", &SegConfigHelper::get_seg_id, "get segment id")
     .def("get_all_applications", &SegConfigHelper::get_all_applications, "Get all applications in the segment")
     .def("get_controller", &SegConfigHelper::get_controller, "Get segment controller")

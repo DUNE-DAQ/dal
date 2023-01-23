@@ -5,8 +5,7 @@ class DalObject;
 
 #include "dal/util.hpp"
 
-namespace daq {
-  namespace core {
+namespace dunedaq::dal {
 
     class TestCircularDependency {
 
@@ -23,7 +22,7 @@ namespace daq {
 
       private:
 
-        /// \throw daq::core::FoundCircularDependency
+        /// \throw dunedaq::dal::FoundCircularDependency
         void push(const DalObject * object);
 
         void
@@ -55,8 +54,7 @@ namespace daq {
 
         TestCircularDependency& p_fuse;
     };
-  }
-}
+} // dunedaq::dal
 
 
 #endif

@@ -9,10 +9,7 @@
 
 #include "dal/Component.hpp"
 
-namespace daq
-{
-  namespace core
-  {
+namespace dunedaq::dal {
 
     class Partition;
     class ResourceSet;
@@ -41,8 +38,8 @@ namespace daq
       unsigned long m_num_of_slr_disabled_resources;
 
       std::set<const std::string *, SortStringPtr> m_disabled;
-      std::set<const daq::core::Component *> m_user_disabled;
-      std::set<const daq::core::Component *> m_user_enabled;
+      std::set<const dunedaq::dal::Component *> m_user_disabled;
+      std::set<const dunedaq::dal::Component *> m_user_enabled;
 
       void
       __clear() noexcept
@@ -83,31 +80,30 @@ namespace daq
       }
 
       void
-      disable(const daq::core::Component& c)
+      disable(const dunedaq::dal::Component& c)
       {
         m_disabled.insert(&c.UID());
       }
 
       bool
-      is_enabled(const daq::core::Component* c);
+      is_enabled(const dunedaq::dal::Component* c);
 
       bool
-      is_enabled_short(const daq::core::Component* c)
+      is_enabled_short(const dunedaq::dal::Component* c)
       {
         return (m_disabled.find(&c->UID()) == m_disabled.end());
       }
 
       void
-      disable_children(const daq::core::ResourceSet&);
+      disable_children(const dunedaq::dal::ResourceSet&);
 
       void
-      disable_children(const daq::core::Segment&);
+      disable_children(const dunedaq::dal::Segment&);
 
       static unsigned long
-      get_num_of_slr_resources(const daq::core::Partition& p);
+      get_num_of_slr_resources(const dunedaq::dal::Partition& p);
 
     };
-  }
-}
+} // namespace dunedaq::daq
 
 #endif

@@ -23,7 +23,7 @@ def print_info(file_names,environment):
            print("    * " + key + "=\"" + environment[key] + "\"")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="""Example of daq::core::Application::get_info() algorithm usage. The database name is defined either\n
+    parser = argparse.ArgumentParser(description="""Example of dunedaq::dal::Application::get_info() algorithm usage. The database name is defined either\n
        the -d command line parameter, or by the TDAQ_DB environment variable in format \"impl:parameter\",\n
        e.g. \"oksconfig:/tmp/my-db.xml\". By default the algorithms are applied to all applications used by\n
        the partition are their results are printed out.\n\n

@@ -67,13 +67,13 @@ int main(int argc, char *argv[])
       Configuration db(data);
 
       // find partition; exit, if there is no partition object
-      if (const daq::core::Partition * partition = daq::core::get_partition(db, partition_name))
+      if (const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name))
         {
-          db.register_converter(new daq::core::SubstituteVariables(*partition));
+          db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
 
           std::set<std::string> segments;
 
-          const daq::core::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
+          const dunedaq::dal::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
 
           for (const auto& i : root_seg->get_all_applications())
             {

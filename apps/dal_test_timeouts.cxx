@@ -48,9 +48,9 @@ main(int argc, char *argv[])
     {
       ::Configuration conf(db_name);
 
-      if (const daq::core::Partition * p = daq::core::get_partition(conf, partition_name))
+      if (const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(conf, partition_name))
         {
-          if (const daq::core::Segment * s = p->get_segment(segment_name))
+          if (const dunedaq::dal::Segment * s = p->get_segment(segment_name))
             {
               int longT, shortT;
               s->get_timeouts(longT, shortT);
@@ -73,7 +73,7 @@ main(int argc, char *argv[])
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);
     }
-  catch (daq::core::AlgorithmError & ex)
+  catch (dunedaq::dal::AlgorithmError & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);

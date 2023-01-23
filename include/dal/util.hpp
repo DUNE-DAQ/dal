@@ -7,9 +7,9 @@
 #include "config/DalObject.hpp"
 
 
-namespace daq {
+namespace dunedaq {
 
-namespace core {
+namespace dal {
 
     // forward declaration
 
@@ -36,7 +36,7 @@ namespace core {
      *  \return                true, if tag is compatible
      */
 
-  bool is_compatible(const daq::core::Tag& tag, const daq::core::Computer& host, const daq::core::Partition& partition);
+  bool is_compatible(const dunedaq::dal::Tag& tag, const dunedaq::dal::Computer& host, const dunedaq::dal::Partition& partition);
 
 
 
@@ -85,9 +85,9 @@ namespace core {
      *
      *  ::Configuration db(...);  // some code to build configuration database object
      *
-     *  const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+     *  const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
      *  if(partition) {
-     *    db.register_converter(new daq::core::SubstituteVariables(db, *partition));
+     *    db.register_converter(new dunedaq::dal::SubstituteVariables(db, *partition));
      *  }
      *
      *  </i></pre>
@@ -159,7 +159,7 @@ namespace core {
      *  \return Returns the pointer to the partition object if found, or 0.
      */
 
-  const daq::core::Partition * get_partition(::Configuration& conf, const std::string& name, unsigned long rlevel = 10, const std::vector<std::string> * rclasses = nullptr);
+  const dunedaq::dal::Partition * get_partition(::Configuration& conf, const std::string& name, unsigned long rlevel = 10, const std::vector<std::string> * rclasses = nullptr);
 
 
     /**
@@ -168,7 +168,7 @@ namespace core {
      *  The algorithm %is searching the sw repositories used by given partition,
      *  checking all active segments and applications.
      *
-     *  The method throws daq::core::AlgorithmError exception in case of logical problems found in database
+     *  The method throws dunedaq::dal::AlgorithmError exception in case of logical problems found in database
      *  (such as circular dependencies between segments, resources or repositories).
      *
      *  The parameters of the algorithm are:
@@ -177,7 +177,7 @@ namespace core {
      *  \return The used repositories
      */
 
-  std::set<const daq::core::SW_Repository *> get_used_repositories(const daq::core::Partition& p);
+  std::set<const dunedaq::dal::SW_Repository *> get_used_repositories(const dunedaq::dal::Partition& p);
 
 
     /**
@@ -191,10 +191,10 @@ namespace core {
      *  @param[in] repository_root   the partition's repository root
      *  @param[in,out] class_path    the value of class path
      *
-     *  @throw daq::core::NoJarFile is thrown when the jar file is not found or not readable.
+     *  @throw dunedaq::dal::NoJarFile is thrown when the jar file is not found or not readable.
      */
 
-  void add_classpath(const daq::core::SW_Repository& rep, const std::string& repository_root, std::string& class_path);
+  void add_classpath(const dunedaq::dal::SW_Repository& rep, const std::string& repository_root, std::string& class_path);
 
 
     /**
@@ -231,17 +231,17 @@ namespace core {
   void
   set_config_version(const std::string& partition, const std::string& version, bool reload);
 
-} /* close namespace core */
+} // namespace dal
 
 
   ERS_DECLARE_ISSUE(
-    core,
+    dal,
     AlgorithmError,
     ,
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadVariableUsage,
     AlgorithmError,
     message,
@@ -250,7 +250,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadApplicationInfo,
     AlgorithmError,
     "Failed to retrieve information for Application \'" << app_id << "\' from the database: " << message,
@@ -260,7 +260,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadPartitionID,
     AlgorithmError,
     "There is no partition object with UID = \"" << name << '\"',
@@ -269,7 +269,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     SegmentDisabled,
     AlgorithmError,
     "Cannot get information about applications because the segment is disabled",
@@ -277,7 +277,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadProgramInfo,
     AlgorithmError,
     "Failed to retrieve information for Program \'" << prog_id << "\' from the database: " << message,
@@ -287,7 +287,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadHost,
     AlgorithmError,
     "Failed to retrieve application \'" << app_id << "\' from the database: " << message,
@@ -297,7 +297,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     NoDefaultHost,
     AlgorithmError,
     "Failed to find default host for segment \'" << seg_id << "\' " << message,
@@ -307,7 +307,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     NoTemplateAppHost,
     AlgorithmError,
     "Both partition default and segment default hosts are not defined for template application \'" << app_id << "\' from segment \'" << seg_id << "\' (will use localhost, that may cause problems presenting info in IGUI for distributed partition).",
@@ -318,7 +318,7 @@ namespace core {
 
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadTag,
     AlgorithmError,
     "Failed to use tag \'" << tag_id << "\' because: " << message,
@@ -328,7 +328,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadSegment,
     AlgorithmError,
     "Invalid Segment \'" << seg_id << "\' because: " << message,
@@ -338,7 +338,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     GetTemplateApplicationsOfSegmentError,
     AlgorithmError,
     "Failed to get template applications of \'" << name << "\' segment" << message,
@@ -348,7 +348,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     BadTemplateSegmentDescription,
     AlgorithmError,
     "Bad configuration description of template segment \'" << name << "\': " << message,
@@ -358,7 +358,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     CannotGetApplicationObject,
     AlgorithmError,
     "Failed to get application object from name: " << reason,
@@ -367,7 +367,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     CannotFindSegmentByName,
     AlgorithmError,
     "Failed to find segment object \'" << name << "\': " << reason,
@@ -377,7 +377,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     NotInitedObject,
     AlgorithmError,
     "The " << item << " object " << obj << " was not initialized",
@@ -387,7 +387,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     NotInitedByDalAlgorithm,
     AlgorithmError,
     "The " << obj_id << '@' << obj_class << " object " << address << " was not initialized by DAL algorithm " << algo,
@@ -399,7 +399,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     CannotCreateSegConfig,
     AlgorithmError,
     "Failed to create config for segment \'" << name << "\': " << reason,
@@ -409,7 +409,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     CannotGetParents,
     AlgorithmError,
     "Failed to get parents of \'" << object << '\'',
@@ -418,7 +418,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     FoundCircularDependency,
     AlgorithmError,
     "Reach maximum allowed recursion (" << limit << ") during calculation of " << goal << "; possibly there is circular dependency between these objects: " << objects,
@@ -429,7 +429,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     NoJarFile,
     AlgorithmError,
     "Cannot find jar file \'" << file << "\' described by \'" << obj_id << '@' << obj_class << "\' that is part of \'" << rep_id << '@' << rep_class << '\'',
@@ -442,7 +442,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     DuplicatedApplicationID,
     AlgorithmError,
     "Two applications have equal IDs:\n  1) " << first << "\n  2) " << second,
@@ -452,7 +452,7 @@ namespace core {
   )
 
   ERS_DECLARE_ISSUE_BASE(
-    core,
+    dal,
     SegmentIncludedMultipleTimes,
     AlgorithmError,
     "The segment \"" << segment << "\" is included by:\n  1) " << first << "\n  2) " << second,
@@ -462,6 +462,6 @@ namespace core {
     ((std::string)second)
   )
 
-} /* close namespace daq */
+} // namespace dunedaq
 
 #endif

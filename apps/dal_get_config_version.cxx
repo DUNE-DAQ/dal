@@ -38,7 +38,7 @@ main(int argc, char **argv)
 
   try
     {
-      std::string version = ::daq::core::get_config_version(partition);
+      std::string version = ::dunedaq::dal::get_config_version(partition);
       std::cout << version << std::endl;
     }
   catch (const dunedaq::config::NotFound & ex)
