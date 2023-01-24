@@ -34,12 +34,7 @@ daq_add_application(dal_dump_app_config dal_dump_app_config.cxx                 
 daq_add_application(dal_dump_app_depends dal_dump_app_depends.cxx                LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_print_segments dal_print_segments.cxx                    LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_get_app_env dal_get_app_env.cxx                               LINK_LIBRARIES dal config::config Boost::program_options)
-daq_add_application(dal_get_igui_setup dal_get_igui_setup.cxx                         LINK_LIBRARIES dal config::config Boost::program_options)
-daq_add_application(dal_notify dal_notify.cxx                                    LINK_LIBRARIES dal config::config Boost::program_options)
-daq_add_application(dal_control_view dal_control_view.cxx                        LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_test_disabled dal_test_disabled.cxx                      LINK_LIBRARIES dal config::config Boost::program_options)
-daq_add_application(dal_load_is_info_files dal_load_is_info_files.cxx                 LINK_LIBRARIES dal config::config Boost::program_options)
-daq_add_application(dal_create_db_connection_files dal_create_db_connection_files.cxx LINK_LIBRARIES dal config::config Boost::program_options stdc++fs)
 daq_add_application(dal_test_get_config dal_test_get_config.cxx                  LINK_LIBRARIES dal config::config Boost::program_options)
 
 daq_install()
