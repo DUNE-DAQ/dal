@@ -84,9 +84,9 @@ Spoiler alert: you'll get an error.
 
 ## A Realistic Example
 
-The `simple.schema.xml` file and `simple.data.xml` files created by `oks_tutorial` are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we need to go to the `dal` repo: `sourcecode/dal/data/schema/core.schema.xml`. This file is quite large, and describes concepts which are actually used on DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in dal's `CMakeLists.txt` file you see the following:
+The `simple.schema.xml` file and `simple.data.xml` files created by `oks_tutorial` are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we need to go to the `dal` repo: `sourcecode/dal/schema/dal/core.schema.xml`. This file is quite large, and describes concepts which are actually used on DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in dal's `CMakeLists.txt` file you see the following:
 ```
-daq_generate_dal(data/schema/core.schema.xml
+daq_generate_dal(core.schema.xml
   NAMESPACE dunedaq::dal
   INCLUDE ${CMAKE_CODEGEN_BINARY_DIR}/include/${PROJECT_NAME}
   CPP ${CMAKE_CODEGEN_BINARY_DIR}/src

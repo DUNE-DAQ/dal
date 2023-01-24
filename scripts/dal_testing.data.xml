@@ -68,7 +68,7 @@
 <info name="" type="" num-of-items="2" oks-format="data" oks-version="N/A" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20230105T194746" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20230105T194746"/>
 
 <include>
- <file path="core.schema.xml"/>
+ <file path="dal/core.schema.xml"/>
 </include>
 
 <obj class="Partition" id="ToyPartition">

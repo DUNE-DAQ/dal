@@ -13,7 +13,7 @@ find_package(config REQUIRED)
 set(cpp_srcs)
 set(cpp_dump_src)
 
-daq_generate_dal(data/schema/core.schema.xml 
+daq_generate_dal(core.schema.xml 
   NAMESPACE dunedaq::dal
   INCLUDE ${CMAKE_CODEGEN_BINARY_DIR}/include/${PROJECT_NAME}
   CPP ${CMAKE_CODEGEN_BINARY_DIR}/src
