@@ -7,16 +7,18 @@ written](https://gitlab.cern.ch/atlas-tdaq-software/oks) for the ATLAS
 data acquisition effort. Its features include:
 * The ability to define object types in XML (known as OKS "classes"), off of which C++ and Python code can automatically be generated
 * Support for class Attributes, Relationships, and Methods. Attributes and Relationships are automatically generated; Methods allow developers to add behavior to classes
-* The ability to create instances of classes, modify them, read them into the XML file acting as a database and retrieve them from the database
+* The ability to create instances of classes (known as OKS "objects"), modify them, read them into an XML file serving as a database and retrieve them from the database
 
 As of this writing (Jan-18-2023) the packages have been refactored
-only to the extent that they work within the DUNE DAQ framework
+mainly to the extent that they work within the DUNE DAQ framework
 although further changes within the context of DUNE's needs could be
 useful. Also, unfortunately most documentation for OKS is
 access-protected and only available to ATLAS collaborators. However,
 this document provides a taste of what OKS has to offer.
 
 ## Getting Started
+
+_JCF, Jan-25-2023: this documentation is on a special branch of the dal repo; you should skip the manual setup of the repo below, get onto mu2edaq, and simply run `/home/jcfree/bin/set_up_oks_area.sh <new workarea name>`. Then proceed below with the sentence which begins with "With the packages built,"_
 
 To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). 
 Then you'll want to get your hands on the following repos:
@@ -50,15 +52,46 @@ With the packages built, it's time to run some tests to make sure things are in 
 
 If anything goes wrong during the tests, it will be self-evident. Make a note of what happened and contact John Freeman, `jcfree@fnal.gov`. 
 
-## A Look at OKS Databases: XML-Represented classes and objects
+## A Look at OKS Databases: XML-Represented Classes and Objects
 
-While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to run the following command:
-```
-oks_tutorial simple.schema.xml simple.data.xml
-```
-Just looking at the screen output of this application, you can learn a lot, in particular that the files appear to describe a company made up of people and departments represented as objects. To look at how this is represented, if you open `simple.schema.xml` and scroll past a lot preliminary material you don't need to worry about, you'll see a class called "Department", which consists of an Attribute (the name of the Department) and a Relationship (its staff). The Relationship here refers to the department's Employees, which is a count of Employee instances that can range from "zero" ("one" would have made more sense) to "many" (i.e., as many as you want). Scrolling down a little further, you see the Employee class has a superclass called Person, meaning an Employee contains the Attributes, etc. a Person would have but additionally with an Attribute called Salary and a Relationship called Works At. If we look at `simple.data.xml` you see it describes a department called EP with an employee named Maria and a department called IT which contains Alexander and Michel. Then there are three unaffiliated people, Mick, Peter, and a baby. Given that the baby's Birthday Attribute is set to `20000525`, it's safe to say this data file was designed quite a while ago. 
+While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, which from the base of your workarea is `sourcecode/dal/schema/dal/tutorial.schema.xml`:
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the databases. `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:simple.data.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:simple.data.xml -o` will summarize the objects themselves. Play around with it. 
+### Overview of `tutorial.schema.xml`
+
+Let's start with a description of what `tutorial.schema.xml` contains before we even look at its contents. It describes via three classes needed for a (very) simple DAQ: `ReadoutApplication` for detector readout, and `RCApplication` for the Run Control in charge of `ReadoutApplication` instances, and a third class, `Application`, of which they're both subclasses. Open the file, and *unless you're purely curious, scroll past the lengthy header of the file which you'll never need to understand* until you see the following:
+```
+ <class name="Application" description="A software executable" is-abstract="yes">
+  <attribute name="Name" description="Name of the executable, including full path" type="string" init-value="Unknown" is-not-null="yes"/>
+ </class>
+```
+The `is-abstract` qualifier means that you can't have an object which is concretely of type `Application`, you need to subclass it. However, any class which is a subclass of `Application` will automatically contain a `Name` attribute, which here is intended to be the fully-qualified path of the executable in a running DAQ system. 
+
+Next, we see the class for readout:
+```
+<class name="ReadoutApplication" description="An executable which reads out subdetectors">
+  <superclass name="Application"/>
+  <attribute name="SubDetector" description="An enum to describe what type of subdetector it can read out" type="enum" range="PMT,WireChamber" init-value="WireChamber"/>
+ </class>
+```
+...where you can see that there's an OKS enumerated type, where here there are only two options, basically a photon detector or a TPC. 
+
+Then, there's the run control application:
+```
+<class name="RCApplication" description="An executable which allows users to control datataking">
+  <superclass name="Application"/>
+  <attribute name="Timeout" description="Seconds to wait before giving up on a transition" type="u16" range="1..3600" init-value="20" is-not-null="yes"/>
+  <relationship name="ApplicationsControlled" description="Applications RC is in charge of" class-type="Application" low-cc="one" high-cc="many"/>
+ </class>
+```
+And here, we have two items of interest: 
+* A `Timeout` Attribute representing the max number of seconds before giving up on a transition. This is capped at one hour, and defaults to 20 seconds. 
+* An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
+
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:simple.data.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:simple.data.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+
+### Overview of `tutorial.data.xml`
+
+_To be written here_
 
 Note that as a database, it's possible to read in, modify, and save objects. E.g., you can do this once you've created `simple.schema.xml` and `simple.data.xml` and have entered an interactive Python environment:
 ```
