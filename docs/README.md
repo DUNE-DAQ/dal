@@ -5,7 +5,7 @@
 OKS (Object Kernel Support) is a suite of packages [originally
 written](https://gitlab.cern.ch/atlas-tdaq-software/oks) for the ATLAS
 data acquisition effort. Its features include:
-* The ability to define object types in XML (known as OKS "classes"), off of which C++ and Python code can automatically be generated
+* The ability to define object types in XML (known as OKS "classes"), off of which C++ and Python classes can automatically be generated
 * Support for class Attributes, Relationships, and Methods. Attributes and Relationships are automatically generated; Methods allow developers to add behavior to classes
 * The ability to create instances of classes (known as OKS "objects"), modify them, read them into an XML file serving as a database and retrieve them from the database
 
@@ -18,7 +18,7 @@ this document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-_JCF, Jan-25-2023: this documentation is on a special branch of the dal repo; you should skip the manual setup of the repo below, get onto mu2edaq, and simply run `/home/jcfree/bin/set_up_oks_area.sh <new workarea name>`. Then proceed below with the sentence which begins with "With the packages built,"_
+_JCF, Jan-25-2023: this documentation you're reading is on a special branch of the dal repo; you should skip the manual setup of the repo below, get onto mu2edaq, and simply run `/home/jcfree/bin/set_up_oks_area.sh <new workarea name>`. Then proceed below with the sentence which begins with "With the packages built,"_
 
 To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). 
 Then you'll want to get your hands on the following repos:
@@ -58,13 +58,13 @@ While ATLAS has various database implementations (Oracle-based, etc.), for the D
 
 ### Overview of `tutorial.schema.xml`
 
-Let's start with a description of what `tutorial.schema.xml` contains before we even look at its contents. It describes via three classes needed for a (very) simple DAQ: `ReadoutApplication` for detector readout, and `RCApplication` for the Run Control in charge of `ReadoutApplication` instances, and a third class, `Application`, of which they're both subclasses. Open the file, and *unless you're purely curious, scroll past the lengthy header of the file which you'll never need to understand* until you see the following:
+Let's start with a description of what `tutorial.schema.xml` contains before we even look at its contents. It describes via three classes needed for a (very) simple DAQ: `ReadoutApplication` for detector readout, `RCApplication` for the Run Control in charge of `ReadoutApplication` instances, and a third class, `Application`, of which they're both subclasses. Open the file, and *unless you're purely curious, scroll past the lengthy header which you'll never need to understand* until you see the following:
 ```
  <class name="Application" description="A software executable" is-abstract="yes">
   <attribute name="Name" description="Name of the executable, including full path" type="string" init-value="Unknown" is-not-null="yes"/>
  </class>
 ```
-The `is-abstract` qualifier means that you can't have an object which is concretely of type `Application`, you need to subclass it. However, any class which is a subclass of `Application` will automatically contain a `Name` attribute, which here is intended to be the fully-qualified path of the executable in a running DAQ system. 
+The `is-abstract` qualifier means that you can't have an object which is concretely of type `Application`, you can only have objects of subclasses of `Application`. However, any class which is a subclass of `Application` will automatically contain a `Name` attribute, which here is intended to be the fully-qualified path of the executable in a running DAQ system. 
 
 Next, we see the class for readout:
 ```
@@ -84,10 +84,10 @@ Then, there's the run control application:
  </class>
 ```
 And here, we have two items of interest: 
-* A `Timeout` Attribute representing the max number of seconds before giving up on a transition. This is capped at one hour, and defaults to 20 seconds. 
+* A `Timeout` Attribute representing the max number of seconds before giving up on a transition. Represented by an unsigned 2-byte integer, the max timeout is one hour, and defaults to 20 seconds. 
 * An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:simple.data.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:simple.data.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:tutorial.data.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:tutorial.data.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
 
 ### Overview of `tutorial.data.xml`
 
@@ -99,7 +99,7 @@ tutorial.py
 1. As you can see if you open up `tutorial.py`, a Python module is actually _generated_ off of `tutorial.schema.xml`. If we add Attributes, Relations, etc. to the classes, the Python code will automatically pick them up without any additional Python needing to be written. 
 1. `config_dump -d oksconfig:tutorial.data.xml --list-objects --print-referenced-by` provides a nice summary of `tutorial.data.xml`'s contents
 
-We can also see what `tutotial.py` made by opening up `tutorial.data.xml`. Again, please scroll past the extensive header. What we see is two types of readout application, one ID'd as `PhotonReadout` and the other ID'd as `TPCReadout`; these names, of course, are chosen to reflect the choice of the `SubDetector` enum. Then we also see an instance of `RCApplication` where the `ApplicationsControlled` relationship establishes that run control is in charge of the two readout applications:
+We can also see what `tutorial.py` created by opening up `tutorial.data.xml`. Again, please scroll past the extensive header. What we see is two types of readout application, one ID'd as `PhotonReadout` and the other ID'd as `TPCReadout`; these names, of course, are chosen to reflect the choice of the `SubDetector` enum. Then we also see an instance of `RCApplication` where the `ApplicationsControlled` relationship establishes that run control is in charge of the two readout applications:
 ```
 <obj class="RCApplication" id="DummyRC">
  <attr name="Name" type="string" val="/full/pathname/of/RC/executable"/>
@@ -133,10 +133,12 @@ db.commit()
 ```
 If we exit out of Python and look at `tutorial.data.xml`, we see the timeout is now 60 rather than 20. And if we read the data file back in, this update will be reflected. 
 
+You're encouraged to experiment yourself with the objects, either interactively or via edits to `sourcecode/dal/scripts/tutorial.py`; make sure to run `dbt-build` in the case of the latter. 
+
 
 ## A Realistic Example
 
-The `simple.schema.xml` file and `simple.data.xml` files created by `oks_tutorial` are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we need to go to the `dal` repo: `sourcecode/dal/schema/dal/core.schema.xml`. This file is quite large, and describes concepts which are actually used on DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in dal's `CMakeLists.txt` file you see the following:
+The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we need to go to the `dal` repo: `sourcecode/dal/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in dal's `CMakeLists.txt` file you see the following:
 ```
 daq_generate_dal(core.schema.xml
   NAMESPACE dunedaq::dal
@@ -156,6 +158,17 @@ historical reasons and will be removed in the future:
 export TDAQ_DB_DATA=DUMMY_TDAQ_ENV_VALUE ; export TDAQ_DB_PATH=DUMMY_TDAQ_ENV_VALUE ; export TDAQ_IPC_INIT_REF=DUMMY_TDAQ_ENV_VALUE
 dal_dump_app_config -d oksconfig:install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
+...where `dal_testing.data.xml` is written specifically for testing dal's functionality. The output will look like the following:
+```
+Got 2 applications:
+====================================================================================================================================================================
+| num | Application Object                             | Host                      | Segment                        | Segment unique id | Application unique id    |
+====================================================================================================================================================================
+|   1 | ToyRunControlApplication@RunControlApplication | toyhost.fnal.gov@Computer | ToyOnlineSegment@OnlineSegment | ToyOnlineSegment  | ToyRunControlApplication |
+|   2 | SomeApp@CustomLifetimeApplication              | toyhost.fnal.gov@Computer | ToyOnlineSegment@OnlineSegment | ToyOnlineSegment  | SomeApp                  |
+====================================================================================================================================================================
+
+Note that in the output, `Application Object`, `Host` and `Segment` are printed in the format `<object name>@<class name>` where the object is an instance of a class. Note also that `RunControlApplication` is an actual ATLAS class and not to be confused with the much simpler `RCApplication` from the tutorial above. 
 
 Likewise, you can see a Python script which serves the same function,
 but via calling Python bindings to C++ functions. We of course want
