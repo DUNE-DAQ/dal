@@ -12,15 +12,20 @@ tutorial = config.dal.module('tutorial', schemafile)
 db = config.Configuration("oksconfig")
 db.create_db(datafile, [schemafile])
 
-readout_app = tutorial.ReadoutApplication("DummyReadout", 
+readout_app1 = tutorial.ReadoutApplication("PhotonReadout", 
                                           Name="/full/pathname/of/readout/executable",
                                           SubDetector="PMT")
 
+readout_app2 = tutorial.ReadoutApplication("TPCReadout", 
+                                          Name="/full/pathname/of/readout/executable",
+                                          SubDetector="WireChamber")
+
 runcontrol_app = tutorial.RCApplication("DummyRC",
                                                 Name="/full/pathname/of/RC/executable",
-                                                ApplicationsControlled=[readout_app])
+                                                ApplicationsControlled=[readout_app1, readout_app2])
 
-db.update_dal(readout_app)
+db.update_dal(readout_app1)
+db.update_dal(readout_app2)
 db.update_dal(runcontrol_app)
 db.commit()
 
