@@ -91,29 +91,48 @@ OKS also provides tools which parse the XML and provide summaries of the content
 
 ### Overview of `tutorial.data.xml`
 
-_To be written here_
+In this section, we're going to _make_ a data file using the classes from `tutorial.schema.xml`. It's extremely simple, just run this script:
+```
+tutorial.py 
+```
+...and it will produce `tutorial.data.xml`. We'll look at it in a moment, but two things to note first:
+1. As you can see if you open up `tutorial.py`, a Python module is actually _generated_ off of `tutorial.schema.xml`. If we add Attributes, Relations, etc. to the classes, the Python code will automatically pick them up without any additional Python needing to be written. 
+1. `config_dump -d oksconfig:tutorial.data.xml --list-objects --print-referenced-by` provides a nice summary of `tutorial.data.xml`'s contents
 
-Note that as a database, it's possible to read in, modify, and save objects. E.g., you can do this once you've created `simple.schema.xml` and `simple.data.xml` and have entered an interactive Python environment:
+We can also see what `tutotial.py` made by opening up `tutorial.data.xml`. Again, please scroll past the extensive header. What we see is two types of readout application, one ID'd as `PhotonReadout` and the other ID'd as `TPCReadout`; these names, of course, are chosen to reflect the choice of the `SubDetector` enum. Then we also see an instance of `RCApplication` where the `ApplicationsControlled` relationship establishes that run control is in charge of the two readout applications:
+```
+<obj class="RCApplication" id="DummyRC">
+ <attr name="Name" type="string" val="/full/pathname/of/RC/executable"/>
+ <attr name="Timeout" type="u16" val="20"/>
+ <rel name="ApplicationsControlled">
+  <ref class="ReadoutApplication" id="PhotonReadout"/>
+  <ref class="ReadoutApplication" id="TPCReadout"/>
+ </rel>
+</obj>
+```
+The run control timeout is set to its default of 20 seconds. Say we want to change this, and save the result. For such a small data file it would be easy to manually edit, but if you think of a full-blown DAQ system you'll want to automate a lot of things. Fortunately we can alter the value via Python. Go into an interactive Python environment and do the following:
 ```
 import config
-db = config.Configuration('oksconfig:simple.data.xml')
-mick = db.get_dal('Person', 'mick')
+db = config.Configuration('oksconfig:tutorial.data.xml')
+rc = db.get_dal("RCApplication", "DummyRC")  # i.e., first argument is name of the class, the second is the name of the object
+print(rc.Timeout)
 ```
-and you can see that Mick's family situation is that he's unmarried:
+where in the last command, you see the timeout of 20 seconds.
+
+For fun, let's try to set the timeout to an illegal value (i.e., a timeout greater than an hour):
 ```
-print(mick.Family_Situation)   # Will print "Single"
+rc.Timeout = 7200 # 2 hrs before run control gives up!
 ```
-Let's get Mick a spouse:
+...you'll get a `ValueError`. 
+
+Let's set it to a less-ridiculous 60 seconds, and save the result:
 ```
-mick.Family_Situation = "Married"
-db.update_dal(mick)
+rc.Timeout = 60
+db.update_dal(rc)
 db.commit()
 ```
-...and now, if you open up simple.data.xml and look up Mick, you'll see that he is, in fact, now married. Note that since `Family_Situation` is an enumeration, you can't give it an illegal value. See what happens if you do this:
-```
-mick.Family_Situation = "This is not an option"
-```
-Spoiler alert: you'll get an error. 
+If we exit out of Python and look at `tutorial.data.xml`, we see the timeout is now 60 rather than 20. And if we read the data file back in, this update will be reflected. 
+
 
 ## A Realistic Example
 
