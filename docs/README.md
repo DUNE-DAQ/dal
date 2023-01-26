@@ -152,10 +152,8 @@ daq_generate_dal(core.schema.xml
 ...where the things most important to notice at this time are that `core.schema.xml` gets fed into `daq_generate_dal` which proceeds to generate code off of the classes defined in `core.schema.xml`, storing the generated files in the `dal_cpp_srcs` variable and using those files as part of the build of the package's main library. You'll notice also that the classes in `core.schema.xml` contain not only Attributes and Relationships as in the tutorial example above, but also Methods. If you look at the `Partition` class (l. 415) and scroll down a bit, you'll see a `get_all_applications` Method declared, along with its accompanying C++ declaration (as well as Java declaration, but we ignore this). The implementation of `get_all_applications` needs to be done manually, however, and is accomplished on l. 1301 of `src/algorithms.cpp`. If you scroll to the top of that file you'll see a `#include "dal/Partition.hpp"` line. In the actual dal repo, there's no such include file. However, assuming you followed the build instructions at the top of this document, you'll find it in the `build/` area of your work area, as the header was in fact generated. 
 
 To see the `get_all_applications` function in action, you can do the
-following. Note the dummy environment variable settings are needed for
-historical reasons and will be removed in the future:
+following. 
 ```
-export TDAQ_DB_DATA=DUMMY_TDAQ_ENV_VALUE ; export TDAQ_DB_PATH=DUMMY_TDAQ_ENV_VALUE ; export TDAQ_IPC_INIT_REF=DUMMY_TDAQ_ENV_VALUE
 dal_dump_app_config -d oksconfig:install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 ...where `dal_testing.data.xml` is written specifically for testing dal's functionality. The output will look like the following:
@@ -167,6 +165,7 @@ Got 2 applications:
 |   1 | ToyRunControlApplication@RunControlApplication | toyhost.fnal.gov@Computer | ToyOnlineSegment@OnlineSegment | ToyOnlineSegment  | ToyRunControlApplication |
 |   2 | SomeApp@CustomLifetimeApplication              | toyhost.fnal.gov@Computer | ToyOnlineSegment@OnlineSegment | ToyOnlineSegment  | SomeApp                  |
 ====================================================================================================================================================================
+```
 
 Note that in the output, `Application Object`, `Host` and `Segment` are printed in the format `<object name>@<class name>` where the object is an instance of a class. Note also that `RunControlApplication` is an actual ATLAS class and not to be confused with the much simpler `RCApplication` from the tutorial above. 
 
