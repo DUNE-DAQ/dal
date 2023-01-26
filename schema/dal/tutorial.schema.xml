@@ -82,10 +82,8 @@
 
 <info name="" type="" num-of-items="3" oks-format="schema" oks-version="862f2957270" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20230123T223700" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20230123T223700"/> 
 
- <class name="RunControlApplication" description="An executable which allows users to control datataking">
-  <superclass name="Application"/>
-  <attribute name="Timeout" description="Seconds to wait before giving up on a transition" type="u16" range="1..3600" init-value="20" is-not-null="yes"/> 
-  <relationship name="ApplicationsControlled" description="Applications RC is in charge of" class-type="Application" low-cc="one" high-cc="many"/> 
+ <class name="Application" description="A software executable" is-abstract="yes">
+  <attribute name="Name" description="Name of the executable, including full path" type="string" init-value="Unknown" is-not-null="yes"/>
  </class>
 
  <class name="ReadoutApplication" description="An executable which reads out subdetectors">
@@ -93,8 +91,10 @@
   <attribute name="SubDetector" description="An enum to describe what type of subdetector it can read out" type="enum" range="PMT,WireChamber" init-value="WireChamber"/>
  </class>
 
- <class name="Application" description="A software executable" is-abstract="yes">
-  <attribute name="Name" description="Name of the executable, including full path" type="string" init-value="Unknown" is-not-null="yes"/>
+ <class name="RCApplication" description="An executable which allows users to control datataking">
+  <superclass name="Application"/>
+  <attribute name="Timeout" description="Seconds to wait before giving up on a transition" type="u16" range="1..3600" init-value="20" is-not-null="yes"/> 
+  <relationship name="ApplicationsControlled" description="Applications RC is in charge of" class-type="Application" low-cc="one" high-cc="many"/> 
  </class>
 
 </oks-schema>

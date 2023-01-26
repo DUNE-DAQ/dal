@@ -16,7 +16,7 @@ readout_app = tutorial.ReadoutApplication("DummyReadout",
                                           Name="/full/pathname/of/readout/executable",
                                           SubDetector="PMT")
 
-runcontrol_app = tutorial.RunControlApplication("DummyRC",
+runcontrol_app = tutorial.RCApplication("DummyRC",
                                                 Name="/full/pathname/of/RC/executable",
                                                 ApplicationsControlled=[readout_app])
 
