@@ -35,12 +35,12 @@ namespace py = pybind11;
 
 namespace {
 
-  std::string print_app(const daq::core::BaseApplication* app) {
+  std::string print_app(const dunedaq::dal::BaseApplication* app) {
     check_ptrs({app});
     return app->UID() + "@" + app->class_name() + " on " + app->get_host()->UID() + "@" + app->get_host()->class_name();
   }
 
-  std::string print_segment(const daq::core::Segment* seg)
+  std::string print_segment(const dunedaq::dal::Segment* seg)
   {
     check_ptrs({seg});
 
@@ -89,7 +89,7 @@ namespace {
     return out;
   }
   
-  std::string print_segment_timeout(const daq::core::Segment* seg) {
+  std::string print_segment_timeout(const dunedaq::dal::Segment* seg) {
     check_ptrs({seg});
 
     int action_timeout, shortaction_timeout;
@@ -111,12 +111,12 @@ namespace dunedaq::dal::python {
 
   std::string get_parents_test(const Configuration& db, const::std::string partition_id, const std::string& component_id ) {
     
-    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id.c_str());
+    const dunedaq::dal::Component* component_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Component>(component_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id.c_str());
 
     check_ptrs( {component_ptr, partition_ptr});
 
-    std::list< std::vector<const daq::core::Component*>> parents;
+    std::list< std::vector<const dunedaq::dal::Component*>> parents;
     component_ptr->get_parents(*partition_ptr, parents);
 
     std::string line;
@@ -133,11 +133,11 @@ namespace dunedaq::dal::python {
   }
 
   std::string get_log_directory_test(const Configuration& db, const::std::string partition_id) {
-    return const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id)->get_log_directory();
+    return const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id)->get_log_directory();
   }
 
   std::string get_segment_test(const Configuration& db, const::std::string partition_id, const std::string& seg_name) {
-    auto partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    auto partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
     check_ptrs({partition_ptr});
     
     return print_segment(partition_ptr->get_segment(seg_name));
@@ -145,8 +145,8 @@ namespace dunedaq::dal::python {
 
   std::string get_value_test(const Configuration& db, const std::string& variable_id, const std::string& tag_id) {
 
-    const daq::core::Variable *variable_ptr = const_cast<Configuration&>(db).get<daq::core::Variable>(variable_id);
-    const daq::core::Tag * tag_ptr = const_cast<Configuration&>(db).get<daq::core::Tag>(tag_id);
+    const dunedaq::dal::Variable *variable_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Variable>(variable_id);
+    const dunedaq::dal::Tag * tag_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Tag>(tag_id);
 
     check_ptrs({variable_ptr, tag_ptr});
 
@@ -154,8 +154,8 @@ namespace dunedaq::dal::python {
   }
 
   bool disabled_test(const Configuration& db, const::std::string partition_id, const std::string& component_id) {
-    const daq::core::Component* component_ptr = const_cast<Configuration&>(db).get<daq::core::Component>(component_id);
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    const dunedaq::dal::Component* component_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Component>(component_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
 
     check_ptrs({component_ptr});
     check_ptrs({partition_ptr});
@@ -164,10 +164,10 @@ namespace dunedaq::dal::python {
   }
 
   std::string get_timeouts_test(const Configuration& db, const::std::string partition_id, const std::string& segment_id) {
-    const daq::core::Partition* partition_ptr = const_cast<Configuration&>(db).get<daq::core::Partition>(partition_id);
+    const dunedaq::dal::Partition* partition_ptr = const_cast<Configuration&>(db).get<dunedaq::dal::Partition>(partition_id);
     check_ptrs({partition_ptr});
 
-    const daq::core::Segment* segment_ptr = partition_ptr->get_segment(segment_id);
+    const dunedaq::dal::Segment* segment_ptr = partition_ptr->get_segment(segment_id);
     check_ptrs({segment_ptr});
 
     return print_segment_timeout(segment_ptr);

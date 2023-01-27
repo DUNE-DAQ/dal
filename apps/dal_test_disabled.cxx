@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void
-run_test(const daq::core::Component * obj, const daq::core::Partition * partition)
+run_test(const dunedaq::dal::Component * obj, const dunedaq::dal::Partition * partition)
 {
   TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on object " << obj ;
 
@@ -33,9 +33,9 @@ run_test(const daq::core::Component * obj, const daq::core::Partition * partitio
 }
 
 static void
-test_application(const daq::core::BaseApplication * a, const daq::core::Partition * partition)
+test_application(const dunedaq::dal::BaseApplication * a, const dunedaq::dal::Partition * partition)
 {
-  if (const daq::core::Component * c = a->cast<daq::core::Component>())
+  if (const dunedaq::dal::Component * c = a->cast<dunedaq::dal::Component>())
     {
       TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on resource application " << a ;
 
@@ -45,7 +45,7 @@ test_application(const daq::core::BaseApplication * a, const daq::core::Partitio
 
           if (a->get_base_app() != a)
             {
-              bool result2 = a->get_base_app()->cast<daq::core::Component>()->disabled(*partition, true);
+              bool result2 = a->get_base_app()->cast<dunedaq::dal::Component>()->disabled(*partition, true);
 
               if (result != result2)
                 {
@@ -64,7 +64,7 @@ test_application(const daq::core::BaseApplication * a, const daq::core::Partitio
 }
 
 static void
-test_segment(const daq::core::Segment * s, const daq::core::Partition * partition)
+test_segment(const dunedaq::dal::Segment * s, const dunedaq::dal::Partition * partition)
 {
 
   TLOG_DEBUG(1) <<  "call disabled(" << partition << ") on segment " << s ;
@@ -144,13 +144,13 @@ main(int argc, char *argv[])
         {
           ::Configuration db(data);
 
-          const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+          const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
 
           if(!partition) return 1;
 
-          db.register_converter(new daq::core::SubstituteVariables(*partition));
+          db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
 
-          std::vector<const daq::core::Component *> objs;
+          std::vector<const dunedaq::dal::Component *> objs;
 
           db.get(objs);
 
@@ -161,8 +161,8 @@ main(int argc, char *argv[])
           for (const auto& i : objs)
             run_test(i, partition);
 
-          const daq::core::Segment* rootSeg = nullptr;
-          std::vector<const daq::core::BaseApplication *> apps;
+          const dunedaq::dal::Segment* rootSeg = nullptr;
+          std::vector<const dunedaq::dal::BaseApplication *> apps;
 
           if (test_segments || test_applications)
             rootSeg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
@@ -185,14 +185,14 @@ main(int argc, char *argv[])
             {
               std::cout << "There are " << disabled_list.size() << " objects disabled and there are " << enabled_list.size() << " objects enabled by user.\nApply user configuration and repeat the test.\n";
 
-              std::set<const daq::core::Component *> user_disabled;
-              std::set<const daq::core::Component *> user_enabled;
+              std::set<const dunedaq::dal::Component *> user_disabled;
+              std::set<const dunedaq::dal::Component *> user_enabled;
 
               for (size_t i=0; i < disabled_list.size(); ++i)
                 {
                   try
                     {
-                      if(const daq::core::Component * c = db.get<daq::core::Component>(disabled_list[i]))
+                      if(const dunedaq::dal::Component * c = db.get<dunedaq::dal::Component>(disabled_list[i]))
                         {
                           user_disabled.insert(c);
                         }
@@ -207,7 +207,7 @@ main(int argc, char *argv[])
                 {
                   try
                     {
-                      if(const daq::core::Component * c = db.get<daq::core::Component>(enabled_list[i]))
+                      if(const dunedaq::dal::Component * c = db.get<dunedaq::dal::Component>(enabled_list[i]))
                         {
                           user_enabled.insert(c);
                         }

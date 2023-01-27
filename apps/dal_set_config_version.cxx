@@ -44,7 +44,7 @@ main(int argc, char **argv)
 
   try
     {
-      ::daq::core::set_config_version(partition, version, reload);
+      ::dunedaq::dal::set_config_version(partition, version, reload);
     }
   catch (const dunedaq::config::NotFound & ex)
     {

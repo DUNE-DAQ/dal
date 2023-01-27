@@ -8,10 +8,7 @@
 #include "dal/app-config.hpp"
 
 
-namespace daq
-{
-  namespace core
-  {
+namespace dunedaq::dal {
 
     // forward declarations
 
@@ -23,7 +20,7 @@ namespace daq
      * \brief The class describes segment configuration parameters
      *
      *  The class provides methods to get description of nested segments and applications.
-     *  An object of SegConfig class should be created by daq::core::Partition::get_segment() algorithm.
+     *  An object of SegConfig class should be created by dunedaq::dal::Partition::get_segment() algorithm.
      *  Above algorithm allows to limit depth of nested segments description (e.g. for efficiency reasons)
      *  using optional \e depth parameter. If depth parameter is set to 0, then get description of this
      *  segment only (no description of nested segments is provided even if there are such segments in database).
@@ -59,7 +56,7 @@ namespace daq
      *  Use get_all_applications() method to get description of applications in given and chosen nested segments (as defined by depth parameter).
      *  It is possible to provide precise selection criteria by application class types, names of nested segments and hosts.
      *  The get_all_applications() method invoked on online segment is used to get all applications of partition (see
-     *  daq::core::Partition::get_all_applications() algorithm).
+     *  dunedaq::dal::Partition::get_all_applications() algorithm).
      *
      *  \par Segment Hosts
      *
@@ -188,13 +185,13 @@ namespace daq
 
     private:
 
-      const daq::core::Partition * m_partition;
-      const daq::core::Segment * m_base_segment;
+      const dunedaq::dal::Partition * m_partition;
+      const dunedaq::dal::Segment * m_base_segment;
       const BaseApplication * m_controller;
       std::vector<const BaseApplication *> m_infrastructure;
       std::vector<const BaseApplication *> m_applications;
       std::vector<const Segment *> m_nested_segments;
-      std::vector<const daq::core::Computer *> m_hosts;
+      std::vector<const dunedaq::dal::Computer *> m_hosts;
       bool m_is_disabled;
       bool m_is_templated;
 
@@ -213,8 +210,6 @@ namespace daq
       }
 
     };
-
-  }
-}
+} // namespace dunedaq::dal
 
 #endif

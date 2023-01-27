@@ -74,7 +74,7 @@ get_configuration(Configuration& db, const std::string& partition_name, const st
   try {
       // find partition || exit, if there is no partition object
 
-    const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+    const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
     if(!partition) return;
 
     std::ostringstream fname;
@@ -84,13 +84,13 @@ get_configuration(Configuration& db, const std::string& partition_name, const st
       // register variables converter
 
     if(subst) {
-      db.register_converter(new daq::core::SubstituteVariables(*partition));
+      db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
     }
 
 
       // get application object (a normal application or template application)
 
-    const daq::core::BaseApplication * b_app = (object_id.empty() ? 0 : db.get<daq::core::BaseApplication>(object_id));
+    const dunedaq::dal::BaseApplication * b_app = (object_id.empty() ? 0 : db.get<dunedaq::dal::BaseApplication>(object_id));
 
     if(!object_id.empty() && !b_app) {
       f << "ERROR: cannot get object \'" << object_id << "\' of class \'BaseApplication\'\n";
@@ -106,13 +106,13 @@ get_configuration(Configuration& db, const std::string& partition_name, const st
       segments.insert(segment_id);
     }
 
-    const daq::core::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
-    std::vector<const daq::core::BaseApplication *> objects = root_seg->get_all_applications(nullptr, (!segments.empty() ? &segments : nullptr), nullptr);
+    const dunedaq::dal::Segment * root_seg = partition->get_segment(partition->get_OnlineInfrastructure()->UID());
+    std::vector<const dunedaq::dal::BaseApplication *> objects = root_seg->get_all_applications(nullptr, (!segments.empty() ? &segments : nullptr), nullptr);
 
     unsigned int count = 0;
 
     for (const auto& i : objects) {
-      if(b_app && (i->get_base_app()->cast<daq::core::BaseApplication>() != b_app)) continue;
+      if(b_app && (i->get_base_app()->cast<dunedaq::dal::BaseApplication>() != b_app)) continue;
       if(!app_name.empty() && app_name != i->UID()) continue;
 
       count++;
@@ -139,7 +139,7 @@ get_configuration(Configuration& db, const std::string& partition_name, const st
 
         print_info(file_names, environment, f);
       }
-      catch ( daq::core::AlgorithmError & ex ) {
+      catch ( dunedaq::dal::AlgorithmError & ex ) {
         ers::error( ex ) ;  // report a problem
       }
     }

@@ -45,7 +45,7 @@
 
 
 static void
-printHost(const daq::core::Computer * host, bool print_rl_cmd, bool print_tag)
+printHost(const dunedaq::dal::Computer * host, bool print_rl_cmd, bool print_tag)
 {
   std::cout << host->UID();
 
@@ -167,17 +167,17 @@ main(int argc, char **argv)
     {
       Configuration conf(data);
 
-      const daq::core::Partition * p = daq::core::get_partition(conf, partition);
+      const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(conf, partition);
 
       if(!p)
         return 1;
 
-      conf.register_converter(new daq::core::SubstituteVariables(*p));
+      conf.register_converter(new dunedaq::dal::SubstituteVariables(*p));
 
       // print all hosts defined by the configuration
       if (print_all)
         {
-          std::vector<const daq::core::Computer*> hosts;
+          std::vector<const dunedaq::dal::Computer*> hosts;
           conf.get(hosts);
 
           for (const auto& i : hosts)
@@ -188,12 +188,12 @@ main(int argc, char **argv)
 
           // remember visited hosts
           std::string appName(application);
-          std::set<const daq::core::Computer *, std::less<const daq::core::Computer *> > hosts;
+          std::set<const dunedaq::dal::Computer *, std::less<const dunedaq::dal::Computer *> > hosts;
 
           // iterate over the list of applications to retrieve host names and add them to "hosts"
           for(auto & i : p->get_all_applications())
             {
-              const daq::core::BaseApplication * a = i->get_base_app();
+              const dunedaq::dal::BaseApplication * a = i->get_base_app();
 
  	      // search only for one specific application
 	      if (!appName.empty() && (i->UID() != appName))
@@ -201,31 +201,31 @@ main(int argc, char **argv)
 
               // ignore non-restartable applications if required
               if(
-                ignore_non_restartable && a->get_IfExitsUnexpectedly() != daq::core::BaseApplication::IfExitsUnexpectedly::Restart &&
-                a->get_IfFailsToStart() != daq::core::BaseApplication::IfFailsToStart::Restart
+                ignore_non_restartable && a->get_IfExitsUnexpectedly() != dunedaq::dal::BaseApplication::IfExitsUnexpectedly::Restart &&
+                a->get_IfFailsToStart() != dunedaq::dal::BaseApplication::IfFailsToStart::Restart
               ) continue;
 
-              if(const daq::core::CustomLifetimeApplicationBase * ca = a->cast<daq::core::CustomLifetimeApplicationBase>())
+              if(const dunedaq::dal::CustomLifetimeApplicationBase * ca = a->cast<dunedaq::dal::CustomLifetimeApplicationBase>())
                 {
                   // ignore started at certain moment if required
                   if(
-                    (ignore_started_at_boot && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::Boot_Shutdown)       ||
-                    (ignore_started_at_sor  && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::SOR_EOR)             ||
-                    (ignore_started_at_eor  && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::EOR_SOR)             ||
-                    (ignore_started_by_user && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::UserDefined_Shutdown)
+                    (ignore_started_at_boot && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::Boot_Shutdown)       ||
+                    (ignore_started_at_sor  && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::SOR_EOR)             ||
+                    (ignore_started_at_eor  && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::EOR_SOR)             ||
+                    (ignore_started_by_user && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::UserDefined_Shutdown)
                   ) continue;
 
 
                   // ignore stopped at certain moment if required
                   if(
-                    (ignore_stopped_at_sor  && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::EOR_SOR)             ||
-                    (ignore_stopped_at_eor  && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::SOR_EOR)             ||
-                    (ignore_stopped_at_shut && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::Boot_Shutdown)       ||
-                    (ignore_stopped_by_user && ca->get_Lifetime() == daq::core::CustomLifetimeApplicationBase::Lifetime::UserDefined_Shutdown)
+                    (ignore_stopped_at_sor  && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::EOR_SOR)             ||
+                    (ignore_stopped_at_eor  && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::SOR_EOR)             ||
+                    (ignore_stopped_at_shut && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::Boot_Shutdown)       ||
+                    (ignore_stopped_by_user && ca->get_Lifetime() == dunedaq::dal::CustomLifetimeApplicationBase::Lifetime::UserDefined_Shutdown)
                   ) continue;
                 }
 
-              const daq::core::Computer * host = i->get_host();
+              const dunedaq::dal::Computer * host = i->get_host();
 
               if (hosts.find(host) == hosts.end())
                 {

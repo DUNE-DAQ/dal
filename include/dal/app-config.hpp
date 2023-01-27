@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace daq {
-  namespace core {
+namespace dunedaq::dal {
 
       // forward declarations
 
@@ -38,7 +37,7 @@ namespace daq {
      *  - use method get_seg_id() to get segment id (is different from segment configuration object ID for template segments)
      *
      *  An object of AppConfig class may only be created by the SegConfig::get_all_applications() and
-     *  the daq::core::Partition::get_all_applications() algorithms. A user should not create an object of AppConfig class
+     *  the dunedaq::dal::Partition::get_all_applications() algorithms. A user should not create an object of AppConfig class
      *  (constructor remains public by efficiency reasons).
      **/
 
@@ -54,17 +53,17 @@ namespace daq {
        *  The constructor may only used by the SegConfig::get_all_applications() algorithm to create normal application.
        *  It cannot be made truly private by efficiency reasons.
        **/
-      AppConfig(const BaseApplication * app, const Computer * host, const daq::core::Segment * seg);
+      AppConfig(const BaseApplication * app, const Computer * host, const dunedaq::dal::Segment * seg);
 
       /**
        *  The constructor may only used by the SegConfig::get_all_applications() algorithm to create templated application.
        *  It cannot be made truly private by efficiency reasons.
        **/
-      AppConfig(const BaseApplication * app, const Computer * host, const daq::core::Segment * seg, BackupHostFactory& factory);
+      AppConfig(const BaseApplication * app, const Computer * host, const dunedaq::dal::Segment * seg, BackupHostFactory& factory);
 
       /**
        * Get base application object used to configure the application.
-       * \throw Throw daq::core::NotInitedObject if the object was not initialized and cannot be used.
+       * \throw Throw dunedaq::dal::NotInitedObject if the object was not initialized and cannot be used.
        */
       const BaseApplication *
       get_base_app() const
@@ -74,7 +73,7 @@ namespace daq {
 
       /**
        * Get the host where the application runs on.
-       * \throw Throw daq::core::NotInitedObject if the object was not initialized and cannot be used.
+       * \throw Throw dunedaq::dal::NotInitedObject if the object was not initialized and cannot be used.
        */
       const Computer *
       get_host() const
@@ -84,7 +83,7 @@ namespace daq {
 
       /**
        * Get segment that the application belongs.
-       * \throw Throw daq::core::NotInitedObject if the object was not initialized and cannot be used.
+       * \throw Throw dunedaq::dal::NotInitedObject if the object was not initialized and cannot be used.
        */
       const Segment *
       get_segment() const
@@ -119,7 +118,7 @@ namespace daq {
       const Computer * m_host;
       const Segment * m_segment;
       bool m_is_templated;
-      std::vector<const daq::core::Computer *> m_template_backup_hosts;
+      std::vector<const dunedaq::dal::Computer *> m_template_backup_hosts;
 
       void
       clear()
@@ -137,8 +136,6 @@ namespace daq {
       }
 
     };
-
-  }
-}
+} // namespace dunedaq::dal
 
 #endif

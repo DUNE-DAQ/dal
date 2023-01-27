@@ -99,7 +99,7 @@ const int paths_to_shared_libraries_default_size(32);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef std::map<std::string, std::string> Emap;
-typedef std::vector<const daq::core::Parameter *> EnvironmentVars;
+typedef std::vector<const dunedaq::dal::Parameter *> EnvironmentVars;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -117,22 +117,22 @@ inline void append2str(std::string& s, unsigned short i)
 
   // The functions to recursively find first enabled host
 
-static const daq::core::Computer *
-find_enabled(const std::vector<const daq::core::ComputerBase *>& hosts);
+static const dunedaq::dal::Computer *
+find_enabled(const std::vector<const dunedaq::dal::ComputerBase *>& hosts);
 
-static const daq::core::Computer *
-find_enabled(const daq::core::ComputerBase * cb)
+static const dunedaq::dal::Computer *
+find_enabled(const dunedaq::dal::ComputerBase * cb)
 {
-  if (const daq::core::Computer * c = cb->cast<daq::core::Computer>())
+  if (const dunedaq::dal::Computer * c = cb->cast<dunedaq::dal::Computer>())
     {
       if (c->get_State())
         return c;
     }
-  else if (const daq::core::ComputerSet * cs = cb->cast<daq::core::ComputerSet>())
+  else if (const dunedaq::dal::ComputerSet * cs = cb->cast<dunedaq::dal::ComputerSet>())
     {
       for (const auto & i : cs->get_Contains())
         {
-          if (const daq::core::Computer * c = find_enabled(i))
+          if (const dunedaq::dal::Computer * c = find_enabled(i))
             return c;
         }
     }
@@ -140,11 +140,11 @@ find_enabled(const daq::core::ComputerBase * cb)
   return nullptr;
 }
 
-static const daq::core::Computer *
-find_enabled(const std::vector<const daq::core::ComputerBase *>& hosts)
+static const dunedaq::dal::Computer *
+find_enabled(const std::vector<const dunedaq::dal::ComputerBase *>& hosts)
 {
   for (const auto & i : hosts)
-    if(const daq::core::Computer * c = find_enabled(i))
+    if(const dunedaq::dal::Computer * c = find_enabled(i))
       return c;
 
   return nullptr;
@@ -155,13 +155,13 @@ find_enabled(const std::vector<const daq::core::ComputerBase *>& hosts)
   // The functions to recursively build vector of computers from computer base object(s)
 
 static void
-add_computers(std::vector<const daq::core::Computer *>& v, const daq::core::ComputerBase * cb)
+add_computers(std::vector<const dunedaq::dal::Computer *>& v, const dunedaq::dal::ComputerBase * cb)
 {
-  if (const daq::core::Computer * cp = cb->cast<daq::core::Computer>())
+  if (const dunedaq::dal::Computer * cp = cb->cast<dunedaq::dal::Computer>())
     {
       v.push_back(cp);
     }
-  else if (const daq::core::ComputerSet * cs = cb->cast<daq::core::ComputerSet>())
+  else if (const dunedaq::dal::ComputerSet * cs = cb->cast<dunedaq::dal::ComputerSet>())
     {
       for (const auto & i : cs->get_Contains())
         add_computers(v, i);
@@ -169,7 +169,7 @@ add_computers(std::vector<const daq::core::Computer *>& v, const daq::core::Comp
 }
 
 static void
-add_computers(std::vector<const daq::core::Computer *>& v, const std::vector<const daq::core::ComputerBase *>& hosts)
+add_computers(std::vector<const dunedaq::dal::Computer *>& v, const std::vector<const dunedaq::dal::ComputerBase *>& hosts)
 {
   for (const auto & i : hosts)
     add_computers(v, i);
@@ -178,7 +178,7 @@ add_computers(std::vector<const daq::core::Computer *>& v, const std::vector<con
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const std::string&
-daq::core::Variable::get_value(const Tag * tag) const
+dunedaq::dal::Variable::get_value(const Tag * tag) const
 {
   if (tag == nullptr)
     {
@@ -186,7 +186,7 @@ daq::core::Variable::get_value(const Tag * tag) const
         {
           std::ostringstream text;
           text << "the algorithm was invoked on multi-value " << this << " object (file \'" << p_obj.contained_in() << "\') without explicit Tag object";
-          throw daq::core::BadVariableUsage(ERS_HERE, text.str());
+          throw dunedaq::dal::BadVariableUsage(ERS_HERE, text.str());
         }
     }
   else
@@ -206,7 +206,7 @@ daq::core::Variable::get_value(const Tag * tag) const
    */
 
 static void
-add_env_var(Emap& dict, const daq::core::Variable * var, const daq::core::Tag * tag)
+add_env_var(Emap& dict, const dunedaq::dal::Variable * var, const dunedaq::dal::Tag * tag)
 {
   dict.emplace(var->get_Name(), var->get_value(tag));
 }
@@ -217,12 +217,12 @@ add_env_var(Emap& dict, const daq::core::Variable * var, const daq::core::Tag * 
    */
 
 static void
-add_env_vars(Emap& dict, const EnvironmentVars& envs, const daq::core::Tag * tag)
+add_env_vars(Emap& dict, const EnvironmentVars& envs, const dunedaq::dal::Tag * tag)
 {
   for (const auto & i : envs)
-    if (const daq::core::Variable * var = i->cast<daq::core::Variable>())
+    if (const dunedaq::dal::Variable * var = i->cast<dunedaq::dal::Variable>())
       add_env_var(dict, var, tag);
-    else if (const daq::core::VariableSet * vars = i->cast<daq::core::VariableSet>())
+    else if (const dunedaq::dal::VariableSet * vars = i->cast<dunedaq::dal::VariableSet>())
       add_env_vars(dict, vars->get_Contains(), tag);
 }
 
@@ -237,7 +237,7 @@ add_env_var(Emap& dict, const std::string& name, const std::string& value)
   static const std::string beg_str("$(");
   static const std::string end_str(")");
 
-  std::string s = daq::core::substitute_variables(value, 0, beg_str, end_str);
+  std::string s = dunedaq::dal::substitute_variables(value, 0, beg_str, end_str);
   if( s.length() < 2 || s[0] != '$' || s[1] != '(' ) {
     dict[name] = std::move(s);
   }
@@ -290,7 +290,7 @@ add_search_path(std::vector<std::string>& paths, std::string&& path)
 
 struct BinaryInfo
 {
-  BinaryInfo(const daq::core::Tag& tag) : m_hw_tag(tag.get_HW_Tag()), m_sw_tag(tag.get_SW_Tag())
+  BinaryInfo(const dunedaq::dal::Tag& tag) : m_hw_tag(tag.get_HW_Tag()), m_sw_tag(tag.get_SW_Tag())
   {
     m_bin_path.reserve(32);
     m_lib_path.reserve(32);
@@ -307,7 +307,7 @@ struct BinaryInfo
   }
 
   bool
-  is_compatible(const daq::core::TagMapping* mapping) const
+  is_compatible(const dunedaq::dal::TagMapping* mapping) const
   {
     return (m_hw_tag == mapping->get_HW_Tag() && m_sw_tag == mapping->get_SW_Tag());
   }
@@ -321,13 +321,13 @@ struct BinaryInfo
 
 static void
 get_paths(
-    const daq::core::SW_Package* package,
+    const dunedaq::dal::SW_Package* package,
     std::vector<std::string>& search_paths,
     std::vector<std::string>& paths_to_shared_libraries,
     const BinaryInfo& binary_info,
-    daq::core::TestCircularDependency& cd_fuse)
+    dunedaq::dal::TestCircularDependency& cd_fuse)
 {
-  if (const daq::core::SW_Repository * repository = package->cast<daq::core::SW_Repository>())
+  if (const dunedaq::dal::SW_Repository * repository = package->cast<dunedaq::dal::SW_Repository>())
     {
       const std::string& patch_area(repository->get_PatchArea());
       const std::string& installation_path(repository->get_InstallationPath());
@@ -354,7 +354,7 @@ get_paths(
           add_search_path(paths_to_shared_libraries, make_path(installation_path, binary_info.m_lib_path));
         }
     }
-  else if (const daq::core::SW_ExternalPackage * epkg = package->cast<daq::core::SW_ExternalPackage>())
+  else if (const dunedaq::dal::SW_ExternalPackage * epkg = package->cast<dunedaq::dal::SW_ExternalPackage>())
     {
       const std::string& package_patch_area(epkg->get_PatchArea());
       const std::string& package_installation_path(epkg->get_InstallationPath());
@@ -388,13 +388,13 @@ get_paths(
   else
     {
       std::ostringstream text;
-      text << "failed to cast " << package << " to " << daq::core::SW_Repository::s_class_name << " or " << daq::core::SW_ExternalPackage::s_class_name << " class";
-      throw (daq::core::AlgorithmError(ERS_HERE, text.str()));
+      text << "failed to cast " << package << " to " << dunedaq::dal::SW_Repository::s_class_name << " or " << dunedaq::dal::SW_ExternalPackage::s_class_name << " class";
+      throw (dunedaq::dal::AlgorithmError(ERS_HERE, text.str()));
     }
 
   // Loop over all Uses SW_Package and call get_paths on those
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, package);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, package);
       for (const auto & i : package->get_Uses())
         get_paths(i, search_paths, paths_to_shared_libraries, binary_info, cd_fuse);
     }
@@ -407,17 +407,17 @@ get_paths(
 //
 
 static void
-check_tag(const daq::core::SW_Package* package, const daq::core::Tag& tag, daq::core::TestCircularDependency& cd_fuse)
-// throws (daq::core::BadTag)
+check_tag(const dunedaq::dal::SW_Package* package, const dunedaq::dal::Tag& tag, dunedaq::dal::TestCircularDependency& cd_fuse)
+// throws (dunedaq::dal::BadTag)
 {
-  if (const daq::core::SW_Repository * repository = package->cast<daq::core::SW_Repository>())
+  if (const dunedaq::dal::SW_Repository * repository = package->cast<dunedaq::dal::SW_Repository>())
     {
       // Check through the tags to see if there is a match
       for (const auto& i : repository->get_Tags())
         if (i == &tag)
           goto test_used_sw_packages;
     }
-  else if (const daq::core::SW_ExternalPackage * epkg = package->cast<daq::core::SW_ExternalPackage>())
+  else if (const dunedaq::dal::SW_ExternalPackage * epkg = package->cast<dunedaq::dal::SW_ExternalPackage>())
     {
       // Check through the shared library tag mappings to see if there is a match
       for (const auto& i : epkg->get_SharedLibraries())
@@ -433,19 +433,19 @@ check_tag(const daq::core::SW_Package* package, const daq::core::Tag& tag, daq::
     {
       std::ostringstream text;
       text << "failed to cast " << package << " to SW_Repository or SW_ExternalPackage class";
-      throw(daq::core::AlgorithmError(ERS_HERE, text.str()));
+      throw(dunedaq::dal::AlgorithmError(ERS_HERE, text.str()));
     }
 
   {
     std::ostringstream text;
     text << "the " << package << " does not support this tag";
-    throw(daq::core::BadTag(ERS_HERE, tag.UID(), text.str()));
+    throw(dunedaq::dal::BadTag(ERS_HERE, tag.UID(), text.str()));
   }
 
   // Test tags of used packages
   test_used_sw_packages:
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, package);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, package);
 
       for (const auto& i : package->get_Uses())
         check_tag(i, tag, cd_fuse);
@@ -462,7 +462,7 @@ check_tag(const daq::core::SW_Package* package, const daq::core::Tag& tag, daq::
    */
 
 inline void
-add_path(const std::vector<const daq::core::Component *> & p, std::list<std::vector<const daq::core::Component *> >& out)
+add_path(const std::vector<const dunedaq::dal::Component *> & p, std::list<std::vector<const dunedaq::dal::Component *> >& out)
 {
   out.push_back(p);
 }
@@ -477,12 +477,12 @@ add_path(const std::vector<const daq::core::Component *> & p, std::list<std::vec
 static void
 make_parents_list(
     const ConfigObjectImpl * child,
-    const daq::core::ResourceSet * resource_set,
-    std::vector<const daq::core::Component *> & p_list,
-    std::list< std::vector<const daq::core::Component *> >& out,
-    daq::core::TestCircularDependency& cd_fuse)
+    const dunedaq::dal::ResourceSet * resource_set,
+    std::vector<const dunedaq::dal::Component *> & p_list,
+    std::list< std::vector<const dunedaq::dal::Component *> >& out,
+    dunedaq::dal::TestCircularDependency& cd_fuse)
 {
-  daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, resource_set);
+  dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, resource_set);
 
   // add the resource set to the path
   p_list.push_back(resource_set);
@@ -494,7 +494,7 @@ make_parents_list(
         {
           add_path(p_list, out);
         }
-      else if (const daq::core::ResourceSet * rs = i->cast<daq::core::ResourceSet>())
+      else if (const dunedaq::dal::ResourceSet * rs = i->cast<dunedaq::dal::ResourceSet>())
         {
           make_parents_list(child, rs, p_list, out, cd_fuse);
         }
@@ -508,13 +508,13 @@ make_parents_list(
 static void
 make_parents_list(
     const ConfigObjectImpl * child,
-    const daq::core::Segment * segment,
-    std::vector<const daq::core::Component *> & p_list,
-    std::list<std::vector<const daq::core::Component *> >& out,
+    const dunedaq::dal::Segment * segment,
+    std::vector<const dunedaq::dal::Component *> & p_list,
+    std::list<std::vector<const dunedaq::dal::Component *> >& out,
     bool is_segment,
-    daq::core::TestCircularDependency& cd_fuse)
+    dunedaq::dal::TestCircularDependency& cd_fuse)
 {
-  daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, segment);
+  dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, segment);
 
   // add the segment to the path
   p_list.push_back(segment);
@@ -532,7 +532,7 @@ make_parents_list(
       for (const auto& i : segment->get_Resources())
         if (i->config_object().implementation() == child)
           add_path(p_list, out);
-        else if (const daq::core::ResourceSet * resource_set = i->cast<daq::core::ResourceSet>())
+        else if (const dunedaq::dal::ResourceSet * resource_set = i->cast<dunedaq::dal::ResourceSet>())
           make_parents_list(child, resource_set, p_list, out, cd_fuse);
     }
 
@@ -544,15 +544,15 @@ make_parents_list(
 
 static void
 check_segment(
-    std::list< std::vector<const daq::core::Component *> >& out,
-    const daq::core::Segment * segment,
+    std::list< std::vector<const dunedaq::dal::Component *> >& out,
+    const dunedaq::dal::Segment * segment,
     const ConfigObjectImpl * child,
     bool is_segment,
-    daq::core::TestCircularDependency& cd_fuse)
+    dunedaq::dal::TestCircularDependency& cd_fuse)
 {
-  daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, segment);
+  dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, segment);
 
-  std::vector<const daq::core::Component *> s_list;
+  std::vector<const dunedaq::dal::Component *> s_list;
 
   if (segment->config_object().implementation() == child)
     add_path(s_list,out);
@@ -562,22 +562,22 @@ check_segment(
 
 
 void
-daq::core::Component::get_parents(const daq::core::Partition& partition, std::list<std::vector<const daq::core::Component *>>& parents) const
+dunedaq::dal::Component::get_parents(const dunedaq::dal::Partition& partition, std::list<std::vector<const dunedaq::dal::Component *>>& parents) const
 {
   const ConfigObjectImpl * obj_impl = config_object().implementation();
 
-  const bool is_segment = castable(daq::core::Segment::s_class_name);
+  const bool is_segment = castable(dunedaq::dal::Segment::s_class_name);
 
   try
     {
-      daq::core::TestCircularDependency cd_fuse("component parents", &partition);
+      dunedaq::dal::TestCircularDependency cd_fuse("component parents", &partition);
 
       // check partition's segments
       for (const auto& i : partition.get_Segments())
         check_segment(parents, i, obj_impl, is_segment, cd_fuse);
 
       // check online-infrastructure segment
-      const daq::core::Segment * s = partition.get_OnlineInfrastructure();
+      const dunedaq::dal::Segment * s = partition.get_OnlineInfrastructure();
       check_segment(parents, s, obj_impl, is_segment, cd_fuse);
 
       // check partition's online-infrastructure
@@ -593,13 +593,13 @@ daq::core::Component::get_parents(const daq::core::Partition& partition, std::li
     }
   catch (ers::Issue & ex)
     {
-      ers::error(daq::core::CannotGetParents(ERS_HERE, full_name(), ex));
+      ers::error(dunedaq::dal::CannotGetParents(ERS_HERE, full_name(), ex));
     }
 }
 
 
 bool
-daq::core::is_compatible(const daq::core::Tag& tag, const daq::core::Computer& host, const daq::core::Partition& partition)
+dunedaq::dal::is_compatible(const dunedaq::dal::Tag& tag, const dunedaq::dal::Computer& host, const dunedaq::dal::Partition& partition)
 {
   if (tag.get_HW_Tag() == host.get_HW_Tag())
     return true;
@@ -666,8 +666,8 @@ set_path(std::map<std::string, std::string>& environment, const std::string& var
 
 struct UsedPackages
 {
-  std::set<const daq::core::SW_Package*> m_packages_set;
-  std::vector<const daq::core::SW_Package*> m_packages;
+  std::set<const dunedaq::dal::SW_Package*> m_packages_set;
+  std::vector<const dunedaq::dal::SW_Package*> m_packages;
 
   UsedPackages()
   {
@@ -675,7 +675,7 @@ struct UsedPackages
   }
 
   void
-  add(const daq::core::SW_Package* p)
+  add(const dunedaq::dal::SW_Package* p)
   {
     if (m_packages_set.insert(p).second == true)
       {
@@ -685,7 +685,7 @@ struct UsedPackages
   }
 
   void
-  add(const std::vector<const daq::core::SW_Package*>& in)
+  add(const std::vector<const dunedaq::dal::SW_Package*>& in)
   {
     for (const auto & i : in)
       add(i);
@@ -711,7 +711,7 @@ get_env(const char * name)
 static const char * s_repository(get_env(s_tdaq_db_repository_str.c_str()));
 
 static void
-add_front_partition_environment(std::map<std::string, std::string>& environment, const daq::core::Partition& partition)
+add_front_partition_environment(std::map<std::string, std::string>& environment, const dunedaq::dal::Partition& partition)
 {
   if (s_repository)
     {
@@ -766,8 +766,8 @@ add_front_partition_environment(std::map<std::string, std::string>& environment,
 
 static void
 extend_env_var(std::map<std::string, std::string>& environment,
-               const daq::core::SW_PackageVariable* var,
-               const daq::core::SW_Package * package,
+               const dunedaq::dal::SW_PackageVariable* var,
+               const dunedaq::dal::SW_Package * package,
                std::string&& value)
 {
   std::string& val = environment[var->get_Name()];
@@ -790,10 +790,10 @@ extend_env_var(std::map<std::string, std::string>& environment,
 
 static void
 add_end_partition_environment(std::map<std::string, std::string>& environment,
-                              const daq::core::Partition& partition,
-			      const daq::core::BaseApplication * base_application,
-			      const daq::core::ComputerProgram * computer_program,
-                              const daq::core::Tag * tag)
+                              const dunedaq::dal::Partition& partition,
+			      const dunedaq::dal::BaseApplication * base_application,
+			      const dunedaq::dal::ComputerProgram * computer_program,
+                              const dunedaq::dal::Tag * tag)
 {
   // Partition needs Environment
   add_env_vars(environment, partition.get_ProcessEnvironment(), tag);
@@ -808,14 +808,14 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
     if (base_application)
       used_sw.add(base_application->get_Uses());
 
-    used_sw.add(computer_program->get_BelongsTo()->cast<daq::core::SW_Package>());
+    used_sw.add(computer_program->get_BelongsTo()->cast<dunedaq::dal::SW_Package>());
     used_sw.add(computer_program->get_Uses());
 
     for (const auto &i : used_sw.m_packages)
       add_env_vars(environment, i->get_ProcessEnvironment(), tag);
 
     for (const auto &j : used_sw.m_packages)
-      if (const daq::core::SW_Repository *sr = j->cast<daq::core::SW_Repository>())
+      if (const dunedaq::dal::SW_Repository *sr = j->cast<dunedaq::dal::SW_Repository>())
         {
           const std::string &rn = sr->get_InstallationPathVariableName();
           if (!rn.empty())
@@ -829,18 +829,18 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
                   std::ostringstream text;
                   text << "environment variable " << rn << "=\'" << sr->get_InstallationPath() << "\' defined by object " << sr
                       << " was already defined for it; check configuration database";
-                  ers::warning(daq::core::BadVariableUsage(ERS_HERE, text.str()));
+                  ers::warning(dunedaq::dal::BadVariableUsage(ERS_HERE, text.str()));
                 }
             }
         }
 
-    for (std::vector<const daq::core::SW_Package*>::const_reverse_iterator j = used_sw.m_packages.rbegin(); j != used_sw.m_packages.rend(); ++j)
+    for (std::vector<const dunedaq::dal::SW_Package*>::const_reverse_iterator j = used_sw.m_packages.rbegin(); j != used_sw.m_packages.rend(); ++j)
       for (const auto &v : (*j)->get_AddProcessEnvironment())
         {
           extend_env_var(environment, v, (*j), make_path((*j)->get_InstallationPath(), v->get_Suffix()));
 
           // note, new value is prepended, so patch area will have priority
-          if (const daq::core::SW_Repository *r = (*j)->cast<daq::core::SW_Repository>())
+          if (const dunedaq::dal::SW_Repository *r = (*j)->cast<dunedaq::dal::SW_Repository>())
             {
               if (!r->get_PatchArea().empty())
                 extend_env_var(environment, v, (*j), make_path(r->get_PatchArea(), v->get_Suffix()));
@@ -849,7 +849,7 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
 
 
     // if the program is Java script, generate Java's CLASSPATH
-    if (const daq::core::Script *script = computer_program->cast<daq::core::Script>())
+    if (const dunedaq::dal::Script *script = computer_program->cast<dunedaq::dal::Script>())
       if (!strcasecmp("java", script->get_Shell().c_str()))
         {
           TLOG_DEBUG(5) <<  "application " << base_application << " is Java script" ;
@@ -866,7 +866,7 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
 
           for (const auto &j : used_sw.m_packages)
             {
-              if (const daq::core::SW_Repository *rep = j->cast<daq::core::SW_Repository>())
+              if (const dunedaq::dal::SW_Repository *rep = j->cast<dunedaq::dal::SW_Repository>())
                 {
                   add_classpath(*rep, user_dir, class_path);
                 }
@@ -926,13 +926,13 @@ mk_app_env_string(std::map<std::string, std::string>& environment)
 ******************************************************************************/
 
 static void get_parameters(
-  const daq::core::ComputerProgram * this_cp,
+  const dunedaq::dal::ComputerProgram * this_cp,
   std::vector<std::string>& program_names,
   std::vector<std::string>& search_paths,
   std::vector<std::string>& paths_to_shared_libraries,
-  const daq::core::Tag& tag,
-  const daq::core::Computer& host,
-  const daq::core::Partition& partition
+  const dunedaq::dal::Tag& tag,
+  const dunedaq::dal::Computer& host,
+  const dunedaq::dal::Partition& partition
 )
 // throw ( BadProgramInfo BadTag)
 {
@@ -942,8 +942,8 @@ static void get_parameters(
             << "\n  host      = " << &host
             << "\n  partition = " << &partition ;
 
-  const daq::core::SW_Repository * belongs_to = nullptr;
-  const bool is_script = (this_cp->class_name() == daq::core::Script::s_class_name);
+  const dunedaq::dal::SW_Repository * belongs_to = nullptr;
+  const bool is_script = (this_cp->class_name() == dunedaq::dal::Script::s_class_name);
   const std::string& repository_root(partition.get_RepositoryRoot());
 
   // Check ComputerProgram belong to SW_Package
@@ -953,22 +953,22 @@ static void get_parameters(
     }
   catch (dunedaq::config::Exception& ex)
     {
-      throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to read SW_Package object", ex);
+      throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to read SW_Package object", ex);
     }
 
   // Check the tag is supported by the hardware
-  if (!daq::core::is_compatible(tag, host, partition))
+  if (!dunedaq::dal::is_compatible(tag, host, partition))
     {
       std::ostringstream text;
       text << "this tag is not applicable on host " << host.UID() << " with hw tag \"" << host.get_HW_Tag() << '\"';
-      throw daq::core::BadTag(ERS_HERE, tag.UID(), text.str());
+      throw dunedaq::dal::BadTag(ERS_HERE, tag.UID(), text.str());
     }
 
   // Check that the software repositories support the tag
   // i.e. the BelongsTo and its subtree and the Uses and their subtree
   try
     {
-      daq::core::TestCircularDependency cd_fuse("program tags", this_cp);
+      dunedaq::dal::TestCircularDependency cd_fuse("program tags", this_cp);
 
       // Check the BelongsTo repository (and its subtree) supports the tag
       check_tag(belongs_to, tag, cd_fuse);
@@ -981,7 +981,7 @@ static void get_parameters(
     {
       std::ostringstream text;
       text << this_cp << " is not compatible (running on on host " << &host << ')';
-      throw daq::core::BadTag(ERS_HERE, tag.UID(), text.str(), ex );
+      throw dunedaq::dal::BadTag(ERS_HERE, tag.UID(), text.str(), ex );
     }
 
   // Find program name (either a script, a binary with no exact implementation or a binary with exact implementation)
@@ -993,14 +993,14 @@ static void get_parameters(
       program_name = this_cp->get_BinaryName();
       TLOG_DEBUG(6) <<  "the Program name is \"" << program_name << "\" (name of script)" ;
       if (program_name.empty())
-        throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (name of script)" );
+        throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (name of script)" );
       }
     else
       {
-        const daq::core::Binary * binary_program = this_cp->cast<daq::core::Binary>();
+        const dunedaq::dal::Binary * binary_program = this_cp->cast<dunedaq::dal::Binary>();
 
         if (binary_program == nullptr)
-          throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "program is not a ComputerProgram");
+          throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "program is not a ComputerProgram");
 
         if (binary_program->get_ExactImplementations().empty())
           {
@@ -1008,7 +1008,7 @@ static void get_parameters(
             program_name = this_cp->get_BinaryName();
             TLOG_DEBUG(6) <<  "the program name is \"" << program_name << "\" (name of binary without exact implementations)" ;
             if (program_name.empty())
-              throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (no exact implementation)" );
+              throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "program has no BinaryName defined (no exact implementation)" );
           }
         else
           {
@@ -1028,7 +1028,7 @@ static void get_parameters(
               {
                 std::ostringstream text;
                 text << "the program " << this_cp << " has no exact implementation for it";
-                throw daq::core::BadTag(ERS_HERE, tag.UID(), text.str() );
+                throw dunedaq::dal::BadTag(ERS_HERE, tag.UID(), text.str() );
               }
           }
       }
@@ -1081,7 +1081,7 @@ static void get_parameters(
   // and any repositories which they use (recursively)
   try
     {
-      daq::core::TestCircularDependency cd_fuse("program binary and library paths", this_cp);
+      dunedaq::dal::TestCircularDependency cd_fuse("program binary and library paths", this_cp);
 
       for (const auto& i : this_cp->get_Uses())
         get_paths(i, search_paths, paths_to_shared_libraries, binary_info, cd_fuse);
@@ -1092,7 +1092,7 @@ static void get_parameters(
     }
   catch (ers::Issue & ex)
     {
-      throw daq::core::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to get binary and library paths.", ex);
+      throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to get binary and library paths.", ex);
     }
 }
 
@@ -1100,15 +1100,15 @@ static void get_parameters(
  ******************* ALGORITHM ComputerProgram::get_info() ********************
  ******************************************************************************/
 
-void daq::core::ComputerProgram::get_info(
+void dunedaq::dal::ComputerProgram::get_info(
   std::map<std::string, std::string>& environment,
   std::vector<std::string>& program_names,
-  const daq::core::Partition& partition,
-  const daq::core::Tag& tag,
-  const daq::core::Computer& host
+  const dunedaq::dal::Partition& partition,
+  const dunedaq::dal::Tag& tag,
+  const dunedaq::dal::Computer& host
 ) const
 {
-  TLOG_DEBUG(4) << " CALL daq::core::ComputerProgram::get_info()" 
+  TLOG_DEBUG(4) << " CALL dunedaq::dal::ComputerProgram::get_info()" 
 	    << "  \n this      = " << this  
 	    << "  \n tag       = " << &tag 
 	    << "  \n host      = " << &host
@@ -1139,7 +1139,7 @@ void daq::core::ComputerProgram::get_info(
     add_end_partition_environment(environment, partition, nullptr, this, &tag);
   }
   catch ( dunedaq::config::Generic & ex ) {
-     throw daq::core::BadProgramInfo( ERS_HERE, UID(), "failed to build Program environment", ex ) ;
+     throw dunedaq::dal::BadProgramInfo( ERS_HERE, UID(), "failed to build Program environment", ex ) ;
   }
 
     // add "PATH" and "LD_LIBRARY_PATH" variables
@@ -1152,36 +1152,36 @@ void daq::core::ComputerProgram::get_info(
 
 static void
 get_resourse_apps(
-  const daq::core::ResourceBase * obj,
-  std::vector<const daq::core::BaseApplication *>& out,
-  const daq::core::Partition * p,
-  daq::core::TestCircularDependency& cd_fuse)
+  const dunedaq::dal::ResourceBase * obj,
+  std::vector<const dunedaq::dal::BaseApplication *>& out,
+  const dunedaq::dal::Partition * p,
+  dunedaq::dal::TestCircularDependency& cd_fuse)
 {
   if (p == nullptr || obj->disabled(*p, true) == false)
     {
       // test if the resource base can be casted to the application
-      if (const daq::core::BaseApplication * r = obj->cast<daq::core::BaseApplication>())
+      if (const dunedaq::dal::BaseApplication * r = obj->cast<dunedaq::dal::BaseApplication>())
         {
           out.push_back(r);
         }
 
       // test if the resource base can contain nested resources
-      if (const daq::core::ResourceSet * s = obj->cast<daq::core::ResourceSet>())
+      if (const dunedaq::dal::ResourceSet * s = obj->cast<dunedaq::dal::ResourceSet>())
         {
           for (const auto& i : s->get_Contains())
             {
-              daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+              dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
               get_resourse_apps(i, out, p, cd_fuse);
             }
         }
     }
 }
 
-static std::vector<const daq::core::BaseApplication *>
-get_resource_applications(const daq::core::ResourceBase * obj, const daq::core::Partition * p = nullptr)
+static std::vector<const dunedaq::dal::BaseApplication *>
+get_resource_applications(const dunedaq::dal::ResourceBase * obj, const dunedaq::dal::Partition * p = nullptr)
 {
-  daq::core::TestCircularDependency cd_fuse("resource applications", obj);
-  std::vector<const daq::core::BaseApplication *> out;
+  dunedaq::dal::TestCircularDependency cd_fuse("resource applications", obj);
+  std::vector<const dunedaq::dal::BaseApplication *> out;
   get_resourse_apps(obj, out, p, cd_fuse);
   return out;
 }
@@ -1191,10 +1191,10 @@ get_resource_applications(const daq::core::ResourceBase * obj, const daq::core::
 ******************************************************************************/
 
 void
-daq::core::Segment::get_timeouts(int& actionTimeout, int& shortActionTimeout) const
-  //throws (daq::core::BadSegment)
+dunedaq::dal::Segment::get_timeouts(int& actionTimeout, int& shortActionTimeout) const
+  //throws (dunedaq::dal::BadSegment)
 {
-  const daq::core::Partition * partition = get_seg_config(false)->get_partition();
+  const dunedaq::dal::Partition * partition = get_seg_config(false)->get_partition();
 
   actionTimeout = shortActionTimeout = 0;
 
@@ -1226,13 +1226,13 @@ daq::core::Segment::get_timeouts(int& actionTimeout, int& shortActionTimeout) co
 
   for (const auto& a : get_applications())
     {
-      if (const daq::core::RunControlApplicationBase* rcApp = a->cast<daq::core::RunControlApplicationBase>())
+      if (const dunedaq::dal::RunControlApplicationBase* rcApp = a->cast<dunedaq::dal::RunControlApplicationBase>())
         {
           if (rcApp->get_ActionTimeout() > actionTimeout)
             actionTimeout = rcApp->get_ActionTimeout();
         }
 
-      if (const daq::core::BaseApplication* slApp = a->cast<daq::core::BaseApplication>())
+      if (const dunedaq::dal::BaseApplication* slApp = a->cast<dunedaq::dal::BaseApplication>())
         {
           if (static_cast<int>(slApp->get_ExitTimeout()) > shortActionTimeout)
             shortActionTimeout = slApp->get_ExitTimeout();
@@ -1241,27 +1241,24 @@ daq::core::Segment::get_timeouts(int& actionTimeout, int& shortActionTimeout) co
     }
 
   actionTimeout += get_IsControlledBy()->get_ActionTimeout();
-  shortActionTimeout += get_IsControlledBy()->cast<daq::core::BaseApplication>()->get_ExitTimeout();
+  shortActionTimeout += get_IsControlledBy()->cast<dunedaq::dal::BaseApplication>()->get_ExitTimeout();
 
   TLOG_DEBUG(4) <<  "Segment: " << UID() << ": Action Timeout --> " << actionTimeout << "; Exit Timeout --> " << shortActionTimeout ;
 
   return;
 }
 
-namespace daq
-{
-  namespace core
-  {
+namespace dunedaq::dal {
 
     class BackupHostFactory
     {
     public:
-      BackupHostFactory(const daq::core::Segment& seg) :
+      BackupHostFactory(const dunedaq::dal::Segment& seg) :
           m_seg(seg), m_num_of_hosts(seg.get_Hosts().size()), m_count(0)
       {
       }
 
-      const daq::core::Computer *
+      const dunedaq::dal::Computer *
       get_next()
       {
         size_t idx = m_count++ % m_num_of_hosts;
@@ -1269,10 +1266,10 @@ namespace daq
         if (idx == 0)
           {
             m_count++;
-            return m_seg.get_Hosts()[1]->cast<daq::core::Computer>();
+            return m_seg.get_Hosts()[1]->cast<dunedaq::dal::Computer>();
           }
 
-        return m_seg.get_Hosts()[idx]->cast<daq::core::Computer>();
+        return m_seg.get_Hosts()[idx]->cast<dunedaq::dal::Computer>();
       }
 
       size_t
@@ -1282,12 +1279,11 @@ namespace daq
       }
 
     private:
-      const daq::core::Segment& m_seg;
+      const dunedaq::dal::Segment& m_seg;
       const size_t m_num_of_hosts;
       size_t m_count;
     };
-  }
-}
+} // namespace dunedaq::dal
 
 
 
@@ -1297,27 +1293,27 @@ namespace daq
 ******************************************************************************/
 
 
-std::vector<const daq::core::BaseApplication *>
-daq::core::Partition::get_all_applications(std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const daq::core::Computer *> * use_hosts) const
+std::vector<const dunedaq::dal::BaseApplication *>
+dunedaq::dal::Partition::get_all_applications(std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const dunedaq::dal::Computer *> * use_hosts) const
 {
   return get_segment(get_OnlineInfrastructure()->UID())->get_all_applications(app_types, use_segments, use_hosts);
 }
 
 
 void
-get_generic_resources(const daq::core::ResourceBase * obj, ::Configuration& db, std::list<const daq::core::Resource *>& out, const daq::core::Partition * p, daq::core::TestCircularDependency& cd_fuse)
+get_generic_resources(const dunedaq::dal::ResourceBase * obj, ::Configuration& db, std::list<const dunedaq::dal::Resource *>& out, const dunedaq::dal::Partition * p, dunedaq::dal::TestCircularDependency& cd_fuse)
 {
   if (p == nullptr || obj->disabled(*p) == false)
     {
-      if (const daq::core::Resource * r = db.cast<daq::core::Resource>(obj))
+      if (const dunedaq::dal::Resource * r = db.cast<dunedaq::dal::Resource>(obj))
         {
           out.push_back(r);
         }
-      else if (const daq::core::ResourceSet * s = db.cast<daq::core::ResourceSet>(obj))
+      else if (const dunedaq::dal::ResourceSet * s = db.cast<dunedaq::dal::ResourceSet>(obj))
         {
           for (const auto& i : s->get_Contains())
             {
-              daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+              dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
               get_generic_resources(i, db, out, p, cd_fuse);
             }
         }
@@ -1325,17 +1321,17 @@ get_generic_resources(const daq::core::ResourceBase * obj, ::Configuration& db, 
 }
 
 void
-daq::core::ResourceBase::get_resources(::Configuration& db, std::list<const Resource *>& out, const daq::core::Partition * p) const
+dunedaq::dal::ResourceBase::get_resources(::Configuration& db, std::list<const Resource *>& out, const dunedaq::dal::Partition * p) const
 {
-  daq::core::TestCircularDependency cd_fuse("generic resources", this);
+  dunedaq::dal::TestCircularDependency cd_fuse("generic resources", this);
   get_generic_resources(this, db, out, p, cd_fuse);
 }
 
 
-static std::vector<const daq::core::BaseApplication *>
-get_all_referenced(const daq::core::AppConfig * app, const std::vector<const daq::core::BaseApplication*>& refs, const std::vector<const daq::core::BaseApplication *>& all_apps)
+static std::vector<const dunedaq::dal::BaseApplication *>
+get_all_referenced(const dunedaq::dal::AppConfig * app, const std::vector<const dunedaq::dal::BaseApplication*>& refs, const std::vector<const dunedaq::dal::BaseApplication *>& all_apps)
 {
-  std::vector<const daq::core::BaseApplication *> out;
+  std::vector<const dunedaq::dal::BaseApplication *> out;
 
   for (const auto& x : all_apps)
     {
@@ -1374,10 +1370,7 @@ get_all_referenced(const daq::core::AppConfig * app, const std::vector<const daq
 }
 
 
-namespace daq
-{
-  namespace core
-  {
+namespace dunedaq::dal {
     // This class is a friend of AppConfig and SegConfig
     class AlgorithmUtils
     {
@@ -1387,71 +1380,70 @@ namespace daq
     public:
 
       static void
-      add_applications(daq::core::Segment& seg, const daq::core::Rack * rack, const daq::core::Partition& p, const daq::core::Computer * default_host);
+      add_applications(dunedaq::dal::Segment& seg, const dunedaq::dal::Rack * rack, const dunedaq::dal::Partition& p, const dunedaq::dal::Computer * default_host);
 
       static void
-      add_segments(daq::core::Segment& seg, const daq::core::Partition& p, const std::vector<const daq::core::Segment*>& objs, const daq::core::Rack * rack, const daq::core::Computer * default_host, ::config::map<std::string>& fuse);
+      add_segments(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition& p, const std::vector<const dunedaq::dal::Segment*>& objs, const dunedaq::dal::Rack * rack, const dunedaq::dal::Computer * default_host, ::config::map<std::string>& fuse);
 
       static void
-      get_applications(std::vector<const daq::core::BaseApplication *>& out, const daq::core::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const daq::core::Computer *> * hosts);
+      get_applications(std::vector<const dunedaq::dal::BaseApplication *>& out, const dunedaq::dal::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const dunedaq::dal::Computer *> * hosts);
 
       static AppConfig *
-      reset_app_config(daq::core::BaseApplication& app);
+      reset_app_config(dunedaq::dal::BaseApplication& app);
 
       static SegConfig *
-      reset_seg_config(daq::core::Segment& seg, const daq::core::Partition* p);
+      reset_seg_config(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition* p);
 
-      static const daq::core::Partition*
-      get_partition(const daq::core::BaseApplication * app);
+      static const dunedaq::dal::Partition*
+      get_partition(const dunedaq::dal::BaseApplication * app);
 
 
     private:
 
       static void
-      add_template_application(const daq::core::TemplateApplication * a, const char * type, daq::core::Segment& seg, std::vector<const daq::core::BaseApplication *>& apps, BackupHostFactory& factory);
+      add_template_application(const dunedaq::dal::TemplateApplication * a, const char * type, dunedaq::dal::Segment& seg, std::vector<const dunedaq::dal::BaseApplication *>& apps, BackupHostFactory& factory);
 
       static void
-      add_normal_application(const daq::core::Application * a, daq::core::Segment& seg, std::vector<const daq::core::BaseApplication *>& apps);
+      add_normal_application(const dunedaq::dal::Application * a, dunedaq::dal::Segment& seg, std::vector<const dunedaq::dal::BaseApplication *>& apps);
 
-      static const daq::core::Computer *
-      get_host(const daq::core::Segment& seg, const daq::core::BaseApplication * base_app, const daq::core::Application * app = nullptr);
+      static const dunedaq::dal::Computer *
+      get_host(const dunedaq::dal::Segment& seg, const dunedaq::dal::BaseApplication * base_app, const dunedaq::dal::Application * app = nullptr);
 
       static bool
-      check_app(const daq::core::BaseApplication * app, std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const daq::core::Computer *> * use_hosts);
+      check_app(const dunedaq::dal::BaseApplication * app, std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const dunedaq::dal::Computer *> * use_hosts);
 
       static void
-      check_non_template_segment(const daq::core::Segment& seg, const daq::core::BaseApplication * base_app);
+      check_non_template_segment(const dunedaq::dal::Segment& seg, const dunedaq::dal::BaseApplication * base_app);
 
       static void
-      set_backup_hosts(const std::string& runs_on, std::vector<const daq::core::Computer *>& template_backup_hosts, BackupHostFactory& factory);
+      set_backup_hosts(const std::string& runs_on, std::vector<const dunedaq::dal::Computer *>& template_backup_hosts, BackupHostFactory& factory);
 
     };
-  }
-}
+} // namespace dunedaq::dal
 
-const daq::core::Computer *
-daq::core::AlgorithmUtils::get_host(const daq::core::Segment& seg, const daq::core::BaseApplication * base_app, const daq::core::Application * app)
+const dunedaq::dal::Computer *
+dunedaq::dal::AlgorithmUtils::get_host(const dunedaq::dal::Segment& seg, const dunedaq::dal::BaseApplication * base_app, const dunedaq::dal::Application * app)
 {
   if (app)
     {
-      if (const daq::core::Computer * h = app->get_RunsOn())
+      if (const dunedaq::dal::Computer * h = app->get_RunsOn())
         return h;
     }
 
   if (!seg.get_hosts().empty())
-    return seg.get_hosts().front()->cast<daq::core::Computer>();
+    return seg.get_hosts().front()->cast<dunedaq::dal::Computer>();
 
   std::ostringstream text;
   text << "to run " << base_app << " (there is no any defined enabled default host for segment, partition or localhost)";
-  throw (daq::core::NoDefaultHost(ERS_HERE, seg.UID(), text.str()));
+  throw (dunedaq::dal::NoDefaultHost(ERS_HERE, seg.UID(), text.str()));
 }
 
 void
-daq::core::AlgorithmUtils::add_normal_application(const daq::core::Application * a, daq::core::Segment& seg, std::vector<const daq::core::BaseApplication *>& apps)
+dunedaq::dal::AlgorithmUtils::add_normal_application(const dunedaq::dal::Application * a, dunedaq::dal::Segment& seg, std::vector<const dunedaq::dal::BaseApplication *>& apps)
 {
   check_non_template_segment(seg, a);
-  daq::core::BaseApplication * app_obj = const_cast<daq::core::BaseApplication *>(seg.configuration().get<daq::core::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), a->UID()));
-  daq::core::AppConfig * app_config = daq::core::AlgorithmUtils::reset_app_config(*app_obj);
+  dunedaq::dal::BaseApplication * app_obj = const_cast<dunedaq::dal::BaseApplication *>(seg.configuration().get<dunedaq::dal::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), a->UID()));
+  dunedaq::dal::AppConfig * app_config = dunedaq::dal::AlgorithmUtils::reset_app_config(*app_obj);
   app_config->m_host = get_host(seg, a, a);
   app_config->m_segment = &seg;
   app_config->m_base_app = a;
@@ -1459,28 +1451,28 @@ daq::core::AlgorithmUtils::add_normal_application(const daq::core::Application *
 }
 
 void
-daq::core::AlgorithmUtils::add_template_application(const daq::core::TemplateApplication * a, const char * type, daq::core::Segment& seg, std::vector<const daq::core::BaseApplication *>& apps, BackupHostFactory& factory)
+dunedaq::dal::AlgorithmUtils::add_template_application(const dunedaq::dal::TemplateApplication * a, const char * type, dunedaq::dal::Segment& seg, std::vector<const dunedaq::dal::BaseApplication *>& apps, BackupHostFactory& factory)
 {
-  const std::vector<const daq::core::Computer*>& hosts(seg.get_hosts());
+  const std::vector<const dunedaq::dal::Computer*>& hosts(seg.get_hosts());
   int start_idx(0), end_idx(hosts.size());
 
   const std::string& runs_on(a->get_RunsOn());
-  const bool runs_on_first_host(runs_on == daq::core::TemplateApplication::RunsOn::FirstHost || runs_on == daq::core::TemplateApplication::RunsOn::FirstHostWithBackup);
+  const bool runs_on_first_host(runs_on == dunedaq::dal::TemplateApplication::RunsOn::FirstHost || runs_on == dunedaq::dal::TemplateApplication::RunsOn::FirstHostWithBackup);
 
   if (hosts.empty())
     {
       std::ostringstream text;
       text << type << " template application " << a << " may not be run, since segment has no enabled hosts";
-      throw daq::core::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
+      throw dunedaq::dal::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
     }
 
-  if (runs_on == daq::core::TemplateApplication::RunsOn::AllButFirstHost)
+  if (runs_on == dunedaq::dal::TemplateApplication::RunsOn::AllButFirstHost)
     {
       if (hosts.size() < 2)
         {
           std::ostringstream text;
-          text << type << " template application " << a << " may not be run on \"" << daq::core::TemplateApplication::RunsOn::AllButFirstHost << "\" since segment has " << hosts.size() << " enabled hosts only";
-          throw daq::core::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
+          text << type << " template application " << a << " may not be run on \"" << dunedaq::dal::TemplateApplication::RunsOn::AllButFirstHost << "\" since segment has " << hosts.size() << " enabled hosts only";
+          throw dunedaq::dal::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
         }
 
       start_idx = 1;
@@ -1499,7 +1491,7 @@ daq::core::AlgorithmUtils::add_template_application(const daq::core::TemplateApp
 
   for (int i = start_idx; i < end_idx; ++i)
     {
-      const daq::core::Computer * h = hosts[i];
+      const dunedaq::dal::Computer * h = hosts[i];
       const uint16_t num_of_tapps(default_num_of_tapps ? default_num_of_tapps : h->get_NumberOfCores());
 
       if(!runs_on_first_host)
@@ -1521,8 +1513,8 @@ daq::core::AlgorithmUtils::add_template_application(const daq::core::TemplateApp
               append2str(app_id, j);
             }
 
-          daq::core::BaseApplication * app_obj = const_cast<daq::core::BaseApplication *>(seg.configuration().get<daq::core::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), app_id));
-          daq::core::AppConfig * app_config = daq::core::AlgorithmUtils::reset_app_config(*app_obj);
+          dunedaq::dal::BaseApplication * app_obj = const_cast<dunedaq::dal::BaseApplication *>(seg.configuration().get<dunedaq::dal::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), app_id));
+          dunedaq::dal::AppConfig * app_config = dunedaq::dal::AlgorithmUtils::reset_app_config(*app_obj);
           app_config->m_is_templated = true;
           app_config->m_host = h;
           set_backup_hosts(runs_on, app_config->m_template_backup_hosts, factory);
@@ -1534,20 +1526,20 @@ daq::core::AlgorithmUtils::add_template_application(const daq::core::TemplateApp
 }
 
 void
-daq::core::AlgorithmUtils::check_non_template_segment(const daq::core::Segment& seg, const daq::core::BaseApplication * base_app)
+dunedaq::dal::AlgorithmUtils::check_non_template_segment(const dunedaq::dal::Segment& seg, const dunedaq::dal::BaseApplication * base_app)
 {
   if(seg.p_seg_config->m_is_templated)
     {
       std::ostringstream text;
       text << "the segment contains non-template application " << base_app;
-      throw daq::core::BadTemplateSegmentDescription(ERS_HERE, seg.UID(), text.str());
+      throw dunedaq::dal::BadTemplateSegmentDescription(ERS_HERE, seg.UID(), text.str());
     }
 }
 
 void
-daq::core::AlgorithmUtils::set_backup_hosts(const std::string& runs_on, std::vector<const daq::core::Computer *>& template_backup_hosts, BackupHostFactory& factory)
+dunedaq::dal::AlgorithmUtils::set_backup_hosts(const std::string& runs_on, std::vector<const dunedaq::dal::Computer *>& template_backup_hosts, BackupHostFactory& factory)
 {
-  if (runs_on == daq::core::TemplateApplication::RunsOn::FirstHostWithBackup)
+  if (runs_on == dunedaq::dal::TemplateApplication::RunsOn::FirstHostWithBackup)
     {
       if (factory.get_size() > 1)
         {
@@ -1563,9 +1555,9 @@ daq::core::AlgorithmUtils::set_backup_hosts(const std::string& runs_on, std::vec
 
 
 static void
-add_enabled_hosts(std::vector<const daq::core::Computer *>& to, const std::vector<const daq::core::ComputerBase*>& from, unsigned int default_capacity)
+add_enabled_hosts(std::vector<const dunedaq::dal::Computer *>& to, const std::vector<const dunedaq::dal::ComputerBase*>& from, unsigned int default_capacity)
 {
-  std::vector<const daq::core::Computer *> hosts;
+  std::vector<const dunedaq::dal::Computer *> hosts;
   hosts.reserve(default_capacity);
   add_computers(hosts, from);
 
@@ -1575,9 +1567,9 @@ add_enabled_hosts(std::vector<const daq::core::Computer *>& to, const std::vecto
 }
 
 void
-daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::core::Rack * rack, const daq::core::Partition& p, const daq::core::Computer * default_host)
+dunedaq::dal::AlgorithmUtils::add_applications(dunedaq::dal::Segment& seg, const dunedaq::dal::Rack * rack, const dunedaq::dal::Partition& p, const dunedaq::dal::Computer * default_host)
 {
-  daq::core::SegConfig * seg_config = seg.get_seg_config(false);
+  dunedaq::dal::SegConfig * seg_config = seg.get_seg_config(false);
 
   // fill hosts of segment
 
@@ -1593,7 +1585,7 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
         {
           std::ostringstream text;
           text << "number of enabled computers in \'" << rack << "\' is " << seg_config->m_hosts.size() << " (at least two required)";
-          throw daq::core::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
+          throw dunedaq::dal::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
         }
     }
 
@@ -1608,7 +1600,7 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
     {
       static std::string local_hostname = OksSystem::LocalHost::full_local_name();
 
-      if (const daq::core::Computer * host = seg.configuration().get<daq::core::Computer>(local_hostname))
+      if (const dunedaq::dal::Computer * host = seg.configuration().get<dunedaq::dal::Computer>(local_hostname))
         {
           if (host->get_State() == true)
             {
@@ -1623,49 +1615,49 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
 
   // add controller
     {
-      const daq::core::RunControlApplicationBase * ctrl_obj = seg.get_IsControlledBy();
-      daq::core::BaseApplication * app_obj = nullptr;
-      daq::core::AppConfig * app_config = nullptr;
+      const dunedaq::dal::RunControlApplicationBase * ctrl_obj = seg.get_IsControlledBy();
+      dunedaq::dal::BaseApplication * app_obj = nullptr;
+      dunedaq::dal::AppConfig * app_config = nullptr;
 
-      if (const daq::core::RunControlApplication * a = ctrl_obj->cast<daq::core::RunControlApplication>())
+      if (const dunedaq::dal::RunControlApplication * a = ctrl_obj->cast<dunedaq::dal::RunControlApplication>())
         {
           check_non_template_segment(seg, a);
-          app_obj = const_cast<daq::core::BaseApplication *>(seg.configuration().get<daq::core::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), a->UID()));
-          app_config = daq::core::AlgorithmUtils::reset_app_config(*app_obj);
+          app_obj = const_cast<dunedaq::dal::BaseApplication *>(seg.configuration().get<dunedaq::dal::BaseApplication>(const_cast<ConfigObject&>(a->config_object()), a->UID()));
+          app_config = dunedaq::dal::AlgorithmUtils::reset_app_config(*app_obj);
           app_config->m_host = get_host(seg, a, a);
         }
-      else if (const daq::core::TemplateApplication * t = ctrl_obj->cast<daq::core::TemplateApplication>())
+      else if (const dunedaq::dal::TemplateApplication * t = ctrl_obj->cast<dunedaq::dal::TemplateApplication>())
         {
           const std::string& t_runs_on(t->get_RunsOn());
-          if(t_runs_on != daq::core::TemplateApplication::RunsOn::FirstHost && t_runs_on != daq::core::TemplateApplication::RunsOn::FirstHostWithBackup)
+          if(t_runs_on != dunedaq::dal::TemplateApplication::RunsOn::FirstHost && t_runs_on != dunedaq::dal::TemplateApplication::RunsOn::FirstHostWithBackup)
             {
               std::ostringstream text;
               text << "controller template application " << t << " may only be run on first host (\"" << t_runs_on << "\" is set instead)";
-              throw daq::core::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
+              throw dunedaq::dal::CannotCreateSegConfig(ERS_HERE, seg.UID(), text.str());
             }
 
-          app_obj = const_cast<daq::core::BaseApplication *>(seg.configuration().get<daq::core::BaseApplication>(const_cast<ConfigObject&>(t->config_object()), seg.UID()));
-          app_config = daq::core::AlgorithmUtils::reset_app_config(*app_obj);
+          app_obj = const_cast<dunedaq::dal::BaseApplication *>(seg.configuration().get<dunedaq::dal::BaseApplication>(const_cast<ConfigObject&>(t->config_object()), seg.UID()));
+          app_config = dunedaq::dal::AlgorithmUtils::reset_app_config(*app_obj);
           app_config->m_is_templated = true;
           app_config->m_host = get_host(seg, t);
           set_backup_hosts(t_runs_on, app_config->m_template_backup_hosts, factory);
         }
 
       app_config->m_segment = &seg;
-      app_config->m_base_app = ctrl_obj->cast<daq::core::BaseApplication>();
+      app_config->m_base_app = ctrl_obj->cast<dunedaq::dal::BaseApplication>();
       seg_config->m_controller = app_obj;
     }
 
   // add infrastructure
   for (const auto& x : seg.get_Infrastructure())
     {
-      if (seg.configuration().cast<daq::core::Resource>(x) == nullptr)
+      if (seg.configuration().cast<dunedaq::dal::Resource>(x) == nullptr)
         {
-          if (const daq::core::InfrastructureApplication * a = x->cast<daq::core::InfrastructureApplication>())
+          if (const dunedaq::dal::InfrastructureApplication * a = x->cast<dunedaq::dal::InfrastructureApplication>())
             {
               add_normal_application(a, seg, seg_config->m_infrastructure);
             }
-          else if (const daq::core::TemplateApplication * t = x->cast<daq::core::TemplateApplication>())
+          else if (const dunedaq::dal::TemplateApplication * t = x->cast<dunedaq::dal::TemplateApplication>())
             {
               add_template_application(t, "infrastructure", seg, seg_config->m_infrastructure, factory);
             }
@@ -1678,11 +1670,11 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
       // get enabled resources
       for (const auto& j : get_resource_applications(x, &p))
         {
-          if (const daq::core::Application * a = j->cast<daq::core::Application>())
+          if (const dunedaq::dal::Application * a = j->cast<dunedaq::dal::Application>())
             {
               add_normal_application(a, seg, seg_config->m_applications);
             }
-          else if (const daq::core::TemplateApplication * t = j->cast<daq::core::TemplateApplication>())
+          else if (const dunedaq::dal::TemplateApplication * t = j->cast<dunedaq::dal::TemplateApplication>())
             {
               add_template_application(t, "resource", seg, seg_config->m_applications, factory);
             }
@@ -1692,13 +1684,13 @@ daq::core::AlgorithmUtils::add_applications(daq::core::Segment& seg, const daq::
   // add applications
   for (const auto& x : seg.get_Applications())
     {
-      if (seg.configuration().cast<daq::core::Resource>(x) == nullptr)
+      if (seg.configuration().cast<dunedaq::dal::Resource>(x) == nullptr)
         {
-          if (const daq::core::Application * a = x->cast<daq::core::Application>())
+          if (const dunedaq::dal::Application * a = x->cast<dunedaq::dal::Application>())
             {
               add_normal_application(a, seg, seg_config->m_applications);
             }
-          else if (const daq::core::TemplateApplication * t = x->cast<daq::core::TemplateApplication>())
+          else if (const dunedaq::dal::TemplateApplication * t = x->cast<dunedaq::dal::TemplateApplication>())
             {
               add_template_application(t, "normal", seg, seg_config->m_applications, factory);
             }
@@ -1722,34 +1714,34 @@ check_mulpiple_inclusion(::config::map<std::string>& fuse, const std::string& id
   auto ret = fuse.emplace(id,parent);
   if(ret.second == false)
     {
-      throw daq::core::SegmentIncludedMultipleTimes( ERS_HERE, id, seg_config_to_name((*ret.first).second), seg_config_to_name(parent) );
+      throw dunedaq::dal::SegmentIncludedMultipleTimes( ERS_HERE, id, seg_config_to_name((*ret.first).second), seg_config_to_name(parent) );
     }
 }
 
 void
-daq::core::AlgorithmUtils::add_segments(
-    daq::core::Segment& seg,
-    const daq::core::Partition& p,
-    const std::vector<const daq::core::Segment*>& objs,
-    const daq::core::Rack * rack,
-    const daq::core::Computer * default_host,
+dunedaq::dal::AlgorithmUtils::add_segments(
+    dunedaq::dal::Segment& seg,
+    const dunedaq::dal::Partition& p,
+    const std::vector<const dunedaq::dal::Segment*>& objs,
+    const dunedaq::dal::Rack * rack,
+    const dunedaq::dal::Computer * default_host,
     ::config::map<std::string>& fuse)
 {
-  daq::core::SegConfig * seg_config = seg.get_seg_config(false);
+  dunedaq::dal::SegConfig * seg_config = seg.get_seg_config(false);
 
-  if(const daq::core::Computer * c = find_enabled(seg.get_Hosts()))
+  if(const dunedaq::dal::Computer * c = find_enabled(seg.get_Hosts()))
     default_host = c;
 
   seg_config->m_is_disabled = seg.disabled(p, true);
 
   if(seg_config->m_is_disabled == false)
     {
-      daq::core::AlgorithmUtils::add_applications(seg, rack, p, default_host);
+      dunedaq::dal::AlgorithmUtils::add_applications(seg, rack, p, default_host);
     }
 
   for(const auto& x : objs)
     {
-      if(const daq::core::TemplateSegment * ts = x->cast<TemplateSegment>())
+      if(const dunedaq::dal::TemplateSegment * ts = x->cast<TemplateSegment>())
         {
           bool ts_is_disabled = ts->disabled(p, true);
 
@@ -1763,8 +1755,8 @@ daq::core::AlgorithmUtils::add_segments(
 
               check_mulpiple_inclusion(fuse, id, seg.p_UID);
 
-              daq::core::Segment * s = const_cast<daq::core::Segment *>(p.configuration().get<daq::core::Segment>(const_cast<ConfigObject&>(ts->config_object()), id));
-              daq::core::SegConfig * nested_seg_config = daq::core::AlgorithmUtils::reset_seg_config(*s, &p);
+              dunedaq::dal::Segment * s = const_cast<dunedaq::dal::Segment *>(p.configuration().get<dunedaq::dal::Segment>(const_cast<ConfigObject&>(ts->config_object()), id));
+              dunedaq::dal::SegConfig * nested_seg_config = dunedaq::dal::AlgorithmUtils::reset_seg_config(*s, &p);
               nested_seg_config->m_is_disabled = is_disabled;
               nested_seg_config->m_is_templated = true;
               nested_seg_config->m_base_segment = x;
@@ -1781,8 +1773,8 @@ daq::core::AlgorithmUtils::add_segments(
         {
           check_mulpiple_inclusion(fuse, x->UID(), seg.p_UID);
 
-          daq::core::Segment * s = const_cast<daq::core::Segment *>(p.configuration().get<daq::core::Segment>(const_cast<ConfigObject&>(x->config_object()), x->UID()));
-          daq::core::SegConfig * nested_seg_config = daq::core::AlgorithmUtils::reset_seg_config(*s, &p);
+          dunedaq::dal::Segment * s = const_cast<dunedaq::dal::Segment *>(p.configuration().get<dunedaq::dal::Segment>(const_cast<ConfigObject&>(x->config_object()), x->UID()));
+          dunedaq::dal::SegConfig * nested_seg_config = dunedaq::dal::AlgorithmUtils::reset_seg_config(*s, &p);
           nested_seg_config->m_is_templated = false;
           nested_seg_config->m_base_segment = x;
 
@@ -1802,7 +1794,7 @@ daq::core::AlgorithmUtils::add_segments(
  */
 
 bool
-daq::core::AlgorithmUtils::check_app(const daq::core::BaseApplication * app, std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const daq::core::Computer *> * use_hosts)
+dunedaq::dal::AlgorithmUtils::check_app(const dunedaq::dal::BaseApplication * app, std::set<std::string> * app_types, std::set<std::string> * use_segments, std::set<const dunedaq::dal::Computer *> * use_hosts)
 {
   TLOG_DEBUG( 5) <<
     "check_app(app=" << app->UID() << ", seg=" << app->get_segment() << ", host=" << app->get_host() << "):"
@@ -1820,7 +1812,7 @@ daq::core::AlgorithmUtils::check_app(const daq::core::BaseApplication * app, std
 }
 
 void
-daq::core::AlgorithmUtils::get_applications(std::vector<const daq::core::BaseApplication *>& out, const daq::core::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const daq::core::Computer *> * hosts)
+dunedaq::dal::AlgorithmUtils::get_applications(std::vector<const dunedaq::dal::BaseApplication *>& out, const dunedaq::dal::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const dunedaq::dal::Computer *> * hosts)
 {
   SegConfig * seg_config = seg.get_seg_config(false);
 
@@ -1854,8 +1846,8 @@ daq::core::AlgorithmUtils::get_applications(std::vector<const daq::core::BaseApp
     get_applications(out, *x, app_types, segments, hosts);
 }
 
-daq::core::AppConfig *
-daq::core::AlgorithmUtils::reset_app_config(daq::core::BaseApplication& app)
+dunedaq::dal::AppConfig *
+dunedaq::dal::AlgorithmUtils::reset_app_config(dunedaq::dal::BaseApplication& app)
 {
   if (app.p_app_config)
     app.p_app_config->clear();
@@ -1865,8 +1857,8 @@ daq::core::AlgorithmUtils::reset_app_config(daq::core::BaseApplication& app)
   return app.p_app_config.get();
 }
 
-daq::core::SegConfig *
-daq::core::AlgorithmUtils::reset_seg_config(daq::core::Segment& seg, const daq::core::Partition* p)
+dunedaq::dal::SegConfig *
+dunedaq::dal::AlgorithmUtils::reset_seg_config(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition* p)
 {
   if (seg.p_seg_config)
     seg.p_seg_config->clear(p);
@@ -1876,14 +1868,14 @@ daq::core::AlgorithmUtils::reset_seg_config(daq::core::Segment& seg, const daq::
   return seg.p_seg_config.get();
 }
 
-const daq::core::Partition*
-daq::core::AlgorithmUtils::get_partition(const daq::core::BaseApplication * app)
+const dunedaq::dal::Partition*
+dunedaq::dal::AlgorithmUtils::get_partition(const dunedaq::dal::BaseApplication * app)
 {
   return app->get_segment()->get_seg_config(false)->get_partition();
 }
 
-const daq::core::Segment *
-daq::core::Partition::get_segment(const std::string& name) const
+const dunedaq::dal::Segment *
+dunedaq::dal::Partition::get_segment(const std::string& name) const
 {
   if (m_app_config.m_root_segment == nullptr)
     {
@@ -1891,16 +1883,16 @@ daq::core::Partition::get_segment(const std::string& name) const
 
       if (m_app_config.m_root_segment == nullptr)
         {
-          const daq::core::OnlineSegment * onlseg = get_OnlineInfrastructure();
+          const dunedaq::dal::OnlineSegment * onlseg = get_OnlineInfrastructure();
 
-          daq::core::Segment * root_segment = const_cast<daq::core::Segment *>(const_cast<Configuration&>(p_db).get<daq::core::Segment>(const_cast<ConfigObject&>(onlseg->config_object()), onlseg->UID()));
+          dunedaq::dal::Segment * root_segment = const_cast<dunedaq::dal::Segment *>(const_cast<Configuration&>(p_db).get<dunedaq::dal::Segment>(const_cast<ConfigObject&>(onlseg->config_object()), onlseg->UID()));
 
           // reinitialize seg config
-          daq::core::AlgorithmUtils::reset_seg_config(*root_segment, this);
+          dunedaq::dal::AlgorithmUtils::reset_seg_config(*root_segment, this);
 
           root_segment->p_seg_config->m_base_segment = root_segment;
 
-          const daq::core::Computer * default_host = get_DefaultHost();
+          const dunedaq::dal::Computer * default_host = get_DefaultHost();
 
           if (default_host && default_host->get_State() == false)
             {
@@ -1910,18 +1902,18 @@ daq::core::Partition::get_segment(const std::string& name) const
           ::config::map<std::string> fuse;
           fuse[root_segment->UID()] = "";
 
-          daq::core::AlgorithmUtils::add_segments(*root_segment, *this, get_Segments(), nullptr, default_host, fuse);
+          dunedaq::dal::AlgorithmUtils::add_segments(*root_segment, *this, get_Segments(), nullptr, default_host, fuse);
 
           for (const auto& a : get_OnlineInfrastructureApplications())
             {
-              if (const daq::core::ResourceBase * r = a->cast<daq::core::ResourceBase>())
+              if (const dunedaq::dal::ResourceBase * r = a->cast<dunedaq::dal::ResourceBase>())
                 {
                   if (r->disabled(*this, true) == true)
                     continue;
                 }
 
-              std::vector<const daq::core::BaseApplication *>& apps(a->cast<daq::core::InfrastructureBase>() ? root_segment->get_seg_config(false)->m_infrastructure : root_segment->get_seg_config(false)->m_applications);
-              daq::core::AlgorithmUtils::add_normal_application(a, *root_segment, apps);
+              std::vector<const dunedaq::dal::BaseApplication *>& apps(a->cast<dunedaq::dal::InfrastructureBase>() ? root_segment->get_seg_config(false)->m_infrastructure : root_segment->get_seg_config(false)->m_applications);
+              dunedaq::dal::AlgorithmUtils::add_normal_application(a, *root_segment, apps);
             }
 
           // check duplicated application IDs
@@ -1931,16 +1923,16 @@ daq::core::Partition::get_segment(const std::string& name) const
           //   do it once per load/reload modifying ApplicationConfig
 
           struct Compare {
-              bool operator()(const daq::core::BaseApplication *lhs, const daq::core::BaseApplication *rhs) const
+              bool operator()(const dunedaq::dal::BaseApplication *lhs, const dunedaq::dal::BaseApplication *rhs) const
               { return (lhs->UID() < rhs->UID()); };
           };
 
           struct ValidateAppID
           {
-            std::map<const daq::core::BaseApplication *, const daq::core::Segment *, Compare> m_map;
+            std::map<const dunedaq::dal::BaseApplication *, const dunedaq::dal::Segment *, Compare> m_map;
 
             static std::string
-            str(const daq::core::BaseApplication * x, const daq::core::Segment * y)
+            str(const dunedaq::dal::BaseApplication * x, const dunedaq::dal::Segment * y)
             {
               std::ostringstream s;
               s << '\"' << x << "\" in segment \"" << y->UID() << '\"';
@@ -1948,16 +1940,16 @@ daq::core::Partition::get_segment(const std::string& name) const
             }
 
             void
-            check_duplicated(const daq::core::BaseApplication * a, const daq::core::Segment * s)
+            check_duplicated(const dunedaq::dal::BaseApplication * a, const dunedaq::dal::Segment * s)
             {
               auto ret = m_map.emplace(a, s);
 
               if (ret.second == false)
-                throw daq::core::DuplicatedApplicationID( ERS_HERE, ValidateAppID::str(a, s), ValidateAppID::str(ret.first->first, ret.first->second) );
+                throw dunedaq::dal::DuplicatedApplicationID( ERS_HERE, ValidateAppID::str(a, s), ValidateAppID::str(ret.first->first, ret.first->second) );
             }
 
             void
-            check_duplicated(const daq::core::Segment *s)
+            check_duplicated(const dunedaq::dal::Segment *s)
             {
               SegConfig * seg_config = s->get_seg_config(false);
 
@@ -1987,7 +1979,7 @@ daq::core::Partition::get_segment(const std::string& name) const
         }
     }
 
-  const daq::core::Segment * seg = p_db.find<daq::core::Segment>(name);
+  const dunedaq::dal::Segment * seg = p_db.find<dunedaq::dal::Segment>(name);
 
   if(seg == nullptr)
     {
@@ -2003,33 +1995,33 @@ daq::core::Partition::get_segment(const std::string& name) const
             {
               std::ostringstream text;
               text << "cannot find template segment object \'" << seg_id << '\'';
-              throw daq::core::CannotFindSegmentByName(ERS_HERE, name, text.str());
+              throw dunedaq::dal::CannotFindSegmentByName(ERS_HERE, name, text.str());
             }
 
-          if (const daq::core::TemplateSegment * ts = seg->cast<TemplateSegment>())
+          if (const dunedaq::dal::TemplateSegment * ts = seg->cast<TemplateSegment>())
             {
               std::ostringstream text;
               text << "template segment " << ts << " does not have rack \'" << name.substr(idx + 1) << '\'';
-              throw daq::core::CannotFindSegmentByName(ERS_HERE, name, text.str());
+              throw dunedaq::dal::CannotFindSegmentByName(ERS_HERE, name, text.str());
             }
           else
             {
               std::ostringstream text;
               text << "object \'" << seg_id << "\' is not template segment";
-              throw daq::core::CannotFindSegmentByName(ERS_HERE, name, text.str());
+              throw dunedaq::dal::CannotFindSegmentByName(ERS_HERE, name, text.str());
             }
         }
       else
         {
-          throw daq::core::CannotFindSegmentByName(ERS_HERE, name, "no such non-template segment object");
+          throw dunedaq::dal::CannotFindSegmentByName(ERS_HERE, name, "no such non-template segment object");
         }
     }
 
   return seg;
 }
 
-const daq::core::AppConfig *
-daq::core::BaseApplication::get_app_config(bool no_except) const
+const dunedaq::dal::AppConfig *
+dunedaq::dal::BaseApplication::get_app_config(bool no_except) const
 {
   const BaseApplication * ptr;
 
@@ -2041,7 +2033,7 @@ daq::core::BaseApplication::get_app_config(bool no_except) const
         }
       else
         {
-          ptr = p_db.find<daq::core::BaseApplication>(UID());
+          ptr = p_db.find<dunedaq::dal::BaseApplication>(UID());
 
           if(ptr)
             {
@@ -2052,7 +2044,7 @@ daq::core::BaseApplication::get_app_config(bool no_except) const
               if (no_except)
                 return nullptr;
               else
-                throw daq::core::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "BaseApplication::get_app_config()");
+                throw dunedaq::dal::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "BaseApplication::get_app_config()");
             }
         }
     }
@@ -2066,15 +2058,15 @@ daq::core::BaseApplication::get_app_config(bool no_except) const
       if (no_except)
         return nullptr;
       else
-        throw daq::core::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "BaseApplication::get_app_config()");
+        throw dunedaq::dal::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "BaseApplication::get_app_config()");
     }
 
   return ptr->p_app_config.get();
 
 }
 
-daq::core::SegConfig *
-daq::core::Segment::get_seg_config(bool check_disabled, bool no_except) const
+dunedaq::dal::SegConfig *
+dunedaq::dal::Segment::get_seg_config(bool check_disabled, bool no_except) const
 {
   const Segment * ptr;
 
@@ -2086,7 +2078,7 @@ daq::core::Segment::get_seg_config(bool check_disabled, bool no_except) const
         }
       else
         {
-          ptr = p_db.find<daq::core::Segment>(UID());
+          ptr = p_db.find<dunedaq::dal::Segment>(UID());
 
           if (ptr)
             {
@@ -2097,7 +2089,7 @@ daq::core::Segment::get_seg_config(bool check_disabled, bool no_except) const
               if (no_except)
                 return nullptr;
               else
-                throw daq::core::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "Segment::get_seg_config()");
+                throw dunedaq::dal::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "Segment::get_seg_config()");
             }
         }
     }
@@ -2111,106 +2103,106 @@ daq::core::Segment::get_seg_config(bool check_disabled, bool no_except) const
       if (no_except)
         return nullptr;
       else
-        throw daq::core::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "Segment::get_seg_config()");
+        throw dunedaq::dal::NotInitedByDalAlgorithm(ERS_HERE, UID(), class_name(), (void*)this, "Segment::get_seg_config()");
     }
 
   if (check_disabled && ptr->p_seg_config->is_disabled() && no_except == false)
     {
-      throw(daq::core::SegmentDisabled(ERS_HERE));
+      throw(dunedaq::dal::SegmentDisabled(ERS_HERE));
     }
 
   return ptr->p_seg_config.get();
 
 }
 
-const daq::core::Computer *
-daq::core::BaseApplication::get_host() const
+const dunedaq::dal::Computer *
+dunedaq::dal::BaseApplication::get_host() const
 {
   return get_app_config()->get_host();
 }
 
-const daq::core::Segment *
-daq::core::BaseApplication::get_segment() const
+const dunedaq::dal::Segment *
+dunedaq::dal::BaseApplication::get_segment() const
 {
   return get_app_config()->get_segment();
 }
 
-const daq::core::BaseApplication *
-daq::core::BaseApplication::get_base_app() const
+const dunedaq::dal::BaseApplication *
+dunedaq::dal::BaseApplication::get_base_app() const
 {
   return get_app_config()->get_base_app();
 }
 
 bool
-daq::core::BaseApplication::is_templated() const
+dunedaq::dal::BaseApplication::is_templated() const
 {
   return get_app_config()->get_is_templated();
 }
 
 bool
-daq::core::Segment::is_disabled() const
+dunedaq::dal::Segment::is_disabled() const
 {
   return get_seg_config(false)->is_disabled();
 }
 
 bool
-daq::core::Segment::is_templated() const
+dunedaq::dal::Segment::is_templated() const
 {
   return get_seg_config(false)->is_templated();
 }
 
-const daq::core::Segment *
-daq::core::Segment::get_base_segment() const
+const dunedaq::dal::Segment *
+dunedaq::dal::Segment::get_base_segment() const
 {
   return get_seg_config(false)->get_base_segment();
 }
 
-const daq::core::BaseApplication *
-daq::core::Segment::get_controller() const
+const dunedaq::dal::BaseApplication *
+dunedaq::dal::Segment::get_controller() const
 {
   return get_seg_config(true)->get_controller();
 }
 
-const std::vector<const daq::core::BaseApplication *>&
-daq::core::Segment::get_infrastructure() const
+const std::vector<const dunedaq::dal::BaseApplication *>&
+dunedaq::dal::Segment::get_infrastructure() const
 {
   return get_seg_config(true)->get_infrastructure();
 }
 
-const std::vector<const daq::core::BaseApplication *>&
-daq::core::Segment::get_applications() const
+const std::vector<const dunedaq::dal::BaseApplication *>&
+dunedaq::dal::Segment::get_applications() const
 {
   return get_seg_config(true)->get_applications();
 }
 
-const std::vector<const daq::core::Segment*>&
-daq::core::Segment::get_nested_segments() const
+const std::vector<const dunedaq::dal::Segment*>&
+dunedaq::dal::Segment::get_nested_segments() const
 {
   return get_seg_config(false)->get_nested_segments();
 }
 
-const std::vector<const daq::core::Computer*>&
-daq::core::Segment::get_hosts() const
+const std::vector<const dunedaq::dal::Computer*>&
+dunedaq::dal::Segment::get_hosts() const
 {
   return get_seg_config(false)->get_hosts();
 }
 
 
-std::vector<const daq::core::BaseApplication *>
-daq::core::BaseApplication::get_initialization_depends_from(const std::vector<const daq::core::BaseApplication *>& all_apps) const
+std::vector<const dunedaq::dal::BaseApplication *>
+dunedaq::dal::BaseApplication::get_initialization_depends_from(const std::vector<const dunedaq::dal::BaseApplication *>& all_apps) const
 {
   return get_all_referenced(get_app_config(), get_base_app()->get_InitializationDependsFrom(), all_apps);
 }
 
-std::vector<const daq::core::BaseApplication *>
-daq::core::BaseApplication::get_shutdown_depends_from(const std::vector<const daq::core::BaseApplication *>& all_apps) const
+std::vector<const dunedaq::dal::BaseApplication *>
+dunedaq::dal::BaseApplication::get_shutdown_depends_from(const std::vector<const dunedaq::dal::BaseApplication *>& all_apps) const
 {
   return get_all_referenced(get_app_config(), get_base_app()->get_ShutdownDependsFrom(), all_apps);
 }
 
 
-std::vector<const daq::core::BaseApplication *>
-daq::core::Segment::get_all_applications(std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const daq::core::Computer *> * hosts) const
+std::vector<const dunedaq::dal::BaseApplication *>
+dunedaq::dal::Segment::get_all_applications(std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const dunedaq::dal::Computer *> * hosts) const
 {
   // get all sub-types
   std::set<std::string> all_app_types;
@@ -2248,22 +2240,22 @@ daq::core::Segment::get_all_applications(std::set<std::string> * app_types, std:
   if (hosts && hosts->empty())
     hosts = nullptr;
 
-  std::vector<const daq::core::BaseApplication *> out;
-  daq::core::AlgorithmUtils::get_applications(out, *this, app_types, segments, hosts);
+  std::vector<const dunedaq::dal::BaseApplication *> out;
+  dunedaq::dal::AlgorithmUtils::get_applications(out, *this, app_types, segments, hosts);
   return out;
 }
 
-static std::vector<const daq::core::Tag*>
-get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::core::Segment *>& s_list)
+static std::vector<const dunedaq::dal::Tag*>
+get_some_info(const dunedaq::dal::BaseApplication * this_app, std::list<const dunedaq::dal::Segment *>& s_list)
 {
-  std::vector<const daq::core::Tag*> tags;
+  std::vector<const dunedaq::dal::Tag*> tags;
 
-  const daq::core::Partition& partition(*daq::core::AlgorithmUtils::get_partition(this_app));
-  const daq::core::Segment * root_segment(partition.get_OnlineInfrastructure()->cast<daq::core::Segment>());
-  const daq::core::Computer& host(*this_app->get_host());
+  const dunedaq::dal::Partition& partition(*dunedaq::dal::AlgorithmUtils::get_partition(this_app));
+  const dunedaq::dal::Segment * root_segment(partition.get_OnlineInfrastructure()->cast<dunedaq::dal::Segment>());
+  const dunedaq::dal::Computer& host(*this_app->get_host());
 
-  const daq::core::BaseApplication * base_app = this_app->get_base_app();
-  const daq::core::Segment * segment = this_app->get_segment();
+  const dunedaq::dal::BaseApplication * base_app = this_app->get_base_app();
+  const dunedaq::dal::Segment * segment = this_app->get_segment();
 
   TLOG_DEBUG( 4) << "  this           = " << this_app->UID() << "\n"
                 "  partition      = " << &partition << "\n"
@@ -2273,7 +2265,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     {
       TLOG_DEBUG( 4) <<  "Building partition-segment[s] path to the application"  ;
 
-      std::list<std::vector<const daq::core::Component *>> paths;
+      std::list<std::vector<const dunedaq::dal::Component *>> paths;
       segment->get_parents(partition, paths);
 
       for (auto& i : paths)
@@ -2282,7 +2274,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
       // If still not found then there is a problem
       if (paths.empty())
         {
-          throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), "the application is not in the partition control tree" );
+          throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), "the application is not in the partition control tree" );
         }
       else if (paths.size() > 1)
         {
@@ -2294,23 +2286,23 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
               for (const auto& j : i)
               text << "   - " << j << std::endl;
             }
-          throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() );
+          throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() );
         }
 
-      std::vector<const daq::core::Component *>& path = paths.front();
+      std::vector<const dunedaq::dal::Component *>& path = paths.front();
 
       TLOG_DEBUG( 5) <<  "add " << root_segment << " as root segment for application " << this_app->UID() ;
       s_list.push_back(root_segment);
 
       if (path.size() != 1 || path[0]->UID() != root_segment->UID())
         {
-          const std::vector<const daq::core::Segment*> * segs = &root_segment->get_nested_segments();
+          const std::vector<const dunedaq::dal::Segment*> * segs = &root_segment->get_nested_segments();
 
           for (const auto& i : path)
             {
-              const daq::core::TemplateSegment * tseg = i->cast<daq::core::TemplateSegment>();
+              const dunedaq::dal::TemplateSegment * tseg = i->cast<dunedaq::dal::TemplateSegment>();
 
-              if (const daq::core::Segment * seg = i->cast<daq::core::Segment>())
+              if (const dunedaq::dal::Segment * seg = i->cast<dunedaq::dal::Segment>())
                 {
                   const ConfigObjectImpl * seg_config_obj_implementation(seg->config_object().implementation());
 
@@ -2335,7 +2327,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
                         {
                           std::ostringstream text;
                           text << "cannot find segment " << seg << " as nested child of " << &partition;
-                          throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() );
+                          throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() );
                         }
                     }
                 }
@@ -2351,7 +2343,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
   if (ers::debug_level() >= 4)
     {
       std::ostringstream text;
-      for (std::list<const daq::core::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i)
+      for (std::list<const dunedaq::dal::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i)
         {
           text << " * segment " << (*i)->UID() << std::endl;
         }
@@ -2366,7 +2358,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     }
   catch (dunedaq::config::Exception& ex)
     {
-      throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), "failed to read application's Program object", ex );
+      throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), "failed to read application's Program object", ex );
     }
 
 
@@ -2375,7 +2367,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
   //     from the segment list, Partition DefaultTags)
   //   - eliminate those which are not supported by the hw
 
-  std::vector<const daq::core::Tag*> tempTags;
+  std::vector<const dunedaq::dal::Tag*> tempTags;
 
   // Get possible tags
   if (base_app->get_ExplicitTag()) {
@@ -2383,7 +2375,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
     tempTags.push_back(base_app->get_ExplicitTag());
   } else {
     // DefaultTags from the segment list
-    for (std::list<const daq::core::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i) {
+    for (std::list<const dunedaq::dal::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i) {
       if(s_list.size() > 1 && *i == root_segment)
         {
           TLOG_DEBUG(4) <<  "skip default tags of " << root_segment << " for application " << this_app->UID() ;
@@ -2408,13 +2400,13 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
 
   // Report error if there are no possible tags
   if (tempTags.empty())
-    throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), "there are no Tags defined for the application" ) ;
+    throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), "there are no Tags defined for the application" ) ;
 
   // Remove tags which are not supported by the hardware
   {
     // Go through all tags and remove tags if not for this hardware
     for (const auto& i : tempTags)
-      if (daq::core::is_compatible(*i, host, partition))
+      if (dunedaq::dal::is_compatible(*i, host, partition))
         tags.push_back(i);
       else
         TLOG_DEBUG(6) <<  "* remove tag " << i << " which is incompatible with the HW tag " << host.get_HW_Tag() ;
@@ -2430,7 +2422,7 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
             text << i;
           }
         text << ") are not supported by the host " << &host << " (HW tag: \'" << host.get_HW_Tag() << "\')";
-        throw daq::core::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() ) ;
+        throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), text.str() ) ;
       }
 
 
@@ -2449,11 +2441,11 @@ get_some_info(const daq::core::BaseApplication * this_app, std::list<const daq::
 }
 
 static std::string
-get_host_and_backup_list(const daq::core::BaseApplication * app)
+get_host_and_backup_list(const dunedaq::dal::BaseApplication * app)
 {
   std::string s(app->get_host()->UID());
 
-  std::vector<const daq::core::Computer *> backup_hosts = app->get_backup_hosts();
+  std::vector<const dunedaq::dal::Computer *> backup_hosts = app->get_backup_hosts();
 
   for (const auto& x : backup_hosts)
     {
@@ -2464,18 +2456,18 @@ get_host_and_backup_list(const daq::core::BaseApplication * app)
   return s;
 }
 
-const daq::core::Tag *
-daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environment, std::vector<std::string>& program_names, std::string & startArgs, std::string & restartArgs) const
+const dunedaq::dal::Tag *
+dunedaq::dal::BaseApplication::get_info(std::map<std::string, std::string>& environment, std::vector<std::string>& program_names, std::string & startArgs, std::string & restartArgs) const
 {
-  const daq::core::Tag * tag = nullptr;
-  const daq::core::BaseApplication * base_app = get_base_app();
-  const daq::core::ComputerProgram * program = base_app->get_Program();
+  const dunedaq::dal::Tag * tag = nullptr;
+  const dunedaq::dal::BaseApplication * base_app = get_base_app();
+  const dunedaq::dal::ComputerProgram * program = base_app->get_Program();
 
-  const daq::core::Partition& partition(*daq::core::AlgorithmUtils::get_partition(this));
-  const daq::core::Computer& host(*get_host());
+  const dunedaq::dal::Partition& partition(*dunedaq::dal::AlgorithmUtils::get_partition(this));
+  const dunedaq::dal::Computer& host(*get_host());
 
-  std::list<const daq::core::Segment *> s_list;
-  std::vector<const daq::core::Tag *> tags = get_some_info(this, s_list) ; // throw BadApplicationInfo
+  std::list<const dunedaq::dal::Segment *> s_list;
+  std::vector<const dunedaq::dal::Tag *> tags = get_some_info(this, s_list) ; // throw BadApplicationInfo
 
   std::vector<std::string> tmp_paths_to_shared_libraries;
   std::vector<std::string> tmp_search_paths;
@@ -2489,23 +2481,23 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
       tag = tags[i];
       break;
     }
-    catch(const daq::core::BadTag &ex) {
+    catch(const dunedaq::dal::BadTag &ex) {
       const int debug_level = 3;
       if(ers::debug_level() >= debug_level) {
         std::ostringstream text;
         text << "cannot use tag " << tags[i];
-        ers::debug( daq::core::BadApplicationInfo(ERS_HERE, UID(), text.str(), ex), debug_level);
+        ers::debug( dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), text.str(), ex), debug_level);
       }
 
       if (i == tags.size()-1) {
-        throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
+        throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
       }
     }
-    catch(daq::core::BadProgramInfo &ex) {
-      throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
+    catch(dunedaq::dal::BadProgramInfo &ex) {
+      throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
     }
     catch(dunedaq::config::Exception& ex) {
-      throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "Failed to read application's parameters to get possible Tags." , ex);
+      throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "Failed to read application's parameters to get possible Tags." , ex);
     }
 
   }
@@ -2533,13 +2525,13 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
 
     // Append paths to shared libraries from application's repositories
     try {
-      daq::core::TestCircularDependency cd_fuse("application binary and library paths", this);
+      dunedaq::dal::TestCircularDependency cd_fuse("application binary and library paths", this);
       for (const auto& i : get_Uses()) {
         get_paths(i, search_paths, paths_to_shared_libraries, binary_info, cd_fuse);
       }
     }
-    catch(daq::core::FoundCircularDependency &ex) {
-      throw daq::core::BadApplicationInfo(ERS_HERE, UID(), "Failed to get binary and library paths.", ex);
+    catch(dunedaq::dal::FoundCircularDependency &ex) {
+      throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "Failed to get binary and library paths.", ex);
     }
 
 
@@ -2586,18 +2578,18 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
 
     // Segment list NeedsEnvironment
     std::map<std::string,std::string> parent_var_names;
-    for (std::list<const daq::core::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i) {
+    for (std::list<const dunedaq::dal::Segment *>::reverse_iterator i = s_list.rbegin(); i != s_list.rend(); ++i) {
       add_env_vars(environment, (*i)->get_ProcessEnvironment(), tag);
 
       for(const auto& j : (*i)->get_infrastructure()) {
-        const daq::core::InfrastructureBase * ia = j->get_base_app()->cast<daq::core::InfrastructureBase>();
+        const dunedaq::dal::InfrastructureBase * ia = j->get_base_app()->cast<dunedaq::dal::InfrastructureBase>();
         const std::string& swv_name(ia->get_SegmentProcEnvVarName());
         if(!swv_name.empty()) {
           try {
               // add value of this segment-wide process environment variable
             const std::string value = (
-              ia->get_SegmentProcEnvVarValue() == daq::core::InfrastructureBase::SegmentProcEnvVarValue::AppId ? j->UID() :
-              ia->get_SegmentProcEnvVarValue() == daq::core::InfrastructureBase::SegmentProcEnvVarValue::RunsOn ? j->get_host()->UID() :
+              ia->get_SegmentProcEnvVarValue() == dunedaq::dal::InfrastructureBase::SegmentProcEnvVarValue::AppId ? j->UID() :
+              ia->get_SegmentProcEnvVarValue() == dunedaq::dal::InfrastructureBase::SegmentProcEnvVarValue::RunsOn ? j->get_host()->UID() :
               get_host_and_backup_list(j)
             );
 
@@ -2621,7 +2613,7 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
             }
           }
           catch(ers::Issue& ex) {
-            throw daq::core::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
+            throw dunedaq::dal::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
           }
         }
       }
@@ -2645,7 +2637,7 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
                << mk_app_env_string(environment)  ;
   }
   catch  ( dunedaq::config::Generic & ex ) {
-    throw daq::core::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
+    throw dunedaq::dal::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
   }
 
     // Add "PATH" and "LD_LIBRARY_PATH" variables
@@ -2661,19 +2653,19 @@ daq::core::BaseApplication::get_info(std::map<std::string, std::string>& environ
   std::string rsa = sa;
   sa.append(base_app->get_Parameters());
   rsa.append(base_app->get_RestartParameters());
-  startArgs = daq::core::substitute_variables(sa, &environment, beg_env_str, end_env_str);
-  restartArgs = daq::core::substitute_variables(rsa, &environment, beg_env_str, end_env_str);
+  startArgs = dunedaq::dal::substitute_variables(sa, &environment, beg_env_str, end_env_str);
+  restartArgs = dunedaq::dal::substitute_variables(rsa, &environment, beg_env_str, end_env_str);
 
   return tag;
 }
 
 
-std::vector<const daq::core::Computer *>
-daq::core::AppConfig::get_backup_hosts() const
+std::vector<const dunedaq::dal::Computer *>
+dunedaq::dal::AppConfig::get_backup_hosts() const
 {
-  if(const daq::core::Application * a = m_base_app->cast<daq::core::Application>())
+  if(const dunedaq::dal::Application * a = m_base_app->cast<dunedaq::dal::Application>())
     {
-      std::vector<const daq::core::Computer *> result;
+      std::vector<const dunedaq::dal::Computer *> result;
       add_computers(result, a->get_BackupHosts());
       return result;
     }
@@ -2683,20 +2675,20 @@ daq::core::AppConfig::get_backup_hosts() const
     }
 }
 
-std::vector<const daq::core::Computer *>
-daq::core::BaseApplication::get_backup_hosts() const
+std::vector<const dunedaq::dal::Computer *>
+dunedaq::dal::BaseApplication::get_backup_hosts() const
 {
   return get_app_config()->get_backup_hosts();
 }
 
-daq::core::ApplicationConfig::ApplicationConfig(::Configuration& db) :
+dunedaq::dal::ApplicationConfig::ApplicationConfig(::Configuration& db) :
     m_db(db), m_root_segment(nullptr)
 {
   TLOG_DEBUG(2) <<  "construct the object " << (void *)this ;
   m_db.add_action(this);
 }
 
-daq::core::ApplicationConfig::~ApplicationConfig()
+dunedaq::dal::ApplicationConfig::~ApplicationConfig()
 {
   TLOG_DEBUG(2) <<  "destroy the object " << (void *)this ;
   m_db.remove_action(this);
@@ -2707,7 +2699,7 @@ daq::core::ApplicationConfig::~ApplicationConfig()
  ******************************************************************************/
 
 std::string
-daq::core::Partition::get_log_directory() const
+dunedaq::dal::Partition::get_log_directory() const
 {
   TLOG_DEBUG(4) <<  " CALL " << this << "::get_log_directory()" ;
 
@@ -2727,42 +2719,42 @@ daq::core::Partition::get_log_directory() const
 
 // adds Parameters used in segment to the vector
 static void
-add_parameters( std::vector<const daq::core::Parameter*>& params, const daq::core::Segment& segment, daq::core::TestCircularDependency& cd_fuse )
+add_parameters( std::vector<const dunedaq::dal::Parameter*>& params, const dunedaq::dal::Segment& segment, dunedaq::dal::TestCircularDependency& cd_fuse )
 {
-  const std::vector<const daq::core::Parameter*>& seg_params(segment.get_Parameters());
+  const std::vector<const dunedaq::dal::Parameter*>& seg_params(segment.get_Parameters());
   params.insert(params.end(), seg_params.begin(), seg_params.end() ) ;
 
   for(const auto& i : segment.get_Segments())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
       add_parameters(params, *i, cd_fuse) ;
     }
 }
 
 static void
-add_vars(std::map<std::string, std::string>& cvt_map, const std::vector<const daq::core::Parameter*>& params, daq::core::TestCircularDependency& cd_fuse)
+add_vars(std::map<std::string, std::string>& cvt_map, const std::vector<const dunedaq::dal::Parameter*>& params, dunedaq::dal::TestCircularDependency& cd_fuse)
 {
   for (const auto& i : params)
     {
-      if (const daq::core::Variable * var = i->cast<daq::core::Variable>())
+      if (const dunedaq::dal::Variable * var = i->cast<dunedaq::dal::Variable>())
         {
           const std::string& v = var->get_value(); // note, algorithm is used here; it returns empty value for multi-value variable
           cvt_map[var->get_Name()] = v;
           if (v.find('$') != std::string::npos || var->get_Name().find('$') != std::string::npos)
             {
-              const_cast<daq::core::Variable *>(var)->DalObject::unread();
+              const_cast<dunedaq::dal::Variable *>(var)->DalObject::unread();
             }
         }
-      else if (const daq::core::VariableSet * vars = i->cast<daq::core::VariableSet>())
+      else if (const dunedaq::dal::VariableSet * vars = i->cast<dunedaq::dal::VariableSet>())
         {
-          daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, vars);
+          dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, vars);
           add_vars(cvt_map, vars->get_Contains(), cd_fuse);
         }
     }
 }
 
 void
-daq::core::SubstituteVariables::reset(const Partition& p)
+dunedaq::dal::SubstituteVariables::reset(const Partition& p)
 {
   m_cvt_map.clear();
 
@@ -2772,18 +2764,18 @@ daq::core::SubstituteVariables::reset(const Partition& p)
 
   try
     {
-      daq::core::TestCircularDependency cd_fuse("segments substitution parameters", &p);
-      std::vector<const daq::core::Parameter*> params = p.get_Parameters();
+      dunedaq::dal::TestCircularDependency cd_fuse("segments substitution parameters", &p);
+      std::vector<const dunedaq::dal::Parameter*> params = p.get_Parameters();
 
-      if (const daq::core::Segment* oseg = p.get_OnlineInfrastructure())
+      if (const dunedaq::dal::Segment* oseg = p.get_OnlineInfrastructure())
         {
-          daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, oseg);
+          dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, oseg);
           add_parameters(params, *oseg, cd_fuse);
         }
 
       for (const auto& i : p.get_Segments())
         {
-          daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+          dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
           add_parameters(params, *i, cd_fuse);
         }
 
@@ -2803,7 +2795,7 @@ daq::core::SubstituteVariables::reset(const Partition& p)
                 {
                   std::ostringstream text;
                   text << "substitute variables conversion map parameter " << rn << "=\'" << i->get_InstallationPath() << "\' defined by object " << *i << " was already defined; check configuration database";
-                  ers::warning(daq::core::BadVariableUsage(ERS_HERE, text.str()));
+                  ers::warning(dunedaq::dal::BadVariableUsage(ERS_HERE, text.str()));
                 }
             }
         }
@@ -2858,7 +2850,7 @@ daq::core::SubstituteVariables::reset(const Partition& p)
 }
 
 void
-daq::core::SubstituteVariables::convert(std::string& s, const Configuration&, const ConfigObject& o, const std::string& a)
+dunedaq::dal::SubstituteVariables::convert(std::string& s, const Configuration&, const ConfigObject& o, const std::string& a)
 {
   TLOG_DEBUG(5) <<  "convert attribute \'" << a << "\' value \'" << s << "\' of object " << &o ;
 
@@ -2871,7 +2863,7 @@ daq::core::SubstituteVariables::convert(std::string& s, const Configuration&, co
 }
 
 std::string
-daq::core::substitute_variables(const std::string& str_from, const std::map<std::string, std::string> * cvs_map, const std::string& beg, const std::string& end)
+dunedaq::dal::substitute_variables(const std::string& str_from, const std::map<std::string, std::string> * cvs_map, const std::string& beg, const std::string& end)
 {
   std::string s(str_from);
 
@@ -2923,7 +2915,7 @@ daq::core::substitute_variables(const std::string& str_from, const std::map<std:
 
   // class Tokenizer is used for easy parsing of string containing several tokens
 
-namespace dal {
+namespace dunedaq::dal {
 class Tokenizer {
 
   public:
@@ -2956,12 +2948,12 @@ Tokenizer::next()
   p_idx = p_string.find_first_not_of(p_delimeters, end_idx);
   return token;
 }
-}
+} // namespace dunedaq::dal
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-const daq::core::Partition *
-daq::core::get_partition(::Configuration& conf, const std::string& pname, unsigned long rlevel, const std::vector<std::string> * rclasses)
+const dunedaq::dal::Partition *
+dunedaq::dal::get_partition(::Configuration& conf, const std::string& pname, unsigned long rlevel, const std::vector<std::string> * rclasses)
 {
   static std::set<std::string> s_already_processed_partitions; // keep list of already processed partitions
   static std::mutex s_mutex;
@@ -2978,7 +2970,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
         }
       else
         {
-          ers::error(daq::core::BadPartitionID(ERS_HERE, name, std::runtime_error("No partition UID provided. What is the UID of the partition you are looking for?")));
+          ers::error(dunedaq::dal::BadPartitionID(ERS_HERE, name, std::runtime_error("No partition UID provided. What is the UID of the partition you are looking for?")));
           return nullptr;
         }
     }
@@ -3016,7 +3008,7 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
       if (const char * rn = get_env("DAL_GET_PARTITION_REF_CLASS_NAMES"))
         {
           rclasses = &dummu;
-          dal::Tokenizer t(rn, ",");
+	  dunedaq::dal::Tokenizer t(rn, ",");
           std::string token;
           std::string names;
           while (!(token = t.next()).empty())
@@ -3031,27 +3023,27 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
           rclasses = &dummu;
           dummu =
             {
-              daq::core::Partition::s_class_name,        // the partition object
-              daq::core::Tag::s_class_name,              // tags, tags mappings (always needed)
-              daq::core::Segment::s_class_name,          // segments
-              daq::core::ResourceSet::s_class_name,      // resource sets
-              daq::core::Rack::s_class_name,             // racks
-              daq::core::BaseApplication::s_class_name,  // applications
-              daq::core::ComputerBase::s_class_name,     // computers and computer sets
-              daq::core::SW_Package::s_class_name,       // sw repositories, packages
-              daq::core::SW_Object::s_class_name,        // sw objects
-              daq::core::BinaryFile::s_class_name,       // sw object extensions
-              daq::core::Parameter::s_class_name         // parameters for substitution
+              dunedaq::dal::Partition::s_class_name,        // the partition object
+              dunedaq::dal::Tag::s_class_name,              // tags, tags mappings (always needed)
+              dunedaq::dal::Segment::s_class_name,          // segments
+              dunedaq::dal::ResourceSet::s_class_name,      // resource sets
+              dunedaq::dal::Rack::s_class_name,             // racks
+              dunedaq::dal::BaseApplication::s_class_name,  // applications
+              dunedaq::dal::ComputerBase::s_class_name,     // computers and computer sets
+              dunedaq::dal::SW_Package::s_class_name,       // sw repositories, packages
+              dunedaq::dal::SW_Object::s_class_name,        // sw objects
+              dunedaq::dal::BinaryFile::s_class_name,       // sw object extensions
+              dunedaq::dal::Parameter::s_class_name         // parameters for substitution
             };
           TLOG_DEBUG(3) <<  " set default ref-class-names parameter (to get info about applications)" ;
         }
     }
 
-  const daq::core::Partition * p = conf.get<daq::core::Partition>(name, false, true, rlevel, rclasses);
+  const dunedaq::dal::Partition * p = conf.get<dunedaq::dal::Partition>(name, false, true, rlevel, rclasses);
 
   if (!p)
     {
-      ers::error(daq::core::BadPartitionID(ERS_HERE, name));
+      ers::error(dunedaq::dal::BadPartitionID(ERS_HERE, name));
     }
 
   return p;
@@ -3064,14 +3056,14 @@ daq::core::get_partition(::Configuration& conf, const std::string& pname, unsign
   // add vector of repository objects to the set of repositories
 
 static void
-add_repositories(std::set<const daq::core::SW_Repository *>& repositories, const std::vector<const daq::core::SW_Package*>& reps, daq::core::TestCircularDependency& cd_fuse)
+add_repositories(std::set<const dunedaq::dal::SW_Repository *>& repositories, const std::vector<const dunedaq::dal::SW_Package*>& reps, dunedaq::dal::TestCircularDependency& cd_fuse)
 {
   for (const auto& i : reps)
     {
-      if (const daq::core::SW_Repository * r = i->cast<daq::core::SW_Repository>())
+      if (const dunedaq::dal::SW_Repository * r = i->cast<dunedaq::dal::SW_Repository>())
         repositories.insert(r);
 
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
       add_repositories(repositories, i->get_Uses(), cd_fuse);
     }
 }
@@ -3080,31 +3072,31 @@ add_repositories(std::set<const daq::core::SW_Repository *>& repositories, const
   // process repositories linked with application
 
 static void
-process_application(std::set<const daq::core::SW_Repository *>& repositories, const daq::core::BaseApplication * a)
+process_application(std::set<const dunedaq::dal::SW_Repository *>& repositories, const dunedaq::dal::BaseApplication * a)
 {
   if (a)
     {
       try
         {
-          daq::core::TestCircularDependency cd_fuse("used repositories", a);
+          dunedaq::dal::TestCircularDependency cd_fuse("used repositories", a);
 
           // add repositories used by application
           add_repositories(repositories, a->get_Uses(), cd_fuse);
 
           // add repositories linked with the application's program
-          if (const daq::core::ComputerProgram * p = a->get_Program())
+          if (const dunedaq::dal::ComputerProgram * p = a->get_Program())
             {
-              if (const daq::core::SW_Repository * r = p->get_BelongsTo())
+              if (const dunedaq::dal::SW_Repository * r = p->get_BelongsTo())
                 repositories.insert(r);
 
-              daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, p);
+              dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, p);
               add_repositories(repositories, p->get_Uses(), cd_fuse);
             }
 
         }
       catch (ers::Issue& ex)
         {
-          ers::error(daq::core::BadApplicationInfo(ERS_HERE,a->UID(),"db problem",ex));
+          ers::error(dunedaq::dal::BadApplicationInfo(ERS_HERE,a->UID(),"db problem",ex));
         }
     }
 }
@@ -3113,10 +3105,10 @@ process_application(std::set<const daq::core::SW_Repository *>& repositories, co
   // process applications of segment
 
 static void
-process_segment(std::set<const daq::core::SW_Repository *>& repositories, const daq::core::Segment& s, daq::core::TestCircularDependency& cd_fuse)
+process_segment(std::set<const dunedaq::dal::SW_Repository *>& repositories, const dunedaq::dal::Segment& s, dunedaq::dal::TestCircularDependency& cd_fuse)
 {
   // check segment's controller
-  process_application(repositories, s.get_IsControlledBy()->cast<daq::core::BaseApplication>());
+  process_application(repositories, s.get_IsControlledBy()->cast<dunedaq::dal::BaseApplication>());
 
   // check segment's applications, which are not resources
   for (const auto & i : s.get_Applications())
@@ -3124,7 +3116,7 @@ process_segment(std::set<const daq::core::SW_Repository *>& repositories, const 
 
   // check segment's infrastructure applications
   for (const auto& i : s.get_Infrastructure())
-    process_application(repositories, i->cast<daq::core::BaseApplication>());
+    process_application(repositories, i->cast<dunedaq::dal::BaseApplication>());
 
   // add segment's resource applications
   for (const auto& i : s.get_Resources())
@@ -3134,21 +3126,21 @@ process_segment(std::set<const daq::core::SW_Repository *>& repositories, const 
   // process applications from nested segments
   for (const auto& i : s.get_Segments())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
       process_segment(repositories, *i, cd_fuse);
     }
 }
 
-std::set<const daq::core::SW_Repository *>
-daq::core::get_used_repositories(const daq::core::Partition& p)
+std::set<const dunedaq::dal::SW_Repository *>
+dunedaq::dal::get_used_repositories(const dunedaq::dal::Partition& p)
 {
-  std::set<const daq::core::SW_Repository *> repositories;
+  std::set<const dunedaq::dal::SW_Repository *> repositories;
 
-  daq::core::TestCircularDependency cd_fuse("used segments and repositories", &p);
+  dunedaq::dal::TestCircularDependency cd_fuse("used segments and repositories", &p);
 
-  if (const daq::core::OnlineSegment * online_segment = p.get_OnlineInfrastructure())
+  if (const dunedaq::dal::OnlineSegment * online_segment = p.get_OnlineInfrastructure())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, online_segment);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, online_segment);
       process_segment(repositories, *online_segment, cd_fuse);
 
       for (const auto &a : p.get_OnlineInfrastructureApplications())
@@ -3157,7 +3149,7 @@ daq::core::get_used_repositories(const daq::core::Partition& p)
 
   for (const auto& i : p.get_Segments())
     {
-      daq::core::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
+      dunedaq::dal::AddTestOnCircularDependency add_fuse_test(cd_fuse, i);
       process_segment(repositories, *i, cd_fuse);
     }
 
@@ -3176,11 +3168,11 @@ check_file_exists(const std::string& path, std::string & file)
 
 
 void
-daq::core::add_classpath(const daq::core::SW_Repository& rep, const std::string& user_dir, std::string& class_path)
+dunedaq::dal::add_classpath(const dunedaq::dal::SW_Repository& rep, const std::string& user_dir, std::string& class_path)
 {
   for (const auto& j : rep.get_SW_Objects())
     {
-      if (const daq::core::JarFile *jf = j->cast<daq::core::JarFile>())
+      if (const dunedaq::dal::JarFile *jf = j->cast<dunedaq::dal::JarFile>())
         {
           std::string file;
 
@@ -3203,7 +3195,7 @@ daq::core::add_classpath(const daq::core::SW_Repository& rep, const std::string&
 
           if (file.empty())
             {
-              ers::error(daq::core::NoJarFile(ERS_HERE, bn, j->UID(), j->class_name(), rep.UID(), rep.class_name()));
+              ers::error(dunedaq::dal::NoJarFile(ERS_HERE, bn, j->UID(), j->class_name(), rep.UID(), rep.class_name()));
             }
           else
             {
@@ -3223,7 +3215,7 @@ static std::string cv_info_name("RunParams.ConfigVersion");
 
 
 std::string
-daq::core::get_config_version(const std::string& partition)
+dunedaq::dal::get_config_version(const std::string& partition)
 {
   
   if(const char * env = getenv(s_tdaq_db_version_str.c_str()))
@@ -3233,7 +3225,7 @@ daq::core::get_config_version(const std::string& partition)
 }
 
 std::string
-daq::core::Partition::get_config_version()
+dunedaq::dal::Partition::get_config_version()
 {
-  return ::daq::core::get_config_version(UID());
+  return ::dunedaq::dal::get_config_version(UID());
 }

@@ -52,13 +52,13 @@ main(int argc, char *argv[])
     {
       Configuration db(data);
 
-      const daq::core::Partition * partition = daq::core::get_partition(db, partition_name);
+      const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
 
       if(!partition) return 1;
 
-      db.register_converter(new daq::core::SubstituteVariables(*partition));
+      db.register_converter(new dunedaq::dal::SubstituteVariables(*partition));
 
-      std::vector<const daq::core::BaseApplication *> all_apps = partition->get_all_applications();
+      std::vector<const dunedaq::dal::BaseApplication *> all_apps = partition->get_all_applications();
 
       std::set<std::string> t_classes = {"TemplateApplication"};
 
@@ -69,9 +69,9 @@ main(int argc, char *argv[])
               std::cout << "found " << a->get_base_app() << std::endl;
 
               std::set<std::string> segments = {a->get_segment()->UID()};
-              std::set<const daq::core::Computer*> hosts = {a->get_host()};
+              std::set<const dunedaq::dal::Computer*> hosts = {a->get_host()};
 
-              std::vector<const daq::core::BaseApplication *> apps2 = partition->get_all_applications(&t_classes, &segments, &hosts);
+              std::vector<const dunedaq::dal::BaseApplication *> apps2 = partition->get_all_applications(&t_classes, &segments, &hosts);
 
               if (!apps2.empty())
                 {

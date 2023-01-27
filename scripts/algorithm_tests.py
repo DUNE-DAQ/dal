@@ -216,6 +216,9 @@ if __name__ == '__main__':
     global db
     global partition
 
+    if "TDAQ_DB_PATH" not in os.environ:
+        os.environ["TDAQ_DB_PATH"] = os.environ["DUNEDAQ_SHARE_PATH"]
+
     scriptsdir=os.path.dirname(os.path.realpath(__file__))
 
     db_file=f"{scriptsdir}/dal_testing.data.xml"

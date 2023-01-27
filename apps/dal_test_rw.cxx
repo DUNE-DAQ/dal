@@ -131,14 +131,14 @@ create_data(::Configuration& db, const std::string& name, const std::string& suf
 
   db.create(f, std::list<std::string>(1, schema_name));
 
-  daq::core::Rack * rack = const_cast<daq::core::Rack *>(db.create<daq::core::Rack>(f, rack_name + suffix));
+  dunedaq::dal::Rack * rack = const_cast<dunedaq::dal::Rack *>(db.create<dunedaq::dal::Rack>(f, rack_name + suffix));
 
-  std::vector<const daq::core::ComputerBase*> rack_nodes;
-  std::vector<const daq::core::Computer*> rack_lfs;
+  std::vector<const dunedaq::dal::ComputerBase*> rack_nodes;
+  std::vector<const dunedaq::dal::Computer*> rack_lfs;
 
-  rack_lfs.push_back(const_cast<daq::core::Computer *>(db.create<daq::core::Computer>(*rack, lfs_name + suffix)));
-  rack_nodes.push_back(const_cast<daq::core::Computer *>(db.create<daq::core::Computer>(*rack, node_name + suffix + "-1")));
-  rack_nodes.push_back(const_cast<daq::core::Computer *>(db.create<daq::core::Computer>(*rack, node_name + suffix + "-2")));
+  rack_lfs.push_back(const_cast<dunedaq::dal::Computer *>(db.create<dunedaq::dal::Computer>(*rack, lfs_name + suffix)));
+  rack_nodes.push_back(const_cast<dunedaq::dal::Computer *>(db.create<dunedaq::dal::Computer>(*rack, node_name + suffix + "-1")));
+  rack_nodes.push_back(const_cast<dunedaq::dal::Computer *>(db.create<dunedaq::dal::Computer>(*rack, node_name + suffix + "-2")));
 
   rack->set_LFS(rack_lfs);
   rack->set_Nodes(rack_nodes);
@@ -210,10 +210,10 @@ main(int argc, char *argv[])
 
       // create map of nodes (key: UID, value: object ptr)
 
-      std::map<std::string, const daq::core::Computer*> nodes_info;
+      std::map<std::string, const dunedaq::dal::Computer*> nodes_info;
 
         {
-          std::vector<const daq::core::Computer*> nodes;
+          std::vector<const dunedaq::dal::Computer*> nodes;
 
           db.get(nodes);
 
@@ -245,14 +245,14 @@ main(int argc, char *argv[])
       // get list of racks, no deleted objects should be there
 
       std::cout << "\nTEST RACKS:\n";
-      std::vector<const daq::core::Rack*> racks;
+      std::vector<const dunedaq::dal::Rack*> racks;
       db.get(racks);
       for (const auto& i : racks)
         {
           std::cout << " - object " << i << std::endl;
         }
 
-      daq::core::Computer * a_good_computer(nullptr);
+      dunedaq::dal::Computer * a_good_computer(nullptr);
 
       // now destroy a rack and see which nodes are invalidated as well
 
@@ -270,7 +270,7 @@ main(int argc, char *argv[])
                   continue;
                 }
               std::cout << " - object " << i.second << " is OK\n";
-              a_good_computer = const_cast<daq::core::Computer *>(i.second);
+              a_good_computer = const_cast<dunedaq::dal::Computer *>(i.second);
             }
           catch (dunedaq::config::DeletedObject& ex)
             {
@@ -306,7 +306,7 @@ main(int argc, char *argv[])
 
       // rename object (also check changes in base classes following inheritance hierarchy)
 
-      const daq::core::HW_Object * hw_object = a_good_computer->cast<daq::core::HW_Object>();
+      const dunedaq::dal::HW_Object * hw_object = a_good_computer->cast<dunedaq::dal::HW_Object>();
 
       std::string old_uid(a_good_computer->UID());
       std::ostringstream new_uid_s;
@@ -319,10 +319,10 @@ main(int argc, char *argv[])
       std::cout
         << " * UID changed in class of object: " << ((a_good_computer->UID() == new_uid) ? "(OK)" : "(FAILED)") << std::endl
         << " * UID changed in base class: " << ((hw_object->UID() == new_uid) ? "(OK)" : "(FAILED)") << std::endl
-        << " * can get object by ID in the class of object: " << ((db.get<daq::core::Computer>(new_uid) == a_good_computer) ? "(OK)" : "(FAILED)") << std::endl
-        << " * can get object by ID in the base class: " << ((db.get<daq::core::HW_Object>(new_uid) == hw_object) ? "(OK)" : "(FAILED)") << std::endl
-        << " * cannot get object by old ID in the class of object: " << ((db.get<daq::core::Computer>(old_uid) == nullptr) ? "(OK)" : "(FAILED)") << std::endl
-        << " * cannot get object by old ID in the base class: " << ((db.get<daq::core::HW_Object>(old_uid) == nullptr) ? "(OK)" : "(FAILED)") << std::endl;
+        << " * can get object by ID in the class of object: " << ((db.get<dunedaq::dal::Computer>(new_uid) == a_good_computer) ? "(OK)" : "(FAILED)") << std::endl
+        << " * can get object by ID in the base class: " << ((db.get<dunedaq::dal::HW_Object>(new_uid) == hw_object) ? "(OK)" : "(FAILED)") << std::endl
+        << " * cannot get object by old ID in the class of object: " << ((db.get<dunedaq::dal::Computer>(old_uid) == nullptr) ? "(OK)" : "(FAILED)") << std::endl
+        << " * cannot get object by old ID in the base class: " << ((db.get<dunedaq::dal::HW_Object>(old_uid) == nullptr) ? "(OK)" : "(FAILED)") << std::endl;
 
       // try to create module with UID of computer
       // the call has to fail, since both classes are derived from the sane base class (HW_Object)
@@ -330,7 +330,7 @@ main(int argc, char *argv[])
       try
         {
           std::cout << "\nTEST: try to create module with id of existing computer object " << a_good_computer->UID() << ' ';
-          daq::core::Module * bad_module = const_cast<daq::core::Module *>(db.create<daq::core::Module>(*a_good_computer, a_good_computer->UID()));
+          dunedaq::dal::Module * bad_module = const_cast<dunedaq::dal::Module *>(db.create<dunedaq::dal::Module>(*a_good_computer, a_good_computer->UID()));
           std::cout << " => the object " << bad_module << " was created: (FAILED)\n";
         }
       catch (dunedaq::config::Exception & ex)
