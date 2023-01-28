@@ -18,8 +18,6 @@ this document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-_JCF, Jan-25-2023: this documentation you're reading is on a special branch of the dal repo; you should skip the manual setup of the repo below, get onto mu2edaq, and simply run `/home/jcfree/bin/set_up_oks_area.sh <new workarea name>`. Then proceed below with the sentence which begins with "With the packages built,"_
-
 To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). 
 Then you'll want to get your hands on the following repos:
 * daq-cmake
