@@ -1,3 +1,5 @@
+_JCF, Jan-28-2023: as of this morning, a nightly NT23-01-28 release exists which contains the OKS suite. If you just use the nightly release you'll be spared the effort of building the repos, but the file paths described in the instructions below assume you're looking at repos in your work area. You can find schema in `$DAL_SHARE` after you've set up your environment, however._
+
 # An Introduction to OKS
 
 ## Overview
@@ -178,11 +180,12 @@ You can play around with `dal_dump_apps/dal_dump_apps.py`, pass the
 
 ## Looking Ahead
 
-There are two major tasks, very much related, which we now face:
+There are three major tasks which we now face:
 * Determining which classes from ATLAS we want to keep, and which to
 throw out. Also, what classes DUNE needs added. Input from
 collaborators will be required. 
 * Determining how to best integrate these tools into our pre-existing
 packages.
+* Getting a GUI editor to make class creation easier than just editing a large XML file. 
 
 
