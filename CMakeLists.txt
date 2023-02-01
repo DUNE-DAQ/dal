@@ -31,7 +31,7 @@ daq_add_application(dal_test_rw dal_test_rw.cxx                                 
 daq_add_application(dal_test_timeouts dal_test_timeouts.cxx                      LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_dump_apps dal_dump_apps.cxx                              LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_dump_apps_mt dal_dump_apps_mt.cxx                        LINK_LIBRARIES dal config::config Boost::program_options pthread)
-daq_add_application(dal_dump_app_config dal_dump_app_config.cxx                 LINK_LIBRARIES dal config Boost::program_options)
+daq_add_application(dal_dump_app_config dal_dump_app_config.cxx                 LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_dump_app_depends dal_dump_app_depends.cxx                LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_print_segments dal_print_segments.cxx                    LINK_LIBRARIES dal config::config Boost::program_options)
 daq_add_application(dal_get_app_env dal_get_app_env.cxx                               LINK_LIBRARIES dal config::config Boost::program_options)
