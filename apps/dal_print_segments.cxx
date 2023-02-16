@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
 #include "dal/OnlineSegment.hpp"
 #include "dal/Partition.hpp"

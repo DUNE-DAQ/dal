@@ -7,7 +7,7 @@ include(CMakeFindDependencyMacro)
 find_dependency(okssystem)
 find_dependency(ers)
 find_dependency(logging)
-find_dependency(config)
+find_dependency(oksdbinterfaces)
 
 # Figure out whether or not this dependency is an installed package or
 # in repo form

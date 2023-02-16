@@ -3,8 +3,8 @@
 
 #include <exception>
 
-#include "config/Configuration.hpp"
-#include "config/DalObject.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/DalObject.hpp"
 
 
 namespace dunedaq {
@@ -206,8 +206,8 @@ namespace dal {
      * \param partition the name of the partition
      * \return the configuration version
      *
-     *  @throw dunedaq::config::NotFound is thrown if case if partition or information repository does not exist
-     *  @throw dunedaq::config::Exception is thrown if case of problems
+     *  @throw dunedaq::oksdbinterfaces::NotFound is thrown if case if partition or information repository does not exist
+     *  @throw dunedaq::oksdbinterfaces::Exception is thrown if case of problems
      */
 
   std::string
@@ -224,8 +224,8 @@ namespace dal {
      * \param version the configuration version
      * \param reload if true, send reload command to RDB and RDB_RW servers
      *
-     *  @throw dunedaq::config::NotFound is thrown if case if partition or information repository does not exist
-     *  @throw dunedaq::config::Exception is thrown if case of problems
+     *  @throw dunedaq::oksdbinterfaces::NotFound is thrown if case if partition or information repository does not exist
+     *  @throw dunedaq::oksdbinterfaces::Exception is thrown if case of problems
      */
 
   void

@@ -1,15 +1,15 @@
 #!/bin/env python3
 
-import config
+import oksdbinterfaces
 import os
 
 schemafile=f'{os.environ["DAL_SHARE"]}/schema/dal/tutorial.schema.xml'
 datafile="tutorial.data.xml"
 
 # binds a new dal into the module named "tutorial"               
-tutorial = config.dal.module('tutorial', schemafile)
+tutorial = oksdbinterfaces.dal.module('tutorial', schemafile)
 
-db = config.Configuration("oksconfig")
+db = oksdbinterfaces.Configuration("oksconfig")
 db.create_db(datafile, [schemafile])
 
 readout_app1 = tutorial.ReadoutApplication("PhotonReadout", 

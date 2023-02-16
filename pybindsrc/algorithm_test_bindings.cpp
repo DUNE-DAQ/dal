@@ -21,7 +21,7 @@
 #include "dal/Variable.hpp"
 #include "dal/util.hpp"
 
-#include "config/Configuration.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
 #include "ers/Issue.hpp"
 
