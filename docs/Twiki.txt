@@ -717,13 +717,13 @@ Read configuration from file _"daq/partitions/be_test.data.xml"_ using oks
 plug-in. 
 
 <verbatim>
-    #include "config/Configuration.h"
+    #include "oksdbinterfaces/Configuration.h"
     ...
     try {
       ::Configuration db("oksconfig:daq/partitions/be_test.data.xml");
       ... // user's code accessing configuration data
     }
-    catch(dunedaq::config::Exception & ex) {
+    catch(dunedaq::oksdbinterfaces::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>
@@ -830,7 +830,7 @@ e.g. as it is shown below.
 ---++++!! C++ Example 
 
 <verbatim>
-    #include "config/Configuration.h"
+    #include "oksdbinterfaces/Configuration.h"
     #include "dal/Partition.h"
     #include "dal/util.h"
     ...
@@ -842,7 +842,7 @@ e.g. as it is shown below.
 *partition));
       }
     }
-    catch(dunedaq::config::Exception & ex) {
+    catch(dunedaq::oksdbinterfaces::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>

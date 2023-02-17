@@ -4,7 +4,7 @@
 #include <atomic>
 #include <mutex>
 
-#include "config/ConfigAction.hpp"
+#include "oksdbinterfaces/ConfigAction.hpp"
 
 class Configuration;
 

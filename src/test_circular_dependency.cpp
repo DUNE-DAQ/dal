@@ -1,4 +1,4 @@
-#include "config/DalObject.hpp"
+#include "oksdbinterfaces/DalObject.hpp"
 
 #include "test_circular_dependency.hpp"
 

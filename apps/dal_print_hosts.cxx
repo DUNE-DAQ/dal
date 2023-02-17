@@ -34,7 +34,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
 #include "dal/BaseApplication.hpp"
 #include "dal/Computer.hpp"
@@ -235,7 +235,7 @@ main(int argc, char **argv)
             }
         }
     }
-  catch (dunedaq::config::Exception & ex)
+  catch (dunedaq::oksdbinterfaces::Exception & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);

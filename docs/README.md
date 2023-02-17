@@ -1,4 +1,3 @@
-_JCF, Jan-28-2023: as of this morning, a nightly NT23-01-28 release exists which contains the OKS suite. If you just use the nightly release you'll be spared the effort of building the repos, but the file paths described in the instructions below assume you're looking at repos in your work area. You can find schema in `$DAL_SHARE` after you've set up your environment, however._
 
 # An Introduction to OKS
 
@@ -24,7 +23,7 @@ To get started working with the DUNE-repurposed OKS packages, you'll want to [se
 Then you'll want to get your hands on the following repos:
 * daq-cmake
 * okssystem
-* config
+* oksdbinterfaces
 * oks
 * genconfig
 * oks_utils
@@ -36,7 +35,7 @@ function which generates code from the XML files. For the other repos, you want 
 exist between the OKS packages you'll also want to edit the `sourcecode/dbt-build-order.cmake` file, adding the following at the end of the `build_order` list:
 ```
                 "okssystem"
-                "config"
+                "oksdbinterfaces"
                 "oks"
                 "genconfig"
                 "oks_utils"
@@ -46,8 +45,8 @@ exist between the OKS packages you'll also want to edit the `sourcecode/dbt-buil
 Once you've made these additions to your work area, you can proceed to build everything using the usual daq-buildtools commands. 
 
 With the packages built, it's time to run some tests to make sure things are in working order. These include:
-* `test_configuration.py`: A test script in the config package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
-* `test_dal.py`: Also from the config package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
+* `test_configuration.py`: A test script in the oksdbinterfaces package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
+* `test_dal.py`: Also from the oksdbinterfaces package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
 * `algorithm_tests.py`: A script from the dal package. Test that Python bindings to class Methods implemented in C++ work as expected. 
 
 If anything goes wrong during the tests, it will be self-evident. Make a note of what happened and contact John Freeman, `jcfree@fnal.gov`. 
@@ -87,7 +86,7 @@ And here, we have two items of interest:
 * A `Timeout` Attribute representing the max number of seconds before giving up on a transition. Represented by an unsigned 2-byte integer, the max timeout is one hour, and defaults to 20 seconds. 
 * An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the config package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the oksdbinterfaces package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
 
 ### Overview of `tutorial.data.xml`
 
@@ -112,8 +111,8 @@ We can also see what `tutorial.py` created by opening up `tutorial.data.xml`. Ag
 ```
 The run control timeout is set to its default of 20 seconds. Say we want to change this, and save the result. For such a small data file it would be easy to manually edit, but if you think of a full-blown DAQ system you'll want to automate a lot of things. Fortunately we can alter the value via Python. Go into an interactive Python environment and do the following:
 ```
-import config
-db = config.Configuration('oksconfig:tutorial.data.xml')
+import oksdbinterfaces
+db = oksdbinterfaces.Configuration('oksconfig:tutorial.data.xml')
 rc = db.get_dal("RCApplication", "DummyRC")  # i.e., first argument is name of the class, the second is the name of the object
 print(rc.Timeout)
 ```
@@ -147,7 +146,7 @@ daq_generate_dal(core.schema.xml
   CPP_OUTPUT  dal_cpp_srcs
   DUMP_OUTPUT cpp_dump_src)
   
-  daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES config::config okssystem::okssystem logging::logging)
+  daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging)
 ```
 ...where the things most important to notice at this time are that `core.schema.xml` gets fed into `daq_generate_dal` which proceeds to generate code off of the classes defined in `core.schema.xml`, storing the generated files in the `dal_cpp_srcs` variable and using those files as part of the build of the package's main library. You'll notice also that the classes in `core.schema.xml` contain not only Attributes and Relationships as in the tutorial example above, but also Methods. If you look at the `Partition` class (l. 415) and scroll down a bit, you'll see a `get_all_applications` Method declared, along with its accompanying C++ declaration (as well as Java declaration, but we ignore this). The implementation of `get_all_applications` needs to be done manually, however, and is accomplished on l. 1301 of `src/algorithms.cpp`. If you scroll to the top of that file you'll see a `#include "dal/Partition.hpp"` line. In the actual dal repo, there's no such include file. However, assuming you followed the build instructions at the top of this document, you'll find it in the `build/` area of your work area, as the header was in fact generated. 
 

@@ -3,8 +3,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigObject.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
 
 #include "dal/Computer.hpp"
 #include "dal/Module.hpp"
@@ -13,7 +13,7 @@
 ERS_DECLARE_ISSUE(
   dal_test_rw,
   ConfigException,
-  "caught dunedaq::config::Exception exception",
+  "caught dunedaq::oksdbinterfaces::Exception exception",
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +235,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i->second << " is OK\n";
               ++i;
             }
-          catch (dunedaq::config::DeletedObject& ex)
+          catch (dunedaq::oksdbinterfaces::DeletedObject& ex)
             {
               std::cout << " - node \'" << i->first << "\' was deleted\n";
               nodes_info.erase(i++);
@@ -272,7 +272,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i.second << " is OK\n";
               a_good_computer = const_cast<dunedaq::dal::Computer *>(i.second);
             }
-          catch (dunedaq::config::DeletedObject& ex)
+          catch (dunedaq::oksdbinterfaces::DeletedObject& ex)
             {
               std::cout << " - node \'" << i.first << "\' was deleted\n";
             }
@@ -333,14 +333,14 @@ main(int argc, char *argv[])
           dunedaq::dal::Module * bad_module = const_cast<dunedaq::dal::Module *>(db.create<dunedaq::dal::Module>(*a_good_computer, a_good_computer->UID()));
           std::cout << " => the object " << bad_module << " was created: (FAILED)\n";
         }
-      catch (dunedaq::config::Exception & ex)
+      catch (dunedaq::oksdbinterfaces::Exception & ex)
         {
           std::cout << " => the object was not created, caught exception \"" << ex.what() << "\": (OK)\n";
         }
 
       return EXIT_SUCCESS;
     }
-  catch (dunedaq::config::Exception & ex)
+  catch (dunedaq::oksdbinterfaces::Exception & ex)
     {
       ers::fatal(dal_test_rw::ConfigException(ERS_HERE, ex));
     }

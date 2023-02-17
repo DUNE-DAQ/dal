@@ -1,4 +1,4 @@
-import config
+import oksdbinterfaces
 import os
 from ._daq_dal_py import * 
 
@@ -7,7 +7,7 @@ scriptsdir=os.path.dirname(os.path.realpath(__file__))
 
 core_schema_name = f'{scriptsdir}/../../../share/schema/dal/core.schema.xml'
 assert os.path.exists(core_schema_name), f"Couldn't find schema file {core_schema_name}"
-dal_classes = config.dal.module('dal_classes', core_schema_name)
+dal_classes = oksdbinterfaces.dal.module('dal_classes', core_schema_name)
 
 Partition = dal_classes.Partition
 Component = dal_classes.Component

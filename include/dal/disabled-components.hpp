@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigAction.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigAction.hpp"
 
 #include "dal/Component.hpp"
 

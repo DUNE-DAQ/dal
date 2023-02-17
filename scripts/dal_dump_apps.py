@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import sys
-import config
+import oksdbinterfaces
 import dal    
 import os
 from argparse import RawTextHelpFormatter
@@ -46,7 +46,7 @@ if __name__ == '__main__':
             os.environ[required_env_variable] = "DUMMY_TDAQ_ENV_VALUE"
 
     # Open database
-    db = config.Configuration(args.data)
+    db = oksdbinterfaces.Configuration(args.data)
     #Get the application object
     app = 0
     if args.application_id : 
