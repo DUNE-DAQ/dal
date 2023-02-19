@@ -19,41 +19,18 @@ this document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). 
-Then you'll want to get your hands on the following repos:
-* daq-cmake
-* okssystem
-* oksdbinterfaces
-* oks
-* genconfig
-* oks_utils
-* dal
-* oksconfig
-
-Note that for daq-cmake, you'll want to switch over to the `johnfreeman/oks_support` branch; this is because of the addition of the `daq_generate_dal` 
-function which generates code from the XML files. For the other repos, you want the `develop` branches which are the default upon cloning. As dependencies
-exist between the OKS packages you'll also want to edit the `sourcecode/dbt-build-order.cmake` file, adding the following at the end of the `build_order` list:
-```
-                "okssystem"
-                "oksdbinterfaces"
-                "oks"
-                "genconfig"
-                "oks_utils"
-                "dal"
-                "oksconfig"
-```
-Once you've made these additions to your work area, you can proceed to build everything using the usual daq-buildtools commands. 
-
-With the packages built, it's time to run some tests to make sure things are in working order. These include:
+To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/) based off the `NT23-02-18` release; this release contains the suite of OKS packages as well as a version of daq-cmake capable of handling the code generation facilities of OKS. You can also develop and build the OKS packages in a work area based on this release; these packages include [dbe (the DataBase Editor GUI)](https://github.com/DUNE-DAQ/dbe#readme), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [genconfig](https://github.com/DUNE-DAQ/genconfig) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [oksdbinterfaces](https://github.com/DUNE-DAQ/oksdbinterfaces), [oksconfig](https://github.com/DUNE-DAQ/oksconfig) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. However, as of Feb-19-2023 there's more than enough functionality to get you started. 
+  
+With the work area set up, it's time to run some tests to make sure things are in working order. These include:
 * `test_configuration.py`: A test script in the oksdbinterfaces package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
 * `test_dal.py`: Also from the oksdbinterfaces package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
 * `algorithm_tests.py`: A script from the dal package. Test that Python bindings to class Methods implemented in C++ work as expected. 
 
-If anything goes wrong during the tests, it will be self-evident. Make a note of what happened and contact John Freeman, `jcfree@fnal.gov`. 
+If anything goes wrong during the tests, it will be self-evident. 
 
 ## A Look at OKS Databases: XML-Represented Classes and Objects
 
-While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, which from the base of your workarea is `sourcecode/dal/schema/dal/tutorial.schema.xml`:
+While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file on disk. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, `$DAL_SHARE/schema/dal/tutorial.schema.xml`.
 
 ### Overview of `tutorial.schema.xml`
 
@@ -63,7 +40,7 @@ Let's start with a description of what `tutorial.schema.xml` contains before we 
   <attribute name="Name" description="Name of the executable, including full path" type="string" init-value="Unknown" is-not-null="yes"/>
  </class>
 ```
-The `is-abstract` qualifier means that you can't have an object which is concretely of type `Application`, you can only have objects of subclasses of `Application`. However, any class which is a subclass of `Application` will automatically contain a `Name` attribute, which here is intended to be the fully-qualified path of the executable in a running DAQ system. 
+(_n.b. if you want to use `emacs` in this environment you may need to run `spack unload cairo`; this hasn't apparently had any negative effects on OKS functionality_). The `is-abstract` qualifier means that you can't have an object which is concretely of type `Application`, you can only have objects of subclasses of `Application`. However, any class which is a subclass of `Application` will automatically contain a `Name` attribute, which here is intended to be the fully-qualified path of the executable in a running DAQ system. 
 
 Next, we see the class for readout:
 ```
@@ -86,7 +63,7 @@ And here, we have two items of interest:
 * A `Timeout` Attribute representing the max number of seconds before giving up on a transition. Represented by an unsigned 2-byte integer, the max timeout is one hour, and defaults to 20 seconds. 
 * An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the oksdbinterfaces package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:sourcecode/dal/schema/dal/tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the oksdbinterfaces package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
 
 ### Overview of `tutorial.data.xml`
 
@@ -132,12 +109,12 @@ db.commit()
 ```
 If we exit out of Python and look at `tutorial.data.xml`, we see the timeout is now 60 rather than 20. And if we read the data file back in, this update will be reflected. 
 
-You're encouraged to experiment yourself with the objects, either interactively or via edits to `sourcecode/dal/scripts/tutorial.py`; make sure to run `dbt-build` in the case of the latter. 
+You're encouraged to experiment yourself with the objects, either interactively or via checking out the dal repo and editing `sourcecode/dal/scripts/tutorial.py`; make sure to run `dbt-build` in the case of the latter. 
 
 
 ## A Realistic Example
 
-The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we need to go to the `dal` repo: `sourcecode/dal/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in dal's `CMakeLists.txt` file you see the following:
+The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we can look at the following: `$DAL_SHARE/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in [dal's `CMakeLists.txt` file](https://github.com/DUNE-DAQ/dal/blob/develop/CMakeLists.txt) you see the following:
 ```
 daq_generate_dal(core.schema.xml
   NAMESPACE dunedaq::dal
@@ -153,7 +130,7 @@ daq_generate_dal(core.schema.xml
 To see the `get_all_applications` function in action, you can do the
 following. 
 ```
-dal_dump_app_config -d oksconfig:install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config -d oksconfig:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 ...where `dal_testing.data.xml` is written specifically for testing dal's functionality. The output will look like the following:
 ```
@@ -172,19 +149,13 @@ Likewise, you can see a Python script which serves the same function,
 but via calling Python bindings to C++ functions. We of course want
 the output to be identical:
 ```
-dal_dump_app_config.py -d oksconfig:install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config.py -d oksconfig:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 You can play around with `dal_dump_apps/dal_dump_apps.py`, pass the
 `-h` argument to see your options. 
 
-## Looking Ahead
+## Next Step
 
-There are three major tasks which we now face:
-* Determining which classes from ATLAS we want to keep, and which to
-throw out. Also, what classes DUNE needs added. Input from
-collaborators will be required. 
-* Determining how to best integrate these tools into our pre-existing
-packages.
-* Getting a GUI editor to make class creation easier than just editing a large XML file. 
+Now that we've learned a bit about OKS, let's take a look at the [GUI interfaces to OKS](https://github.com/DUNE-DAQ/dbe#readme)
 
 
