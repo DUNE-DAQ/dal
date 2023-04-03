@@ -43,6 +43,8 @@
 
 #include "dal/util.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 
 static void
 printHost(const dunedaq::dal::Computer * host, bool print_rl_cmd, bool print_tag)

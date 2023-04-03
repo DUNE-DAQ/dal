@@ -21,6 +21,8 @@
 #include "dal/util.hpp"
 
 
+using namespace dunedaq::oksdbinterfaces;
+
 int main(int argc, char *argv[])
 {
   std::string data;

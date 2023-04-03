@@ -29,6 +29,7 @@
 #include "dal/Segment.hpp"
 #include "dal/util.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
 
 static void
 print_info(

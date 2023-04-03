@@ -60,6 +60,7 @@
 
 #include "test_circular_dependency.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1383,7 +1384,7 @@ namespace dunedaq::dal {
       add_applications(dunedaq::dal::Segment& seg, const dunedaq::dal::Rack * rack, const dunedaq::dal::Partition& p, const dunedaq::dal::Computer * default_host);
 
       static void
-      add_segments(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition& p, const std::vector<const dunedaq::dal::Segment*>& objs, const dunedaq::dal::Rack * rack, const dunedaq::dal::Computer * default_host, ::oksdbinterfaces::map<std::string>& fuse);
+      add_segments(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition& p, const std::vector<const dunedaq::dal::Segment*>& objs, const dunedaq::dal::Rack * rack, const dunedaq::dal::Computer * default_host, dunedaq::oksdbinterfaces::map<std::string>& fuse);
 
       static void
       get_applications(std::vector<const dunedaq::dal::BaseApplication *>& out, const dunedaq::dal::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const dunedaq::dal::Computer *> * hosts);
@@ -1709,7 +1710,7 @@ seg_config_to_name(const std::string& s)
 }
 
 static void
-check_mulpiple_inclusion(::oksdbinterfaces::map<std::string>& fuse, const std::string& id, const std::string& parent)
+check_mulpiple_inclusion(dunedaq::oksdbinterfaces::map<std::string>& fuse, const std::string& id, const std::string& parent)
 {
   auto ret = fuse.emplace(id,parent);
   if(ret.second == false)
@@ -1725,7 +1726,7 @@ dunedaq::dal::AlgorithmUtils::add_segments(
     const std::vector<const dunedaq::dal::Segment*>& objs,
     const dunedaq::dal::Rack * rack,
     const dunedaq::dal::Computer * default_host,
-    ::oksdbinterfaces::map<std::string>& fuse)
+    dunedaq::oksdbinterfaces::map<std::string>& fuse)
 {
   dunedaq::dal::SegConfig * seg_config = seg.get_seg_config(false);
 
@@ -1899,7 +1900,7 @@ dunedaq::dal::Partition::get_segment(const std::string& name) const
               default_host = nullptr;
             }
 
-          ::oksdbinterfaces::map<std::string> fuse;
+          dunedaq::oksdbinterfaces::map<std::string> fuse;
           fuse[root_segment->UID()] = "";
 
           dunedaq::dal::AlgorithmUtils::add_segments(*root_segment, *this, get_Segments(), nullptr, default_host, fuse);
@@ -2215,7 +2216,7 @@ dunedaq::dal::Segment::get_all_applications(std::set<std::string> * app_types, s
         }
       else
         {
-          const ::oksdbinterfaces::fmap<::oksdbinterfaces::fset>& all_scs(configuration().superclasses());
+          const dunedaq::oksdbinterfaces::fmap<dunedaq::oksdbinterfaces::fset>& all_scs(configuration().superclasses());
 
           for (const auto& i : *app_types)
             {
@@ -3215,7 +3216,7 @@ static std::string cv_info_name("RunParams.ConfigVersion");
 
 
 std::string
-dunedaq::dal::get_config_version(const std::string& partition)
+dunedaq::dal::get_config_version(const std::string& /*partition*/)
 {
   
   if(const char * env = getenv(s_tdaq_db_version_str.c_str()))

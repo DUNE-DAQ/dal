@@ -511,7 +511,7 @@
  <class name="ResourceBase">
   <superclass name="Component"/>
   <method name="get_resources" description="Returns list of resources including defined by the nested sets. If partition parameter is provided (i.e. it is not &lt;b&gt;null&lt;/b&gt;), only enabled resources are added.">
-   <method-implementation language="c++" prototype="void get_resources(::Configuration&amp; db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const" body=""/>
+   <method-implementation language="c++" prototype="void get_resources(oksdbinterfaces::Configuration&amp; db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const" body=""/>
   </method>
  </class>
 

@@ -11,6 +11,8 @@
 
 #include "dal/util.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 template<class T>
 void
 stop_and_report(T &tp, const std::string& name)

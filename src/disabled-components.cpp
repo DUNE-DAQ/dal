@@ -13,8 +13,9 @@
 
 #include "test_circular_dependency.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
 
-dunedaq::dal::DisabledComponents::DisabledComponents(::Configuration& db) :
+dunedaq::dal::DisabledComponents::DisabledComponents(Configuration& db) :
   m_db(db),
   m_num_of_slr_enabled_resources(0),
   m_num_of_slr_disabled_resources(0)

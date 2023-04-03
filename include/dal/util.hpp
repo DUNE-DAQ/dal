@@ -70,12 +70,12 @@ namespace dal {
     /**
      *  \brief Implements string converter for database parameters.
      *
-     *  The class implements ::Configuration::AttributeConverter for string %type.
+     *  The class implements dunedaq::oksdbinterfaces::Configuration::AttributeConverter for string %type.
      *  It reads parameters defined for given partition object and uses them to
      *  substitute values of database string attributes.
      *
      *  The parameters are stored as a map of substitution keys and values.
-     *  If database %is changed, the reset(::Configuration&, const Partition&) method needs to be used.
+     *  If database %is changed, the reset(dunedaq::oksdbinterfaces::Configuration&, const Partition&) method needs to be used.
      *
      *  \par Example
      *
@@ -83,7 +83,7 @@ namespace dal {
      *
      *  <pre><i>
      *
-     *  ::Configuration db(...);  // some code to build configuration database object
+     *  dunedaq::oksdbinterfaces::Configuration db(...);  // some code to build configuration database object
      *
      *  const dunedaq::dal::Partition * partition = dunedaq::dal::get_partition(db, partition_name);
      *  if(partition) {
@@ -94,7 +94,7 @@ namespace dal {
      *
      */
 
-  class SubstituteVariables : public ::Configuration::AttributeConverter<std::string> {
+  class SubstituteVariables : public dunedaq::oksdbinterfaces::Configuration::AttributeConverter<std::string> {
 
     public:
 
@@ -114,7 +114,7 @@ namespace dal {
 
         /** Implementation of convert method. **/
 
-      virtual void convert(std::string& value, const Configuration& conf, const ConfigObject& obj, const std::string& attr_name);
+      virtual void convert(std::string& value, const dunedaq::oksdbinterfaces::Configuration& conf, const dunedaq::oksdbinterfaces::ConfigObject& obj, const std::string& attr_name);
 
 
         /** Destroy conversion map. **/
@@ -159,7 +159,7 @@ namespace dal {
      *  \return Returns the pointer to the partition object if found, or 0.
      */
 
-  const dunedaq::dal::Partition * get_partition(::Configuration& conf, const std::string& name, unsigned long rlevel = 10, const std::vector<std::string> * rclasses = nullptr);
+  const dunedaq::dal::Partition * get_partition(dunedaq::oksdbinterfaces::Configuration& conf, const std::string& name, unsigned long rlevel = 10, const std::vector<std::string> * rclasses = nullptr);
 
 
     /**
