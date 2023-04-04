@@ -32,6 +32,7 @@
 #include "dal/util.hpp"
 
 
+using namespace dunedaq::oksdbinterfaces;
 
 
 static void

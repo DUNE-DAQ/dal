@@ -33,6 +33,8 @@
 
 namespace py = pybind11;
 
+using namespace dunedaq::oksdbinterfaces;
+
 namespace {
 
   std::string print_app(const dunedaq::dal::BaseApplication* app) {

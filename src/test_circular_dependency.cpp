@@ -3,7 +3,7 @@
 #include "test_circular_dependency.hpp"
 
 void
-dunedaq::dal::TestCircularDependency::push(const DalObject * object)
+dunedaq::dal::TestCircularDependency::push(const dunedaq::oksdbinterfaces::DalObject * object)
 {
   if(p_index < p_limit) {
     p_objects[p_index++] = object;

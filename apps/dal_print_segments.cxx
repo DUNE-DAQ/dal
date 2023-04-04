@@ -10,6 +10,8 @@
 #include "dal/util.hpp"
 
 namespace po = boost::program_options;
+using namespace dunedaq::oksdbinterfaces;
+
 
 static void
 print_resource(const dunedaq::dal::ResourceBase * res, unsigned int recursion_level)

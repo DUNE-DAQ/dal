@@ -15,7 +15,7 @@ namespace dunedaq::dal {
     class ResourceSet;
     class Segment;
 
-    class DisabledComponents : public ConfigAction
+    class DisabledComponents : public dunedaq::oksdbinterfaces::ConfigAction
     {
 
       friend class Partition;
@@ -32,7 +32,7 @@ namespace dunedaq::dal {
         }
       };
 
-      ::Configuration& m_db;
+      dunedaq::oksdbinterfaces::Configuration& m_db;
 
       unsigned long m_num_of_slr_enabled_resources;
       unsigned long m_num_of_slr_disabled_resources;
@@ -53,13 +53,13 @@ namespace dunedaq::dal {
 
     public:
 
-      DisabledComponents(::Configuration& db);
+      DisabledComponents(dunedaq::oksdbinterfaces::Configuration& db);
 
       virtual
       ~DisabledComponents();
 
       void
-      notify(std::vector<ConfigurationChange *>& /*changes*/) noexcept;
+      notify(std::vector<dunedaq::oksdbinterfaces::ConfigurationChange *>& /*changes*/) noexcept;
 
       void
       load() noexcept;
@@ -68,7 +68,7 @@ namespace dunedaq::dal {
       unload() noexcept;
 
       void
-      update(const ConfigObject& obj, const std::string& name) noexcept;
+      update(const dunedaq::oksdbinterfaces::ConfigObject& obj, const std::string& name) noexcept;
 
       void
       reset() noexcept;

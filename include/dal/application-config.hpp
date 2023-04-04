@@ -6,20 +6,24 @@
 
 #include "oksdbinterfaces/ConfigAction.hpp"
 
-class Configuration;
+namespace dunedaq {
+  namespace oksdbinterfaces {
+    class Configuration;
+  }
+}
 
 namespace dunedaq::dal {
 
     class Segment;
     class Partition;
 
-    class ApplicationConfig : public ConfigAction
+    class ApplicationConfig : public dunedaq::oksdbinterfaces::ConfigAction
     {
       friend class Partition;
 
     private:
 
-      ::Configuration& m_db;
+      dunedaq::oksdbinterfaces::Configuration& m_db;
       mutable std::atomic<const dunedaq::dal::Segment*> m_root_segment;
       mutable std::mutex m_root_segment_mutex;
 
@@ -32,13 +36,13 @@ namespace dunedaq::dal {
 
     public:
 
-      ApplicationConfig(::Configuration& db);
+      ApplicationConfig(dunedaq::oksdbinterfaces::Configuration& db);
 
       virtual
       ~ApplicationConfig();
 
       void
-      notify(std::vector<ConfigurationChange *>& /*changes*/) noexcept
+      notify(std::vector<dunedaq::oksdbinterfaces::ConfigurationChange *>& /*changes*/) noexcept
       {
         __clear();
       }
@@ -56,7 +60,7 @@ namespace dunedaq::dal {
       }
 
       void
-      update(const ConfigObject& /*obj*/, const std::string& /*name*/) noexcept
+      update(const dunedaq::oksdbinterfaces::ConfigObject& /*obj*/, const std::string& /*name*/) noexcept
       {
         __clear();
       }

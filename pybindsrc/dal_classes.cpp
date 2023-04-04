@@ -36,6 +36,8 @@
 #include <vector>
 
 namespace py = pybind11;
+using namespace dunedaq::oksdbinterfaces;
+
 
 namespace dunedaq::dal::python {
 

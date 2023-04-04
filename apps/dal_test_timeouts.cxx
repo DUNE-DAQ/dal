@@ -8,6 +8,8 @@
 #include "dal/Segment.hpp"
 #include "dal/util.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 int
 main(int argc, char *argv[])
 {
@@ -46,7 +48,7 @@ main(int argc, char *argv[])
 
   try
     {
-      ::Configuration conf(db_name);
+      dunedaq::oksdbinterfaces::Configuration conf(db_name);
 
       if (const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(conf, partition_name))
         {
