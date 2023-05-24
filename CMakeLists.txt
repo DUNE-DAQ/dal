@@ -11,21 +11,13 @@ find_package(ers REQUIRED)
 find_package(logging REQUIRED)
 find_package(oksdbinterfaces REQUIRED)
 
-set(cpp_srcs)
-set(cpp_dump_src)
 
-daq_generate_dal(core.schema.xml 
-  NAMESPACE dunedaq::dal
-  INCLUDE ${CMAKE_CODEGEN_BINARY_DIR}/include/${PROJECT_NAME}
-  CPP ${CMAKE_CODEGEN_BINARY_DIR}/src
-  CPP_OUTPUT  dal_cpp_srcs
-  DUMP_OUTPUT cpp_dump_src)
+daq_generate_dal(core.schema.xml)
 
-daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging)
+daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging dal_oks)
 
 daq_add_python_bindings(*.cpp LINK_LIBRARIES dal)
 
-daq_add_application(dal_dump ${cpp_dump_src}                                              LINK_LIBRARIES dal oksdbinterfaces::oksdbinterfaces)
 daq_add_application(dal_print_hosts dal_print_hosts.cxx                               LINK_LIBRARIES dal oksdbinterfaces::oksdbinterfaces Boost::program_options)
 daq_add_application(dal_test_rw dal_test_rw.cxx                                  LINK_LIBRARIES dal oksdbinterfaces::oksdbinterfaces Boost::program_options)
 daq_add_application(dal_test_timeouts dal_test_timeouts.cxx                      LINK_LIBRARIES dal oksdbinterfaces::oksdbinterfaces Boost::program_options)
