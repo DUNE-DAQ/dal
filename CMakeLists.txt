@@ -12,7 +12,7 @@ find_package(logging REQUIRED)
 find_package(oksdbinterfaces REQUIRED)
 
 
-daq_generate_dal(core.schema.xml)
+daq_oks_codegen(core.schema.xml)
 
 daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging dal_oks)
 
