@@ -116,16 +116,19 @@ You're encouraged to experiment yourself with the objects, either interactively 
 
 The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we can look at the following: `$DAL_SHARE/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in [dal's `CMakeLists.txt` file](https://github.com/DUNE-DAQ/dal/blob/develop/CMakeLists.txt) you see the following:
 ```
-daq_generate_dal(core.schema.xml
-  NAMESPACE dunedaq::dal
-  INCLUDE ${CMAKE_CODEGEN_BINARY_DIR}/include/${PROJECT_NAME}
-  CPP ${CMAKE_CODEGEN_BINARY_DIR}/src
-  CPP_OUTPUT  dal_cpp_srcs
-  DUMP_OUTPUT cpp_dump_src)
+daq_generate_dal(core.schema.xml)
   
-  daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp ${dal_cpp_srcs} DAL LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging)
+daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging dal_oks)
 ```
-...where the things most important to notice at this time are that `core.schema.xml` gets fed into `daq_generate_dal` which proceeds to generate code off of the classes defined in `core.schema.xml`, storing the generated files in the `dal_cpp_srcs` variable and using those files as part of the build of the package's main library. You'll notice also that the classes in `core.schema.xml` contain not only Attributes and Relationships as in the tutorial example above, but also Methods. If you look at the `Partition` class (l. 415) and scroll down a bit, you'll see a `get_all_applications` Method declared, along with its accompanying C++ declaration (as well as Java declaration, but we ignore this). The implementation of `get_all_applications` needs to be done manually, however, and is accomplished on l. 1301 of `src/algorithms.cpp`. If you scroll to the top of that file you'll see a `#include "dal/Partition.hpp"` line. In the actual dal repo, there's no such include file. However, assuming you followed the build instructions at the top of this document, you'll find it in the `build/` area of your work area, as the header was in fact generated. 
+...where the things most important to notice at this time are that `core.schema.xml` gets fed into `daq_generate_dal` which proceeds to (1) generate code off of the classes defined in `core.schema.xml` and (2) produce a shared object library which you can subsequently refer to as `dal_oks`. This can be generalized to other packages by way of saying that the shared object library produced by `daq_generate_dal` can be referred to in a `CMakeLists.txt` file as `<name of package>_oks`. Here, it gets linked into the main library-wide package. 
+
+Along with the name of the schema file, there are two other types of arguments you can pass to `daq_generate_dal`:
+
+* The names of packages which contain schema files imported by your package's schema file. `daq_generate_dal` needs to be made aware of this or failures can occur. To do this, you use the `DEP_PKGS` argument (analogous to `daq_codegen`): `DEP_PKGS <dependent package 1> <dependent package 2> ...`.
+
+* The namespace inside which you want the generated classes to be wrapped. This defaults to `dunedaq::<name of package>`, the usual location for a package's components, but it's possible to put your generated classes somewhere else. The way to do this is by adding an argument `NAMESPACE <your namespace>`.
+
+You'll notice also that the classes in `core.schema.xml` contain not only Attributes and Relationships as in the tutorial example above, but also Methods. If you look at the `Partition` class (l. 415) and scroll down a bit, you'll see a `get_all_applications` Method declared, along with its accompanying C++ declaration (as well as Java declaration, but we ignore this). The implementation of `get_all_applications` needs to be done manually, however, and is accomplished on l. 1301 of `src/algorithms.cpp`. If you scroll to the top of that file you'll see a `#include "dal/Partition.hpp"` line. In the actual dal repo, there's no such include file. However, assuming you followed the build instructions at the top of this document, you'll find it in the `build/` area of your work area, as the header was in fact generated. 
 
 To see the `get_all_applications` function in action, you can do the
 following. 
