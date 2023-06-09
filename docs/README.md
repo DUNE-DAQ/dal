@@ -10,16 +10,11 @@ data acquisition effort. Its features include:
 * Support for class Attributes, Relationships, and Methods. Attributes and Relationships are automatically generated; Methods allow developers to add behavior to classes
 * The ability to create instances of classes (known as OKS "objects"), modify them, read them into an XML file serving as a database and retrieve them from the database
 
-As of this writing (Jan-18-2023) the packages have been refactored
-mainly to the extent that they work within the DUNE DAQ framework
-although further changes within the context of DUNE's needs could be
-useful. Also, unfortunately most documentation for OKS is
-access-protected and only available to ATLAS collaborators. However,
-this document provides a taste of what OKS has to offer.
+This document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/) based off the `NT23-02-18` release; this release contains the suite of OKS packages as well as a version of daq-cmake capable of handling the code generation facilities of OKS. You can also develop and build the OKS packages in a work area based on this release; these packages include [dbe (the DataBase Editor GUI)](https://github.com/DUNE-DAQ/dbe#readme), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [genconfig](https://github.com/DUNE-DAQ/genconfig) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [oksdbinterfaces](https://github.com/DUNE-DAQ/oksdbinterfaces), [oksconfig](https://github.com/DUNE-DAQ/oksconfig) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. However, as of Feb-19-2023 there's more than enough functionality to get you started. 
+To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/) based off of a nightly from June 9, 2023 or later; these nightlies will contain the suite of OKS packages as well as a version of daq-cmake (`v2.3.1`) capable of handling the code generation facilities of OKS. You can also develop and build the OKS packages in a work area based on this release; these packages include [dbe (the DataBase Editor GUI)](https://github.com/DUNE-DAQ/dbe#readme), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [genconfig](https://github.com/DUNE-DAQ/genconfig) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [oksdbinterfaces](https://github.com/DUNE-DAQ/oksdbinterfaces), [oksconfig](https://github.com/DUNE-DAQ/oksconfig) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. 
   
 With the work area set up, it's time to run some tests to make sure things are in working order. These include:
 * `test_configuration.py`: A test script in the oksdbinterfaces package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
@@ -30,7 +25,7 @@ If anything goes wrong during the tests, it will be self-evident.
 
 ## A Look at OKS Databases: XML-Represented Classes and Objects
 
-While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file on disk. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, `$DAL_SHARE/schema/dal/tutorial.schema.xml`.
+While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file on disk. There are generally two types of database file: the kind that defines classes, which by convention have the `*.class.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, `$DAL_SHARE/schema/dal/tutorial.schema.xml`. Copy it over into your work area. 
 
 ### Overview of `tutorial.schema.xml`
 
@@ -116,17 +111,11 @@ You're encouraged to experiment yourself with the objects, either interactively 
 
 The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we can look at the following: `$DAL_SHARE/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in [dal's `CMakeLists.txt` file](https://github.com/DUNE-DAQ/dal/blob/develop/CMakeLists.txt) you see the following:
 ```
-daq_generate_dal(core.schema.xml)
+daq_oks_codegen(core.schema.xml)
   
 daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging dal_oks)
 ```
-...where the things most important to notice at this time are that `core.schema.xml` gets fed into `daq_generate_dal` which proceeds to (1) generate code off of the classes defined in `core.schema.xml` and (2) produce a shared object library which you can subsequently refer to as `dal_oks`. This can be generalized to other packages by way of saying that the shared object library produced by `daq_generate_dal` can be referred to in a `CMakeLists.txt` file as `<name of package>_oks`. Here, it gets linked into the main library-wide package. 
-
-Along with the name of the schema file, there are two other types of arguments you can pass to `daq_generate_dal`:
-
-* The names of packages which contain schema files imported by your package's schema file. `daq_generate_dal` needs to be made aware of this or failures can occur. To do this, you use the `DEP_PKGS` argument (analogous to `daq_codegen`): `DEP_PKGS <dependent package 1> <dependent package 2> ...`.
-
-* The namespace inside which you want the generated classes to be wrapped. This defaults to `dunedaq::<name of package>`, the usual location for a package's components, but it's possible to put your generated classes somewhere else. The way to do this is by adding an argument `NAMESPACE <your namespace>`.
+`core.schema.xml` gets fed into `daq_oks_codegen` which proceeds to (1) generate code off of the classes defined in `core.schema.xml` and (2) produce a shared object library which you can subsequently refer to as `dal_oks`. Details on `daq_oks_codegen` can be found [here](https://github.com/DUNE-DAQ/genconfig/tree/develop#readme). 
 
 You'll notice also that the classes in `core.schema.xml` contain not only Attributes and Relationships as in the tutorial example above, but also Methods. If you look at the `Partition` class (l. 415) and scroll down a bit, you'll see a `get_all_applications` Method declared, along with its accompanying C++ declaration (as well as Java declaration, but we ignore this). The implementation of `get_all_applications` needs to be done manually, however, and is accomplished on l. 1301 of `src/algorithms.cpp`. If you scroll to the top of that file you'll see a `#include "dal/Partition.hpp"` line. In the actual dal repo, there's no such include file. However, assuming you followed the build instructions at the top of this document, you'll find it in the `build/` area of your work area, as the header was in fact generated. 
 
