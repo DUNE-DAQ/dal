@@ -114,7 +114,7 @@
    <method-implementation language="c++" prototype="const dunedaq::dal::Segment * get_segment() const" body="ADD_ALGO_1"/>
    <method-implementation language="java" prototype="dal.Segment get_segment() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_segment();"/>
   </method>
-  <method name="get_backup_hosts" description="Get backup hosts for this application.&#xA;&#xA;The method returns vector of computers where the application can be restarted in case of problems.&#xA;&#xA;For normal applications the backup hosts are defined via &quot;BackupHosts&quot; relationship.&#xA;For template applications with &quot;RunsOn&quot; attribute set to &quot;FirstHostWithBackup&quot; the backup hosts are randomly chosen from list of segment hosts; there are no backup hosts for other types of template &quot;RunsOn&quot;.&#xA;&#xA;\throw daq::oksdbinterfaces::Exception in case of problems">
+  <method name="get_backup_hosts" description="Get backup hosts for this application.&#xA;&#xA;The method returns vector of computers where the application can be restarted in case of problems.&#xA;&#xA;For normal applications the backup hosts are defined via &quot;BackupHosts&quot; relationship.&#xA;For template applications with &quot;RunsOn&quot; attribute set to &quot;FirstHostWithBackup&quot; the backup hosts are randomly chosen from list of segment hosts; there are no backup hosts for other types of template &quot;RunsOn&quot;.&#xA;&#xA;\throw daq::conffwk::Exception in case of problems">
    <method-implementation language="c++" prototype="std::vector&lt;const dunedaq::dal::Computer *&gt; get_backup_hosts() const" body="ADD_ALGO_N"/>
    <method-implementation language="java" prototype="dal.Computer[] get_backup_hosts() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_backup_hosts();"/>
   </method>
@@ -418,7 +418,7 @@
   <attribute name="DBPath" description="Defines locations of database repositories (i.e. OKS_DB_ROOT). By default, it is copied from the variable TDAQ_DB_PATH defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_PATH)"/>
   <attribute name="DBName" description="Defines database name, e.g. name of the OKS data file. By default, it is copied from the variable TDAQ_DB_DATA defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_DATA)"/>
   <attribute name="DBVersion" description="Defines database version (SHA key) if GIT repository is used . By default, it is copied from the variable TDAQ_DB_VERSION defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_VERSION)"/>
-  <attribute name="DBTechnology" description="Defines config database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconfig,oksconfig" init-value="rdbconfig"/>
+  <attribute name="DBTechnology" description="Defines config database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconfig,oksconflibs" init-value="rdbconfig"/>
   <attribute name="LogRoot" description="Defines root directory for log files." type="string" init-value="/tmp"/>
   <attribute name="WorkingDirectory" description="Defines directory, where a new process run by pmg will be started." type="string" init-value="/tmp"/>
   <attribute name="RunTypes" type="string" is-multi-value="yes"/>
@@ -511,7 +511,7 @@
  <class name="ResourceBase">
   <superclass name="Component"/>
   <method name="get_resources" description="Returns list of resources including defined by the nested sets. If partition parameter is provided (i.e. it is not &lt;b&gt;null&lt;/b&gt;), only enabled resources are added.">
-   <method-implementation language="c++" prototype="void get_resources(oksdbinterfaces::Configuration&amp; db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const" body=""/>
+   <method-implementation language="c++" prototype="void get_resources(conffwk::Configuration&amp; db, std::list&lt;const Resource *&gt;&amp; out, const Partition * p = 0) const" body=""/>
   </method>
  </class>
 

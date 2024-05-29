@@ -3,8 +3,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/ConfigObject.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/ConfigObject.hpp"
 
 #include "dal/Computer.hpp"
 #include "dal/Module.hpp"
@@ -13,10 +13,10 @@
 ERS_DECLARE_ISSUE(
   dal_test_rw,
   ConfigException,
-  "caught dunedaq::oksdbinterfaces::Exception exception",
+  "caught dunedaq::conffwk::Exception exception",
 )
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -162,7 +162,7 @@ main(int argc, char *argv[])
     {
       cmdl.add_options()
           ("data,d", boost::program_options::value<std::string>(&data_name)->required(), "name of data file to be created")
-          ("database,s", boost::program_options::value<std::string>(&plugin_spec)->required(), "database specification: config plugin (oksconfig | rdbconfig:server-name)")
+          ("database,s", boost::program_options::value<std::string>(&plugin_spec)->required(), "database specification: config plugin (oksconflibs | rdbconfig:server-name)")
           ("help,h", "Print help message");
 
       boost::program_options::variables_map vm;
@@ -237,7 +237,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i->second << " is OK\n";
               ++i;
             }
-          catch (dunedaq::oksdbinterfaces::DeletedObject& ex)
+          catch (dunedaq::conffwk::DeletedObject& ex)
             {
               std::cout << " - node \'" << i->first << "\' was deleted\n";
               nodes_info.erase(i++);
@@ -274,7 +274,7 @@ main(int argc, char *argv[])
               std::cout << " - object " << i.second << " is OK\n";
               a_good_computer = const_cast<dunedaq::dal::Computer *>(i.second);
             }
-          catch (dunedaq::oksdbinterfaces::DeletedObject& ex)
+          catch (dunedaq::conffwk::DeletedObject& ex)
             {
               std::cout << " - node \'" << i.first << "\' was deleted\n";
             }
@@ -335,14 +335,14 @@ main(int argc, char *argv[])
           dunedaq::dal::Module * bad_module = const_cast<dunedaq::dal::Module *>(db.create<dunedaq::dal::Module>(*a_good_computer, a_good_computer->UID()));
           std::cout << " => the object " << bad_module << " was created: (FAILED)\n";
         }
-      catch (dunedaq::oksdbinterfaces::Exception & ex)
+      catch (dunedaq::conffwk::Exception & ex)
         {
           std::cout << " => the object was not created, caught exception \"" << ex.what() << "\": (OK)\n";
         }
 
       return EXIT_SUCCESS;
     }
-  catch (dunedaq::oksdbinterfaces::Exception & ex)
+  catch (dunedaq::conffwk::Exception & ex)
     {
       ers::fatal(dal_test_rw::ConfigException(ERS_HERE, ex));
     }

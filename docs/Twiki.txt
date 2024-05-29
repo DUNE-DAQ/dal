@@ -535,7 +535,7 @@ repositories. See example below for M4 combined partition:
 
 <pre>
     bash$ dal_get_igui_setup -d
-oksconfig:combined/partitions/m4_combined.data.xml -p m4_combined -s sh
+oksconflibs:combined/partitions/m4_combined.data.xml -p m4_combined -s sh
     export <b>__IGUI_PROPERTIES__</b>="  \
         -Digui.ed=TileCaledPanel -Digui.logfile=/logs/M4/m4_combined/igui.out
 \
@@ -678,7 +678,7 @@ variable often used by the partition object). Run this utility by passing OKS
 xml file, partition name and optionally application ID, e.g. as shown below:
 <verbatim>
   bash$ export TDAQ_DB_DATA=daq/partitions/be_test.data.xml
-  bash$ dal_dump_apps -d oksconfig:$TDAQ_DB_DATA -p be_test -s -a
+  bash$ dal_dump_apps -d oksconflibs:$TDAQ_DB_DATA -p be_test -s -a
 RootController
 </verbatim>
 
@@ -717,13 +717,13 @@ Read configuration from file _"daq/partitions/be_test.data.xml"_ using oks
 plug-in. 
 
 <verbatim>
-    #include "oksdbinterfaces/Configuration.h"
+    #include "conffwk/Configuration.h"
     ...
     try {
-      ::Configuration db("oksconfig:daq/partitions/be_test.data.xml");
+      ::Configuration db("oksconflibs:daq/partitions/be_test.data.xml");
       ... // user's code accessing configuration data
     }
-    catch(dunedaq::oksdbinterfaces::Exception & ex) {
+    catch(dunedaq::conffwk::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>
@@ -769,7 +769,7 @@ Get partition object with ID _"be_test"_.
     #include "dal/Partition.h"
     #include <dal/util.h>
     ...
-    ::Configuration db("oksconfig:daq/partitions/be_test.data.xml");
+    ::Configuration db("oksconflibs:daq/partitions/be_test.data.xml");
     if(const daq::core::Partition * p = daq::core::get_partition(db,
 "be_test")) {
       ... // work with object p
@@ -830,7 +830,7 @@ e.g. as it is shown below.
 ---++++!! C++ Example 
 
 <verbatim>
-    #include "oksdbinterfaces/Configuration.h"
+    #include "conffwk/Configuration.h"
     #include "dal/Partition.h"
     #include "dal/util.h"
     ...
@@ -842,7 +842,7 @@ e.g. as it is shown below.
 *partition));
       }
     }
-    catch(dunedaq::oksdbinterfaces::Exception & ex) {
+    catch(dunedaq::conffwk::Exception & ex) {
       std::cerr << "Caught config exception:\n" << ex << std::endl;
     }
 </verbatim>
@@ -874,13 +874,13 @@ For C++ it is enough to link against generated DAL and config libraries:
 <verbatim>
     -ldaq-core-dal -lconfig
 </verbatim>
-%ICON{note}% The implementation plug-ins like liboksconfig.so, librdbconfig.so
+%ICON{note}% The implementation plug-ins like liboksconflibs.so, librdbconfig.so
 %and low level libraries used by them (e.g. liboks.so, librdb.so, etc.) are
 %loaded dynamically and not needed to be linked with your binaries. It is
 %enough, if they will be referenced by your LD_LIBRARY_PATH. 
 
 For Java the dal.jar and config.jar files have to be in the CLASSPATH. The
-implementation plug-ins like oksconfig.jar or rdbconfig.jar have to be in the
+implementation plug-ins like oksconflibs.jar or rdbconfig.jar have to be in the
 CLASSPATH as well. 
 
 ---++ 4.2. Applications
@@ -970,7 +970,7 @@ computer lxplus002 for a test partition (the Computer column is filtered out):
 
 <verbatim>
     bash$ dal_dump_app_config -d
-oksconfig:daq/partitions/lxplus_template_tests.data.xml \
+oksconflibs:daq/partitions/lxplus_template_tests.data.xml \
       -p lxplus-test -c lxplus002.cern.ch -t TemplateApplication
 RunControlApplication
     ===========================================================================================================

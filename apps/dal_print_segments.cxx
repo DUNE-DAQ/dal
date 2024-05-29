@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include "dal/OnlineSegment.hpp"
 #include "dal/Partition.hpp"
@@ -10,7 +10,7 @@
 #include "dal/util.hpp"
 
 namespace po = boost::program_options;
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 
 static void

@@ -3,7 +3,7 @@
 from __future__ import print_function
 import dal
 import sys
-import oksdbinterfaces
+import conffwk
 import os
 import subprocess
 import filecmp
@@ -223,7 +223,7 @@ if __name__ == '__main__':
 
     db_file=f"{scriptsdir}/dal_testing.data.xml"
     assert os.path.exists(db_file)
-    db = oksdbinterfaces.Configuration(f"oksconfig:{db_file}")
+    db = conffwk.Configuration(f"oksconflibs:{db_file}")
 
     partition=db.get_dal("Partition", "ToyPartition")
 

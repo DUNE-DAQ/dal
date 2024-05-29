@@ -14,11 +14,11 @@ This document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). These packages include [dbe (the DataBase Editor GUI)](https://dune-daq-sw.readthedocs.io/en/latest/packages/dbe/), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [genconfig](https://github.com/DUNE-DAQ/genconfig) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [oksdbinterfaces](https://github.com/DUNE-DAQ/oksdbinterfaces), [oksconfig](https://github.com/DUNE-DAQ/oksconfig) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. 
+To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). These packages include [dbe (the DataBase Editor GUI)](https://dune-daq-sw.readthedocs.io/en/latest/packages/dbe/), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [oksdalgen](https://github.com/DUNE-DAQ/oksdalgen) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [conffwk](https://github.com/DUNE-DAQ/conffwk), [oksconflibs](https://github.com/DUNE-DAQ/oksconflibs) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. 
   
 With the work area set up, it's time to run some tests to make sure things are in working order. These include:
-* `test_configuration.py`: A test script in the oksdbinterfaces package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
-* `test_dal.py`: Also from the oksdbinterfaces package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
+* `test_configuration.py`: A test script in the conffwk package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
+* `test_dal.py`: Also from the conffwk package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
 * `algorithm_tests.py`: A script from the dal package. Test that Python bindings to class Methods implemented in C++ work as expected. 
 
 If anything goes wrong during the tests, it will be self-evident. 
@@ -58,7 +58,7 @@ And here, we have two items of interest:
 * A `Timeout` Attribute representing the max number of seconds before giving up on a transition. Represented by an unsigned 2-byte integer, the max timeout is one hour, and defaults to 20 seconds. 
 * An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the oksdbinterfaces package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconfig:tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconfig:tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the conffwk package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconflibs:tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconflibs:tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
 
 ### Overview of `tutorial.data.xml`
 
@@ -68,7 +68,7 @@ tutorial.py
 ```
 ...and it will produce `tutorial.data.xml`. We'll look at it in a moment, but two things to note first:
 1. As you can see if you open up `tutorial.py`, a Python module is actually _generated_ off of `tutorial.schema.xml`. If we add Attributes, Relations, etc. to the classes, the Python code will automatically pick them up without any additional Python needing to be written. 
-1. `config_dump -d oksconfig:tutorial.data.xml --list-objects --print-referenced-by` provides a nice summary of `tutorial.data.xml`'s contents
+1. `config_dump -d oksconflibs:tutorial.data.xml --list-objects --print-referenced-by` provides a nice summary of `tutorial.data.xml`'s contents
 
 We can also see what `tutorial.py` created by opening up `tutorial.data.xml`. Again, please scroll past the extensive header. What we see is two types of readout application, one ID'd as `PhotonReadout` and the other ID'd as `TPCReadout`; these names, of course, are chosen to reflect the choice of the `SubDetector` enum. Then we also see an instance of `RCApplication` where the `ApplicationsControlled` relationship establishes that run control is in charge of the two readout applications:
 ```
@@ -83,8 +83,8 @@ We can also see what `tutorial.py` created by opening up `tutorial.data.xml`. Ag
 ```
 The run control timeout is set to its default of 20 seconds. Say we want to change this, and save the result. For such a small data file it would be easy to manually edit, but if you think of a full-blown DAQ system you'll want to automate a lot of things. Fortunately we can alter the value via Python. Go into an interactive Python environment and do the following:
 ```
-import oksdbinterfaces
-db = oksdbinterfaces.Configuration('oksconfig:tutorial.data.xml')
+import conffwk
+db = conffwk.Configuration('oksconflibs:tutorial.data.xml')
 rc = db.get_dal("RCApplication", "DummyRC")  # i.e., first argument is name of the class, the second is the name of the object
 print(rc.Timeout)
 ```
@@ -113,7 +113,7 @@ The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to 
 ```
 daq_oks_codegen(core.schema.xml)
   
-daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES oksdbinterfaces::oksdbinterfaces okssystem::okssystem logging::logging)
+daq_add_library(algorithms.cpp disabled-components.cpp test_circular_dependency.cpp LINK_LIBRARIES conffwk::conffwk okssystem::okssystem logging::logging)
 ```
 `core.schema.xml` gets fed into `daq_oks_codegen` which proceeds to generate code off of the classes defined in `core.schema.xml` that will subsequently be built into the package's main library. Details on `daq_oks_codegen` can be found [here](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-cmake/#daq_oks_codegen). 
 
@@ -122,7 +122,7 @@ You'll notice also that the classes in `core.schema.xml` contain not only Attrib
 To see the `get_all_applications` function in action, you can do the
 following. 
 ```
-dal_dump_app_config -d oksconfig:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config -d oksconflibs:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 ...where `dal_testing.data.xml` is written specifically for testing dal's functionality. The output will look like the following:
 ```
@@ -141,7 +141,7 @@ Likewise, you can see a Python script which serves the same function,
 but via calling Python bindings to C++ functions. We of course want
 the output to be identical:
 ```
-dal_dump_app_config.py -d oksconfig:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config.py -d oksconflibs:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 You can play around with `dal_dump_apps/dal_dump_apps.py`, pass the
 `-h` argument to see your options. 

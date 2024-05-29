@@ -46,12 +46,12 @@ main(int argc, char **argv)
     {
       ::dunedaq::dal::set_config_version(partition, version, reload);
     }
-  catch (const dunedaq::oksdbinterfaces::NotFound & ex)
+  catch (const dunedaq::conffwk::NotFound & ex)
     {
       std::cerr << ex << std::endl;
       return __RepositoryNotFoundExitStatus__;
     }
-  catch (const dunedaq::oksdbinterfaces::Exception & ex)
+  catch (const dunedaq::conffwk::Exception & ex)
     {
       std::cerr << "ERROR: " << ex << std::endl;
       return __FailureExitStatus__;

@@ -36,7 +36,7 @@ if __name__ == '__main__':
     import argparse
     import sys    
      
-    import oksdbinterfaces
+    import conffwk
 
     import dal
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
       # Open test database
-    db = oksdbinterfaces.Configuration(args.database_name)
+    db = conffwk.Configuration(args.database_name)
 
     # get Partition object
     partition = db.get_dal('Partition', args.partition_name)
