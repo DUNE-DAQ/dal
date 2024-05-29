@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import sys
-import oksdbinterfaces
+import conffwk
 import dal    
 import os
 from argparse import RawTextHelpFormatter
@@ -25,7 +25,7 @@ def print_info(file_names,environment):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""Example of dunedaq::dal::Application::get_info() algorithm usage. The database name is defined either\n
        the -d command line parameter, or by the TDAQ_DB environment variable in format \"impl:parameter\",\n
-       e.g. \"oksconfig:/tmp/my-db.xml\". By default the algorithms are applied to all applications used by\n
+       e.g. \"oksconflibs:/tmp/my-db.xml\". By default the algorithms are applied to all applications used by\n
        the partition are their results are printed out.\n\n
        usage: dal_dump_apps.py [-d | --data database-name]\n
                          [-p | --partition-id partition-id]\n
@@ -46,7 +46,7 @@ if __name__ == '__main__':
             os.environ[required_env_variable] = "DUMMY_TDAQ_ENV_VALUE"
 
     # Open database
-    db = oksdbinterfaces.Configuration(args.data)
+    db = conffwk.Configuration(args.data)
     #Get the application object
     app = 0
     if args.application_id : 

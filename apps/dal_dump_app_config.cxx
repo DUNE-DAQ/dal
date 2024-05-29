@@ -2,7 +2,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include "dal/util.hpp"
 
@@ -11,7 +11,7 @@
 #include "dal/Computer.hpp"
 #include "dal/Segment.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

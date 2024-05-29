@@ -8,7 +8,7 @@
 #include "dal/Segment.hpp"
 #include "dal/util.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 int
 main(int argc, char *argv[])
@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 
   try
     {
-      dunedaq::oksdbinterfaces::Configuration conf(db_name);
+      dunedaq::conffwk::Configuration conf(db_name);
 
       if (const dunedaq::dal::Partition * p = dunedaq::dal::get_partition(conf, partition_name))
         {
@@ -70,7 +70,7 @@ main(int argc, char *argv[])
           return (EXIT_FAILURE);
         }
     }
-  catch (dunedaq::oksdbinterfaces::Exception & ex)
+  catch (dunedaq::conffwk::Exception & ex)
     {
       std::cerr << "Caught " << ex << std::endl;
       return (EXIT_FAILURE);

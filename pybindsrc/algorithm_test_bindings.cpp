@@ -21,7 +21,7 @@
 #include "dal/Variable.hpp"
 #include "dal/util.hpp"
 
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include "ers/Issue.hpp"
 
@@ -33,7 +33,7 @@
 
 namespace py = pybind11;
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 namespace {
 

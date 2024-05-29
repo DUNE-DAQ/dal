@@ -1,15 +1,15 @@
 #!/bin/env python3
 
-import oksdbinterfaces
+import conffwk
 import os
 
 schemafile=f'{os.environ["DAL_SHARE"]}/schema/dal/tutorial.schema.xml'
 datafile="tutorial.data.xml"
 
 # binds a new dal into the module named "tutorial"               
-tutorial = oksdbinterfaces.dal.module('tutorial', schemafile)
+tutorial = conffwk.dal.module('tutorial', schemafile)
 
-db = oksdbinterfaces.Configuration("oksconfig")
+db = conffwk.Configuration("oksconflibs")
 db.create_db(datafile, [schemafile])
 
 readout_app1 = tutorial.ReadoutApplication("PhotonReadout", 

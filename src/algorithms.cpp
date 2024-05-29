@@ -23,10 +23,10 @@
 
 #include <boost/spirit/include/karma.hpp>
 
-#include "oksdbinterfaces/ConfigObject.hpp"
-#include "oksdbinterfaces/ConfigAction.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/map.hpp"
+#include "conffwk/ConfigObject.hpp"
+#include "conffwk/ConfigAction.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/map.hpp"
 
 #include "dal/util.hpp"
 
@@ -60,7 +60,7 @@
 
 #include "test_circular_dependency.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -756,11 +756,11 @@ add_front_partition_environment(std::map<std::string, std::string>& environment,
       if (!DBName.empty())
         add_env_var(environment, s_tdaq_db_data_str, DBName);
     }
-  catch (dunedaq::oksdbinterfaces::Generic& ex)
+  catch (dunedaq::conffwk::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to read object " << &partition;
-      throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.str().c_str(), ex);
+      throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str(), ex);
     }
 }
 
@@ -902,7 +902,7 @@ add_end_partition_environment(std::map<std::string, std::string>& environment,
   }
   else {
     if(tdaq_db_var_it == environment.end()) {
-      add_env_var(environment, s_tdaq_db_str, std::string("oksconfig:") + partition.get_DBName());
+      add_env_var(environment, s_tdaq_db_str, std::string("oksconflibs:") + partition.get_DBName());
       environment.erase(s_tdaq_db_name_str);
     }
   }
@@ -952,7 +952,7 @@ static void get_parameters(
     {
       belongs_to = this_cp->get_BelongsTo();
     }
-  catch (dunedaq::oksdbinterfaces::Exception& ex)
+  catch (dunedaq::conffwk::Exception& ex)
     {
       throw dunedaq::dal::BadProgramInfo(ERS_HERE, this_cp->UID(), "Failed to read SW_Package object", ex);
     }
@@ -1139,7 +1139,7 @@ void dunedaq::dal::ComputerProgram::get_info(
 
     add_end_partition_environment(environment, partition, nullptr, this, &tag);
   }
-  catch ( dunedaq::oksdbinterfaces::Generic & ex ) {
+  catch ( dunedaq::conffwk::Generic & ex ) {
      throw dunedaq::dal::BadProgramInfo( ERS_HERE, UID(), "failed to build Program environment", ex ) ;
   }
 
@@ -1384,7 +1384,7 @@ namespace dunedaq::dal {
       add_applications(dunedaq::dal::Segment& seg, const dunedaq::dal::Rack * rack, const dunedaq::dal::Partition& p, const dunedaq::dal::Computer * default_host);
 
       static void
-      add_segments(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition& p, const std::vector<const dunedaq::dal::Segment*>& objs, const dunedaq::dal::Rack * rack, const dunedaq::dal::Computer * default_host, dunedaq::oksdbinterfaces::map<std::string>& fuse);
+      add_segments(dunedaq::dal::Segment& seg, const dunedaq::dal::Partition& p, const std::vector<const dunedaq::dal::Segment*>& objs, const dunedaq::dal::Rack * rack, const dunedaq::dal::Computer * default_host, dunedaq::conffwk::map<std::string>& fuse);
 
       static void
       get_applications(std::vector<const dunedaq::dal::BaseApplication *>& out, const dunedaq::dal::Segment& seg, std::set<std::string> * app_types, std::set<std::string> * segments, std::set<const dunedaq::dal::Computer *> * hosts);
@@ -1710,7 +1710,7 @@ seg_config_to_name(const std::string& s)
 }
 
 static void
-check_mulpiple_inclusion(dunedaq::oksdbinterfaces::map<std::string>& fuse, const std::string& id, const std::string& parent)
+check_mulpiple_inclusion(dunedaq::conffwk::map<std::string>& fuse, const std::string& id, const std::string& parent)
 {
   auto ret = fuse.emplace(id,parent);
   if(ret.second == false)
@@ -1726,7 +1726,7 @@ dunedaq::dal::AlgorithmUtils::add_segments(
     const std::vector<const dunedaq::dal::Segment*>& objs,
     const dunedaq::dal::Rack * rack,
     const dunedaq::dal::Computer * default_host,
-    dunedaq::oksdbinterfaces::map<std::string>& fuse)
+    dunedaq::conffwk::map<std::string>& fuse)
 {
   dunedaq::dal::SegConfig * seg_config = seg.get_seg_config(false);
 
@@ -1900,7 +1900,7 @@ dunedaq::dal::Partition::get_segment(const std::string& name) const
               default_host = nullptr;
             }
 
-          dunedaq::oksdbinterfaces::map<std::string> fuse;
+          dunedaq::conffwk::map<std::string> fuse;
           fuse[root_segment->UID()] = "";
 
           dunedaq::dal::AlgorithmUtils::add_segments(*root_segment, *this, get_Segments(), nullptr, default_host, fuse);
@@ -2216,7 +2216,7 @@ dunedaq::dal::Segment::get_all_applications(std::set<std::string> * app_types, s
         }
       else
         {
-          const dunedaq::oksdbinterfaces::fmap<dunedaq::oksdbinterfaces::fset>& all_scs(configuration().superclasses());
+          const dunedaq::conffwk::fmap<dunedaq::conffwk::fset>& all_scs(configuration().superclasses());
 
           for (const auto& i : *app_types)
             {
@@ -2357,7 +2357,7 @@ get_some_info(const dunedaq::dal::BaseApplication * this_app, std::list<const du
     {
       base_app->get_Program()->get_BelongsTo(); // throw an exception if "Program" or "BelongsTo" is not set
     }
-  catch (dunedaq::oksdbinterfaces::Exception& ex)
+  catch (dunedaq::conffwk::Exception& ex)
     {
       throw dunedaq::dal::BadApplicationInfo( ERS_HERE, this_app->UID(), "failed to read application's Program object", ex );
     }
@@ -2497,7 +2497,7 @@ dunedaq::dal::BaseApplication::get_info(std::map<std::string, std::string>& envi
     catch(dunedaq::dal::BadProgramInfo &ex) {
       throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "No program suited for the possible Tags found.", ex);
     }
-    catch(dunedaq::oksdbinterfaces::Exception& ex) {
+    catch(dunedaq::conffwk::Exception& ex) {
       throw dunedaq::dal::BadApplicationInfo(ERS_HERE, UID(), "Failed to read application's parameters to get possible Tags." , ex);
     }
 
@@ -2637,7 +2637,7 @@ dunedaq::dal::BaseApplication::get_info(std::map<std::string, std::string>& envi
                   "add TDAQ_APPLICATION_OBJECT_ID and TDAQ_APPLICATION_NAME variables to environment\n"
                << mk_app_env_string(environment)  ;
   }
-  catch  ( dunedaq::oksdbinterfaces::Generic & ex ) {
+  catch  ( dunedaq::conffwk::Generic & ex ) {
     throw dunedaq::dal::BadApplicationInfo( ERS_HERE, UID(), "failed to build Application environment", ex ) ;
   }
 
@@ -2803,7 +2803,7 @@ dunedaq::dal::SubstituteVariables::reset(const Partition& p)
     }
   catch(ers::Issue& ex)
     {
-      throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, "Failed to substitute parameters from the database", ex);
+      throw dunedaq::conffwk::Generic(ERS_HERE, "Failed to substitute parameters from the database", ex);
     }
 
   // Recursive substitution of the variables before they are used
@@ -2817,11 +2817,11 @@ dunedaq::dal::SubstituteVariables::reset(const Partition& p)
         {
           subst_s = substitute_variables(map_iter->second, &m_cvt_map, beg_str, end_str);
         }
-      catch (dunedaq::oksdbinterfaces::Exception& ex)
+      catch (dunedaq::conffwk::Exception& ex)
         {
           std::ostringstream text;
           text << "Failed to calculate variable \'" << map_iter->first << '\'';
-          throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.str().c_str(), ex);
+          throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str(), ex);
         }
 
       if (subst_s != map_iter->second)
@@ -2886,7 +2886,7 @@ dunedaq::dal::substitute_variables(const std::string& str_from, const std::map<s
       text << "Value \'" << str_from << "\' has exceeded the maximum number of substitutions allowed (" << max_subst << "). "
               "It might have a circular dependency with substitution variables. "
               "After " << max_subst << " substitutions it is \'" << s << '\'';
-      throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.str().c_str());
+      throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
     }
 
     if(cvs_map) {
@@ -2902,7 +2902,7 @@ dunedaq::dal::substitute_variables(const std::string& str_from, const std::map<s
       else {
         std::ostringstream text;
         text << "substitution failed for parameter \'" << std::string(s, p_start, p_end - p_start + end.size()) << '\'';
-        throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.str().c_str());
+        throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
       }
     }
 
@@ -3222,7 +3222,7 @@ dunedaq::dal::get_config_version(const std::string& /*partition*/)
   if(const char * env = getenv(s_tdaq_db_version_str.c_str()))
     return env;
 
-  throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, ("The environment variable \"" + s_tdaq_db_version_str + "\" needs to be defined").c_str());
+  throw dunedaq::conffwk::Generic(ERS_HERE, ("The environment variable \"" + s_tdaq_db_version_str + "\" needs to be defined").c_str());
 }
 
 std::string

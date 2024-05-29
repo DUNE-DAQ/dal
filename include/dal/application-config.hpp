@@ -4,10 +4,10 @@
 #include <atomic>
 #include <mutex>
 
-#include "oksdbinterfaces/ConfigAction.hpp"
+#include "conffwk/ConfigAction.hpp"
 
 namespace dunedaq {
-  namespace oksdbinterfaces {
+  namespace conffwk {
     class Configuration;
   }
 }
@@ -17,13 +17,13 @@ namespace dunedaq::dal {
     class Segment;
     class Partition;
 
-    class ApplicationConfig : public dunedaq::oksdbinterfaces::ConfigAction
+    class ApplicationConfig : public dunedaq::conffwk::ConfigAction
     {
       friend class Partition;
 
     private:
 
-      dunedaq::oksdbinterfaces::Configuration& m_db;
+      dunedaq::conffwk::Configuration& m_db;
       mutable std::atomic<const dunedaq::dal::Segment*> m_root_segment;
       mutable std::mutex m_root_segment_mutex;
 
@@ -36,13 +36,13 @@ namespace dunedaq::dal {
 
     public:
 
-      ApplicationConfig(dunedaq::oksdbinterfaces::Configuration& db);
+      ApplicationConfig(dunedaq::conffwk::Configuration& db);
 
       virtual
       ~ApplicationConfig();
 
       void
-      notify(std::vector<dunedaq::oksdbinterfaces::ConfigurationChange *>& /*changes*/) noexcept
+      notify(std::vector<dunedaq::conffwk::ConfigurationChange *>& /*changes*/) noexcept
       {
         __clear();
       }
@@ -60,7 +60,7 @@ namespace dunedaq::dal {
       }
 
       void
-      update(const dunedaq::oksdbinterfaces::ConfigObject& /*obj*/, const std::string& /*name*/) noexcept
+      update(const dunedaq::conffwk::ConfigObject& /*obj*/, const std::string& /*name*/) noexcept
       {
         __clear();
       }
