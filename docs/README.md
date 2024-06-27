@@ -14,9 +14,9 @@ This document provides a taste of what OKS has to offer.
 
 ## Getting Started
 
-To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/). These packages include [dbe (the DataBase Editor GUI)](https://dune-daq-sw.readthedocs.io/en/latest/packages/dbe/), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [oksdalgen](https://github.com/DUNE-DAQ/oksdalgen) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [conffwk](https://github.com/DUNE-DAQ/conffwk), [oksconflibs](https://github.com/DUNE-DAQ/oksconflibs) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. 
+To get started working with the DUNE-repurposed OKS packages, you'll want to [set up a work area](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-buildtools/) and then clone and build this repo ("dal") in order to run the tutorial below. These packages include [dbe (the DataBase Editor GUI)](https://dune-daq-sw.readthedocs.io/en/latest/packages/dbe/), dal (Data Access Library, this repo), [oksutils](https://github.com/DUNE-DAQ/oksutils), [oksdalgen](https://github.com/DUNE-DAQ/oksdalgen) (contains code generation executable), [oks](https://github.com/DUNE-DAQ/oks) (core OKS functionality, not to be confused with the entire OKS suite), [conffwk](https://github.com/DUNE-DAQ/conffwk), [oksconflibs](https://github.com/DUNE-DAQ/oksconflibs) and [okssystem](https://github.com/DUNE-DAQ/okssystem). Some of these packages you may never need to worry about, others (such as the dbe GUI) may benefit from further development. 
   
-With the work area set up, it's time to run some tests to make sure things are in working order. These include:
+With the work area set up, build dal. After building it, it's time to run some tests to make sure things are in working order. These include:
 * `test_configuration.py`: A test script in the conffwk package. Tests that you can create objects, save them to a database, read them back, and remove them from a database.
 * `test_dal.py`: Also from the conffwk package. Test that you can change the values of objects, and get expected errors if you assign out-of-range values. 
 * `algorithm_tests.py`: A script from the dal package. Test that Python bindings to class Methods implemented in C++ work as expected. 
@@ -25,7 +25,7 @@ If anything goes wrong during the tests, it will be self-evident.
 
 ## A Look at OKS Databases: XML-Represented Classes and Objects
 
-While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file on disk. There are generally two types of database file: the kind that defines classes, which by convention have the `*.schema.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, `$DAL_SHARE/schema/dal/tutorial.schema.xml`. Copy it over into your work area. 
+While ATLAS has various database implementations (Oracle-based, etc.), for the DUNE DAQ we only need their basic database format, which is an XML file on disk. There are generally two types of database file: the kind that defines classes, which by convention have the `*.schema.xml` extension, and the kind that define instances of those classes (i.e. objects) and have `*.data.xml` extensions. The class files are known from ATLAS as "schema files" and the object files are known from ATLAS as "data files". A good way to get a feel for these files is to start with the tutorial schema, `./install/dal/share/schema/dal/tutorial.schema.xml` from the base of your work area.  
 
 ### Overview of `tutorial.schema.xml`
 
@@ -58,7 +58,7 @@ And here, we have two items of interest:
 * A `Timeout` Attribute representing the max number of seconds before giving up on a transition. Represented by an unsigned 2-byte integer, the max timeout is one hour, and defaults to 20 seconds. 
 * An `ApplicationsControlled` Relationship, which refers to anywhere from one object subclassed from `Application` to "many", which is OKS-speak for "basically unlimited". 
 
-OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the conffwk package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconflibs:tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconflibs:tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
+OKS also provides tools which parse the XML and provide summaries of the contents of the database (XML file). `config_dump`, part of the conffwk package, is quite useful in this regard. Pass it `-h` to get a description of its abilities; if you just run `config_dump -d oksconflibs:./install/dal/share/schema/dal/tutorial.schema.xml` you'll get a summary of the classes used to defined the objects in the file. Running `config_dump -d oksconflibs:./install/dal/share/schema/dal/tutorial.schema.xml -C` will give you much more detail. For a schema as simple as the one we're showing here, this tool isn't super-useful, but it can be powerful when schemas get bigger and more complex. 
 
 ### Overview of `tutorial.data.xml`
 
@@ -109,7 +109,7 @@ You're encouraged to experiment yourself with the objects, either interactively 
 
 ## A Realistic Example
 
-The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we can look at the following: `$DAL_SHARE/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in [dal's `CMakeLists.txt` file](https://github.com/DUNE-DAQ/dal/blob/develop/CMakeLists.txt) you see the following:
+The `tutorial.schema.xml` file and `tutorial.data.xml` files are fairly easy to understand, and meant to be for educational purposes. To see the actual classes which are used on ATLAS, we can look at the following from the base of your work area: `./install/dal/share/schema/dal/core.schema.xml`. This file is quite large, and describes classes which actually model ATLAS's DAQ systems like `ComputerProgram` and `Rack` and `Crate`. If you look in [dal's `CMakeLists.txt` file](https://github.com/DUNE-DAQ/dal/blob/develop/CMakeLists.txt) you see the following:
 ```
 daq_oks_codegen(core.schema.xml)
   
@@ -122,7 +122,7 @@ You'll notice also that the classes in `core.schema.xml` contain not only Attrib
 To see the `get_all_applications` function in action, you can do the
 following. 
 ```
-dal_dump_app_config -d oksconflibs:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config -d oksconflibs:./install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 ...where `dal_testing.data.xml` is written specifically for testing dal's functionality. The output will look like the following:
 ```
@@ -141,7 +141,7 @@ Likewise, you can see a Python script which serves the same function,
 but via calling Python bindings to C++ functions. We of course want
 the output to be identical:
 ```
-dal_dump_app_config.py -d oksconflibs:$DAL_SHARE/../bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
+dal_dump_app_config.py -d oksconflibs:./install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
 You can play around with `dal_dump_apps/dal_dump_apps.py`, pass the
 `-h` argument to see your options. 
