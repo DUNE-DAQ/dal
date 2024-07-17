@@ -143,8 +143,8 @@ the output to be identical:
 ```
 dal_dump_app_config.py -d oksconflibs:./install/dal/bin/dal_testing.data.xml -p ToyPartition -s ToyOnlineSegment
 ```
-You can play around with `dal_dump_apps/dal_dump_apps.py`, pass the
-`-h` argument to see your options. 
+You can also play around with `dal_dump_apps` or `dal_dump_apps.py`, pass the
+`-h` argument to either program to see your options. 
 
 ## Next Step
 
